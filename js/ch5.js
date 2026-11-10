@@ -3,15 +3,15 @@
    CAPÍTULO 5 — ACEITAÇÃO: o ciclo eterno e a falsa promoção
    ========================================================= */
 SCENES.c5_wake = () => {
-  const hero = new Hero(170, 126, LOOKS.mirangoPJ); hero.speed = 44; hero.slump = 1; hero.frozen = true;
-  const mA = heroActor(hero);
-  const solids = [{ x: -20, y: 150, w: W + 40, h: 30 }];
+  const hero = new Hero(80, BR_FLOOR - 24, LOOKS.mirangoPJ); hero.speed = 24; hero.slump = 1; hero.frozen = true;
+  const mA = { get x() { return hero.cx * 2; }, get y() { return hero.fy * 2; }, h: 56 };
+  const solids = [{ x: -20, y: BR_FLOOR, w: 200, h: 30 }];
   const sc = {
-    hero, botTarget() { return this.dressed ? 304 : 53; }, music: null, amb: 'city', t: 0, mode: 'alarm', lying: true, alarmT: 0, holdBlack: true, vig: .35, desat: .25, stage: 0,
+    hero, botTarget() { return this.dressed ? 146 : 21; }, music: null, amb: 'city', t: 0, mode: 'alarm', lying: true, alarmT: 0, holdBlack: true, vig: .35, desat: .25, stage: 0,
     enter() { this.script = new Script(this.run()); },
     *run() {
       G.fadeA = 1;
-      yield titleCard('CAPÍTULO 5', 'ACEITAÇÃO', 'O ciclo eterno e a falsa promoção');
+      yield titleCard('CAPÍTULO 5', 'ACEITAÇÃO');
       yield fadeTo(0, .8);
       this.ringing = true;
       yield caption('O despertador toca sem piedade na manhã seguinte.', { auto: 2.6 });
@@ -20,7 +20,7 @@ SCENES.c5_wake = () => {
       this.ringing = false; this.mode = 'morning'; sfx('click');
       yield 1;
       yield caption('Mirango abre os olhos na cama simples. Não há praias. Não há fuga.', { auto: 3.2 });
-      this.lying = false; hero.x = 176; hero.y = 126;
+      this.lying = false; hero.x = 80; hero.y = BR_FLOOR - 24;
       yield think(mA, '...');
       yield caption('O peso da depressão continua cravado nos ombros. O passado não pode ser apagado.', { auto: 3.4 });
       hero.frozen = false; this.stage = 3;
@@ -30,11 +30,11 @@ SCENES.c5_wake = () => {
       if (this.script) { this.script.update(dt); if (this.script.done) this.script = null; }
       if (this.ringing) { this.alarmT -= dt; if (this.alarmT <= 0) { sfx('alarm'); this.alarmT = .6; G.shake(.6); } }
       if (this.stage === 1 && Input.pressed('a')) { this.stage = 2; }
-      if (!this.lying) hero.update(dt, solids, { minX: 62, maxX: 316, upJump: false, canJump: false, stride: 11 });
+      if (!this.lying) hero.update(dt, solids, { minX: 32, maxX: 156, upJump: false, canJump: false, stride: 8 });
       this.cur = null;
       if (this.stage === 3 && !hero.frozen) {
-        if (Math.abs(hero.cx - 53) < 30 && !this.dressed) this.cur = { x: 53, l: 'Vestir a roupa cinzenta', k: 'dress' };
-        else if (Math.abs(hero.cx - 304) < 16 && this.dressed) this.cur = { x: 304, l: 'Sair para o trabalho', k: 'out' };
+        if (Math.abs(hero.cx - 21) < 18 && !this.dressed) this.cur = { x: 42, l: 'Vestir a roupa cinzenta', k: 'dress' };
+        else if (Math.abs(hero.cx - 146) < 10 && this.dressed) this.cur = { x: 292, l: 'Sair para o trabalho', k: 'out' };
         if (this.cur && Input.pressed('a')) {
           if (this.cur.k === 'dress') { this.dressed = true; hero.look = LOOKS.mirangoGray; sfx('swoosh'); G.flash('#888', .5); sayAuto(mA, 'Cinza. Combina com tudo.', 1.6, { type: 'thought' }); }
           else { sfx('door'); hero.frozen = true; G.go('c5_street', { dur: .8 }); }
@@ -42,17 +42,19 @@ SCENES.c5_wake = () => {
       }
     },
     draw(c) {
-      drawBedroom(c, this.mode === 'alarm' ? 'alarm' : 'morning', this.t);
-      if (this.lying) {
-        drawPerson(c, 186, 118, LOOKS.mirangoPJ, { rot: Math.PI / 2, eyes: this.stage >= 2 ? null : 'closed' });
-        R(c, 202, 108, 22, 10, '#e8ecf0'); R(c, 202, 108, 22, 2, '#fff');
-      } else hero.draw(c);
-      blindsLight(c, .04, '#ffffff');
-      if (this.ringing && Math.floor(this.t * 8) % 2) { pixText(c, '!', 252, 102, '#ff3030'); pixText(c, '!', 270, 100, '#ff3030'); R(c, 254 + irnd(-1, 1), 113, 14, 1, '#ff3030'); }
+      bedroomFrame(c, (x) => {
+        drawBedroom(x, this.mode === 'alarm' ? 'alarm' : 'morning', this.t);
+        if (this.lying) {
+          drawPerson(x, 72, 58, LOOKS.mirangoPJ, { rot: Math.PI / 2, eyes: this.stage >= 2 ? null : 'closed' });
+          R(x, 92, 55, 10, 6, '#e8ecf0'); R(x, 92, 55, 10, 1, '#fff');
+        } else hero.draw(x);
+        blindsLight(x, .04, '#ffffff');
+        if (this.ringing && Math.floor(this.t * 8) % 2) { pixText(x, '!', 110, 52, '#ff3030'); pixText(x, '!', 120, 51, '#ff3030'); }
+      });
     },
     ui(c) {
-      if (this.stage === 1) promptAt(c, 261, 92, 'a', 'Desligar o despertador');
-      if (this.cur) promptAt(c, this.cur.x, 50, 'a', this.cur.l);
+      if (this.stage === 1) promptAt(c, 230, 96, 'a', 'Desligar o despertador');
+      if (this.cur) promptAt(c, this.cur.x, 58, 'a', this.cur.l);
     }
   };
   return sc;
@@ -70,7 +72,7 @@ SCENES.c5_street = () => {
     // banca de jornal e outdoor
     R(c, 180, 104, 44, 40, '#2e5a3a'); R(c, 180, 104, 44, 4, '#1e4a2a'); R(c, 184, 112, 36, 18, '#e8e4d8');
     pixText(c, 'IA SUBSTITUI', 202, 114, '#c43b3b', 1, 'center'); pixText(c, '40% DOS', 202, 120, '#222', 1, 'center'); pixText(c, 'ESCRITORIOS', 202, 126, '#222', 1, 'center');
-    R(c, 380, 30, 110, 50, '#2a2a30'); R(c, 383, 33, 104, 44, '#d8323c'); pixText(c, 'SEJA PROMOVIDO', 435, 42, '#fff', 1, 'center'); pixText(c, 'TRABALHE MAIS', 435, 52, '#ffd54a', 1, 'center'); pixText(c, 'S = E × I × P', 435, 64, '#fff', 1, 'center');
+    R(c, 380, 30, 110, 50, '#2a2a30'); R(c, 383, 33, 104, 44, '#d8323c'); pixText(c, 'SEJA PROMOVIDO', 435, 42, '#fff', 1, 'center'); pixText(c, 'TRABALHE MAIS', 435, 52, '#ffd54a', 1, 'center'); pixText(c, 'COM CORP.AI', 435, 64, '#fff', 1, 'center');
     R(c, 400, 80, 3, 34, '#2a2a30'); R(c, 466, 80, 3, 34, '#2a2a30');
     // fachada imponente
     R(c, 790, 0, 170, 140, '#2c3340'); for (let y = 6; y < 120; y += 8) for (let x = 796; x < 954; x += 10) R(c, x, y, 7, 6, (x + y) % 3 ? '#3e4c62' : '#5a6a82');
@@ -129,7 +131,7 @@ SCENES.c5_office = () => {
   const hero = new Hero(33, FLOOR - 24, LOOKS.mirangoGray); hero.slump = 1; hero.frozen = true; hero.speed = 46;
   const mA = heroActor(hero);
   const chefe = npc(LOOKS.chefe, 584, FLOOR, { active: false });
-  const solids = [{ x: -40, y: FLOOR, w: OFFICE_W + 80, h: 40 }, { x: 330, y: 128, w: 14, h: 22 }, { x: 452, y: 138, w: 18, h: 12 }, { x: 470, y: 126, w: 18, h: 24 }, { x: 900, y: 134, w: 14, h: 16 }];
+  const solids = [{ x: -40, y: FLOOR, w: OFFICE_W + 80, h: 40 }, ...officeObstSolids()];
   const vac = { x: 400, d: 1 };
   const parts = new Parts();
   const sc = {
@@ -239,6 +241,7 @@ SCENES.c5_office = () => {
       monitorP(c, 676, 134, '#0a2a3a', '#7fd4ff');
       // aspirador-robô
       R(c, Math.round(vac.x) - 6, FLOOR - 4, 12, 4, '#2a2d33'); R(c, Math.round(vac.x) - 5, FLOOR - 5, 10, 1, '#4a4e58'); R(c, Math.round(vac.x) + (vac.d > 0 ? 3 : -4), FLOOR - 4, 1, 1, Math.floor(G.t * 4) % 2 ? '#5aff8a' : '#111');
+      drawOfficeObst(c);
       if (chefe.active) chefe.draw(c);
       if (!this.inElev) hero.draw(c);
       parts.draw(c);
@@ -265,16 +268,12 @@ SCENES.credits = () => {
   const lines = [
     ['O INFUNDÍBULO DE MIRANGO', 10, '#f3efe6'], ['', 6], ['Um jogo em cinco estágios e um ciclo.', 11, '#a9a3b8'], ['', 14],
     ['NEGAÇÃO · RAIVA · BARGANHA', 11, '#d8323c'], ['DEPRESSÃO · ACEITAÇÃO', 11, '#d8323c'], ['', 18],
-    ['FUNDAMENTAÇÃO', 7, '#ffd54a'], ['', 4],
-    ['Miguel Nicolelis', 12, '#f3efe6'], ['O cérebro relativístico — "o verdadeiro criador de tudo"', 9, '#a9a3b8'], ['', 8],
-    ['Ernesto van Peborgh', 12, '#f3efe6'], ['O capitalismo em rede — S = E × I × P', 9, '#a9a3b8'], ['', 8],
-    ['Kurt Vonnegut', 12, '#f3efe6'], ['Tralfamadore e o infundíbulo cronossinclástico', 9, '#a9a3b8'], ['', 18],
     ['ELENCO', 7, '#ffd54a'], ['', 4],
     ['Mirango ......... ele mesmo', 10, '#f3efe6'], ['Plínio ........... sorriso plastificado', 10, '#f3efe6'], ['Sueli ............ supervisão', 10, '#f3efe6'],
     ['Dr. Moura ........ sempre numa call', 10, '#f3efe6'], ['Sr. Castro ....... alinhamento', 10, '#f3efe6'], ['Seu Zé ........... juiz e paçoqueiro', 10, '#f3efe6'],
     ['O Apressado ...... atrasado', 10, '#f3efe6'], ['O Nativo ......... livre', 10, '#f3efe6'], ['', 18],
     ['Pixel art, trilha e efeitos 100% procedurais', 9, '#a9a3b8'], ['(nenhum arquivo externo foi ferido)', 9, '#6a6480'], ['', 22],
-    ['"E assim vai."', 12, '#f3efe6'], ['— Kurt Vonnegut', 9, '#a9a3b8'], ['', 30]
+    ['CORP.AI agradece a sua dedicação.', 11, '#7fd4ff'], ['', 30]
   ];
   let total = 0; for (const l of lines) total += l[1] + 4;
   const sc = {

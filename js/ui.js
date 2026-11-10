@@ -172,7 +172,6 @@ function titleCard(num, name, sub) {
     T(c, num, W / 2, 58, { size: 7, align: 'center', col: '#d8323c' });
     T(c, name, W / 2, 72, { size: 16, align: 'center', col: '#f3efe6' });
     R(c, W / 2 - 60 * k, 96, 120 * k, 1, '#d8323c');
-    T(c, sub, W / 2, 104, { f: FONT2, size: 13, align: 'center', col: '#a9a3b8' });
     c.globalAlpha = 1;
   });
 }

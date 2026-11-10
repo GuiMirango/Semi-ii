@@ -20,7 +20,7 @@ SCENES.c2_reject = () => {
       yield .3; G.fadeA = 0; G.flash('#fff', .8); sfx('shout'); G.shake(7);
       yield shout(m, 'EU ME DEMITO!', { size: 24, maxW: 260, auto: 1.3 });
       m.pose = { eyes: 'wide' };
-      yield titleCard('CAPÍTULO 2', 'RAIVA', 'A subversão da matriz centralizada');
+      yield titleCard('CAPÍTULO 2', 'RAIVA');
       yield caption('Silêncio absoluto. Os colegas estão paralisados em choque.', { auto: 2.6 });
       Music.play('rage');
       m.pose = {};
@@ -80,11 +80,11 @@ SCENES.c2_reject = () => {
 };
 
 /* ---------- Minigame 1: A Faixa do Foda-se (top-down arcade) ---------- */
-const LANES = [{ dir: -1, v: 72 }, { dir: -1, v: 96 }, { dir: -1, v: 60 }, { dir: 1, v: 66 }, { dir: 1, v: 104 }, { dir: 1, v: 80 }];
-const laneY = i => 40 + i * 16;
+const LANES = [{ dir: -1, v: 78 }, { dir: -1, v: 62 }, { dir: 1, v: 70 }, { dir: 1, v: 90 }];
+const LH = 22, laneY = i => 44 + i * LH;
 const CAR_COLS = ['#c62828', '#1e5aa8', '#e3c34a', '#2e7d32', '#eeeeee', '#5d4037', '#7b1fa2', '#ff7043', '#455a64'];
 function drawCarTop(c, v) {
-  const x = Math.round(v.x), y = Math.round(laneY(v.lane) + (16 - v.h) / 2), w = v.w, h = v.h, d = LANES[v.lane].dir;
+  const x = Math.round(v.x), y = Math.round(laneY(v.lane) + (LH - v.h) / 2), w = v.w, h = v.h, d = LANES[v.lane].dir;
   R(c, x + 2, y + h, w - 2, 2, 'rgba(0,0,0,.35)');
   R(c, x, y + 1, w, h - 2, OUT); R(c, x + 1, y, w - 2, h, OUT);
   R(c, x + 1, y + 1, w - 2, h - 2, v.col);
@@ -133,11 +133,12 @@ SCENES.c2_frogger = () => {
     R(c, 0, 36, W, 4, '#c9c4b8'); R(c, 0, 39, W, 1, '#6a665e');
     // ponto de ônibus
     R(c, 234, 8, 68, 20, '#2a2a30'); R(c, 236, 10, 64, 16, '#4a6a8a'); R(c, 236, 10, 64, 2, '#6a8aaa'); pixText(c, 'ONIBUS', 268, 15, '#ffd54a', 1, 'center');
+    R(c, 120, 8, 60, 22, '#2a2a30'); R(c, 122, 10, 56, 18, '#1f4a6a'); pixText(c, 'CORP.AI', 150, 12, '#fff', 1, 'center'); pixText(c, 'SEM TRANSITO', 150, 20, '#7fd4ff', 1, 'center');
     R(c, 222, 6, 3, 30, '#555'); R(c, 218, 4, 11, 7, '#1e5aa8'); pixText(c, 'P', 223, 5, '#fff');
     // asfalto
     R(c, 0, 40, W, 96, '#3a3d44');
     for (let i = 0; i < 1400; i++) R(c, Math.floor(rng() * W), 40 + Math.floor(rng() * 96), 1, 1, rng() < .5 ? '#34373e' : '#42454c');
-    for (let i = 1; i < 6; i++) { if (i === 3) { R(c, 0, laneY(i) - 1, W, 1, '#e3c34a'); R(c, 0, laneY(i) + 1, W, 1, '#e3c34a'); } else for (let x = 0; x < W; x += 16) R(c, x, laneY(i), 8, 1, '#d8d8d8'); }
+    for (let i = 1; i < 4; i++) { if (i === 2) { R(c, 0, laneY(i) - 1, W, 1, '#e3c34a'); R(c, 0, laneY(i) + 1, W, 1, '#e3c34a'); } else for (let x = 0; x < W; x += 16) R(c, x, laneY(i), 8, 1, '#d8d8d8'); }
     // a faixa
     for (let y = 42; y < 134; y += 6) R(c, 140, y, 38, 3, '#e8e8e2');
     // manchas e bueiro
@@ -148,7 +149,7 @@ SCENES.c2_frogger = () => {
     R(c, 0, 140, W, 28, '#9a958c'); for (let x = 0; x < W; x += 12) for (let y = 140; y < 168; y += 12) R(c, x + (((y - 140) / 12) % 2) * 6, y, 11, 11, '#a7a297');
     R(c, 0, 168, W, 12, '#2c3340'); R(c, 0, 168, W, 2, '#59636f'); R(c, 40, 168, 40, 12, '#1a1e26'); pixText(c, 'CORP S.A.', 60, 172, '#8a96a6', 1, 'center');
     // árvores
-    for (const [x, y] of [[20, 18], [120, 20], [190, 16], [26, 152], [230, 154], [300, 152]]) {
+    for (const [x, y] of [[20, 18], [84, 20], [196, 16], [26, 152], [230, 154], [300, 152]]) {
       R(c, x - 8, y - 6, 16, 12, '#1f5a2a'); R(c, x - 6, y - 8, 12, 16, '#1f5a2a'); R(c, x - 5, y - 6, 9, 8, '#2f7a3f'); R(c, x - 3, y - 5, 4, 3, '#4a9a5a');
     }
     // semáforo de pedestre
@@ -162,11 +163,10 @@ SCENES.c2_frogger = () => {
     music: 'rage', amb: 'city', capY: 44, pat: 100, rev: 0, shoutWin: 0, fury: 0, t: 0, spawnT: LANES.map(() => rnd(.2, 1.5)), shoutCD: 0, won: false, script: null, honks: 0,
     enter() {
       // pré-povoa as faixas
-      for (let i = 0; i < 6; i++) for (let k = 0; k < 2; k++) this.spawn(i, rnd(0, W));
+      for (let i = 0; i < 4; i++) for (let k = 0; k < 2; k++) this.spawn(i, rnd(0, W));
       this.script = new Script((function* () {
         yield bigText('A FAIXA DO FODA-SE', 1.6, { size: 13, zoom: true, col: '#ffd54a' });
-        yield caption('O sinal de pedestre está vermelho. Esperar esvazia sua PACIÊNCIA.', { auto: 3 });
-        Balloons.add(null, 'Mover: setas  •  Quando buzinarem: ' + Input.label('b') + ' = Gritar de Volta', { type: 'caption', auto: 5, bottom: true });
+        Balloons.add(null, 'O sinal nunca abre. Atravesse mesmo assim: os carros freiam. Parado, sua PACIÊNCIA acaba. Quando buzinarem: ' + Input.label('b') + ' = Gritar de Volta.', { type: 'caption', auto: 6, bottom: true });
       })());
     },
     spawn(lane, x) {
@@ -185,7 +185,7 @@ SCENES.c2_frogger = () => {
       // movimento do Mirango (8 direções)
       let ix = 0, iy = 0;
       if (!this.won && m.stun <= 0) { if (Input.down('left')) ix--; if (Input.down('right')) ix++; if (Input.down('up') || Input.down('jump')) iy--; if (Input.down('down')) iy++; }
-      const sp = 28 * (1 + this.rev / 90) * (this.fury > 0 ? 1.7 : 1);
+      const sp = 17 * (1 + this.rev / 80) * (this.fury > 0 ? 1.7 : 1);
       const n = Math.hypot(ix, iy) || 1;
       if (m.stun > 0) { m.stun -= dt; m.x += m.vx * dt; m.y += m.vy * dt; m.vx *= .9; m.vy *= .9; }
       else { m.x += ix / n * sp * dt; m.y += iy / n * sp * dt; }
@@ -197,7 +197,6 @@ SCENES.c2_frogger = () => {
         if (!moving) this.pat -= (m.y > 136 ? 15 : 11) * dt; else this.pat = Math.min(100, this.pat + 4 * dt);
         if (this.pat <= 0) {
           this.pat = 55; m.stun = 1.2; m.vx = 0; m.vy = 0; sfx('shout'); G.shake(3);
-          sayAuto({ x: m.x, y: m.y, h: 14 }, pick(['ARGH! ESSE SINAL NÃO ABRE NUNCA?!', 'AAAAAH!', 'EU NÃO AGUENTO MAIS ESPERAR!']), 1.6, { type: 'shout', world: false });
           for (let i = 0; i < 10; i++) parts.add({ x: m.x + rnd(-4, 4), y: m.y - 8, vx: rnd(-10, 10), vy: rnd(-30, -10), life: rnd(.5, 1), col: '#e8e8e8', type: 'smoke', s: 2 });
         }
       }
@@ -207,7 +206,7 @@ SCENES.c2_frogger = () => {
         this.shoutCD = .5;
         const big = this.shoutWin > 0;
         sfx('shout'); G.shake(big ? 3 : 1);
-        sayAuto({ x: m.x, y: m.y, h: 14 }, big ? pick(['VAI VOCÊ!', 'EU TÔ COM PRESSA TAMBÉM!', 'BUZINA PRO SEU CHEFE!', 'NÃO SOU OBRIGADO!', 'O SINAL NUNCA ABRE!', 'ME DEMITI HOJE, AMIGO!']) : 'HMPF!', big ? 1.3 : .6, { type: 'shout', world: false });
+        if (big) sayAuto({ x: m.x, y: m.y, h: 14 }, big ? pick(['VAI VOCÊ!', 'EU TÔ COM PRESSA TAMBÉM!', 'BUZINA PRO SEU CHEFE!', 'NÃO SOU OBRIGADO!', 'O SINAL NUNCA ABRE!', 'ME DEMITI HOJE, AMIGO!']) : 'HMPF!', big ? 1.3 : .6, { type: 'shout', world: false });
         this.rev = Math.min(100, this.rev + (big ? 24 : 3));
         if (big) { this.shoutWin = 0; for (const v of cars) v.driverOut = false; }
         if (this.rev >= 100) {
@@ -217,7 +216,7 @@ SCENES.c2_frogger = () => {
       }
       this.fury -= dt;
       // carros
-      for (let i = 0; i < 6; i++) { this.spawnT[i] -= dt; if (this.spawnT[i] <= 0) { this.spawnT[i] = rnd(1.3, 3) * 80 / LANES[i].v; this.spawn(i); } }
+      for (let i = 0; i < 4; i++) { this.spawnT[i] -= dt; if (this.spawnT[i] <= 0) { this.spawnT[i] = rnd(1.3, 3) * 80 / LANES[i].v; this.spawn(i); } }
       const mb = this.mBox();
       for (const v of cars) {
         const d = LANES[v.lane].dir, ly = laneY(v.lane), front = d > 0 ? v.x + v.w : v.x;
@@ -227,13 +226,14 @@ SCENES.c2_frogger = () => {
           const gap = d > 0 ? o.x - front : v.x - (o.x + o.w);
           if (gap > -2 && gap < 14 + v.v * .15) target = Math.min(target, gap < 6 ? 0 : o.v);
         }
-        let inLane = mb.y + mb.h > ly + 2 && mb.y < ly + 14, dist = d > 0 ? mb.x - front : v.x - (mb.x + mb.w);
-        const blocking = inLane && dist > -6 && dist < 36 + v.v * v.v / 700;
-        if ((blocking && v.type !== 'moto') || this.fury > 0) target = 0;
+        let inLane = mb.y + mb.h > ly + 2 && mb.y < ly + LH - 2, dist = d > 0 ? mb.x - front : v.x - (mb.x + mb.w);
+        const blocking = inLane && dist > -(v.w + 10) && dist < 36 + v.v * v.v / 700;
+        if (blocking || this.fury > 0) target = 0;
+        if (blocking && dist < 10) { v.v = 0; }  // nunca atropela: freia na hora
         const wasFast = v.v > 45;
         v.braking = target < v.v - 1;
         v.v = v.braking ? Math.max(target, v.v - 420 * dt) : Math.min(target, v.v + 70 * dt);
-        if (v.braking && wasFast && (blocking || this.fury > 0) && !v.skidSnd) { v.skidSnd = true; sfx('screech'); skids.push({ x: front - d * 18, y: ly + 3, w: 18, t: 0 }); }
+        if (v.braking && wasFast && (blocking || this.fury > 0) && !v.skidSnd) { v.skidSnd = true; sfx('screech'); skids.push({ x: front - d * 18, y: ly + 5, w: 18, t: 0 }); }
         if (!v.braking) v.skidSnd = false;
         v.x += d * v.v * dt;
         // buzina
@@ -242,15 +242,9 @@ SCENES.c2_frogger = () => {
           if (v.honkT <= 0) {
             v.honkT = rnd(1.6, 2.4); v.driverOut = true; sfx('honk'); this.shoutWin = 1.7; this.honks++;
             const hx = d > 0 ? v.x + v.w - 10 : v.x + 10;
-            sayAuto({ x: hx, y: ly, h: 6 }, pick(['BIIIIII!', 'SAI DA FRENTE, MALUCO!', 'TÁ CEGO?!', 'FON FON!', 'Ô LOUCO!', 'O SINAL TÁ VERMELHO!']), 1.2, { world: false });
+            if (this.honks % 2 === 1) sayAuto({ x: hx, y: ly, h: 6 }, pick(['BIIIIII!', 'SAI DA FRENTE, MALUCO!', 'TÁ CEGO?!', 'FON FON!', 'Ô LOUCO!', 'O SINAL TÁ VERMELHO!']), 1.2, { world: false });
           }
         } else if (v.v > 10) v.driverOut = false;
-        // atropelamento leve: empurrão
-        const cb = { x: v.x, y: ly + (16 - v.h) / 2, w: v.w, h: v.h };
-        if (overlap(mb, cb) && v.v > 25 && m.stun <= 0) {
-          m.stun = .7; m.vy = 130; m.vx = d * 60; this.pat = Math.max(0, this.pat - 15); sfx('hurt'); sfx('honk'); G.shake(3);
-          sayAuto({ x: m.x, y: m.y, h: 14 }, v.type === 'moto' ? 'MOTOBOY!' : 'UOU!', .8, { world: false });
-        }
       }
       for (let i = cars.length - 1; i >= 0; i--) if (cars[i].x < -70 || cars[i].x > W + 70) cars.splice(i, 1);
       for (const s of skids) s.t += dt; while (skids.length > 30) skids.shift();
@@ -296,6 +290,9 @@ function buildStreet() {
     R(c, 250, 22, 18, 18, '#ffe0a0'); R(c, 252, 20, 14, 22, '#ffe0a0'); R(c, 248, 24, 22, 14, '#ffe0a0');
     skyline(c, -5, W + 10, 104, rng, { col: '#c7765a', win: '#d48a6a', hmin: 30, hmax: 70 });
     skyline(c, -5, W + 10, 112, rng, { col: '#8a4a3a', win: '#9a5a48', lit: '#ffd77a', litP: .05, hmin: 20, hmax: 55 });
+    // outdoor de IA
+    R(c, 96, 34, 92, 34, '#2a2a30'); R(c, 98, 36, 88, 30, '#1f4a6a'); pixText(c, 'CORP.AI', 142, 40, '#fff', 2, 'center'); pixText(c, 'DEIXA QUE A IA', 142, 53, '#7fd4ff', 1, 'center'); pixText(c, 'TRABALHA POR VOCE', 142, 59, '#7fd4ff', 1, 'center');
+    R(c, 116, 68, 3, 12, '#2a2a30'); R(c, 166, 68, 3, 12, '#2a2a30');
     // lojas
     const shops = [[0, 70, 'PADARIA', '#c43b3b'], [74, 64, 'FARMACIA', '#2e7d32'], [142, 80, 'LOTERIAS', '#1e5aa8'], [226, 94, 'BAR DO ZE', '#e3a32a']];
     for (const [x, w, n, col] of shops) {
@@ -442,19 +439,19 @@ SCENES.c2_fight = () => {
       const hp0 = def.hp;
       if (ko) {
         sfx('ko'); G.slow = .35;
-        yield { t: 0, update(dt) { this.t += dt; def.x += dir * 260 * dt; def.y = 162 - Math.sin(Math.min(1, this.t / 1.1) * Math.PI) * 60; def.rot += dir * 12 * dt; def.hp = Math.max(0, hp0 - this.t * 3); return this.t > 1.1; } };
+        yield { t: 0, update(dt) { this.t += dt; def.x += dir * 260 * dt; def.y = 162 - Math.sin(Math.min(1, this.t / 1.1) * Math.PI) * 60; def.rot += dir * 12 * dt; def.hp = Math.max(0, hp0 - .5, hp0 - this.t * 3); return this.t > 1.1; } };
         G.slow = 1;
       } else {
-        yield { t: 0, update(dt) { this.t += dt; def.x += dir * 120 * dt * (1 - this.t * 2); def.hp = Math.max(0, hp0 - this.t * 3); return this.t >= .4; } };
+        yield { t: 0, update(dt) { this.t += dt; def.x += dir * 120 * dt * (1 - this.t * 2); def.hp = Math.max(0, hp0 - .5, hp0 - this.t * 3); return this.t >= .4; } };
         def.rot = dir * 1.5; def.y = 168; sfx('thud'); G.shake(3);
       }
       yield { t: 0, update(dt) { this.t += dt; att.x = lerp(def.x - dir * 30, x0, Math.min(1, this.t / .3)); return this.t >= .3; } };
       att.pose = { arms: 'fist' };
     },
-    reset() { A.x = 92; A.y = 162; A.rot = 0; A.hp = 1; A.pose = {}; B.x = 228; B.y = 162; B.rot = 0; B.hp = 1; B.pose = {}; this.reveal = null; },
+    reset() { A.x = 92; A.y = 162; A.rot = 0; A.pose = {}; B.x = 228; B.y = 162; B.rot = 0; B.pose = {}; this.reveal = null; },
     *run() {
       yield bigText('O DUELO DA PAÇOCA', 1.6, { size: 13, zoom: true, col: '#ffd54a' });
-      sayAuto(zé, 'Melhor de três! Sem trapaça!', 2, { name: 'SEU ZÉ — JUIZ' });
+      sayAuto(zé, 'Melhor de três! Cada vitória tira metade da vida. Duas e é nocaute!', 2.6, { name: 'SEU ZÉ — JUIZ' });
       for (let r = 1; r <= 3; r++) {
         this.round = r; this.reset();
         sfx('punch'); yield bigText('ROUND ' + r, 1.1, { size: 18, zoom: true });
@@ -537,6 +534,7 @@ SCENES.c2_fight = () => {
         pxBox(c, x, 8, w + 4, 10, '#1a0a0a', '#f3efe6');
         R(c, x + 2, 10, w, 6, '#5a1010');
         const fw = Math.round(w * v); R(c, right ? x + 2 + w - fw : x + 2, 10, fw, 6, v > .5 ? '#ffd54a' : '#ff8a3a'); R(c, right ? x + 2 + w - fw : x + 2, 10, fw, 2, 'rgba(255,255,255,.4)');
+        R(c, x + 2 + w / 2 - .5, 9, 1, 8, '#f3efe6');
         T(c, name, right ? x + w + 4 : x, 21, { size: 5, align: right ? 'right' : 'left', col: '#fff' });
       };
       bar(8, 120, A.hp, 'MIRANGO', false); bar(188, 120, B.hp, 'APRESSADO', true);
@@ -570,28 +568,60 @@ SCENES.c2_fight = () => {
 const BUS_W = 780, BUS_FLOOR = 150;
 SCENES.c2_bus = () => {
   const rng = srand(31);
+  // assento de ônibus de perfil (frente para a esquerda, onde fica o motorista)
+  const seatP = (c, x, y, col = '#2a5aa8', dark) => {
+    const cd = dark ? '#1e3a70' : '#1e4688';
+    R(c, x - 1, y - 28, 6, 22, OUT); R(c, x, y - 27, 4, 20, col); R(c, x, y - 27, 1, 20, '#5a8ad8'); R(c, x - 1, y - 30, 6, 3, '#c9c9c9');
+    R(c, x - 14, y - 10, 18, 5, OUT); R(c, x - 13, y - 9, 17, 3, col); R(c, x - 13, y - 9, 17, 1, '#5a8ad8'); R(c, x - 13, y - 6, 17, 1, cd);
+    R(c, x - 8, y - 5, 2, 5, '#777'); R(c, x - 1, y - 5, 2, 5, '#777'); R(c, x - 10, y - 1, 12, 1, '#555');
+  };
   const inner = makeCanvas(BUS_W, H, (c) => {
-    R(c, 0, 0, BUS_W, 34, '#1d2230'); R(c, 0, 30, BUS_W, 4, '#c9c9c9');
-    vgrad(c, 0, 34, BUS_W, 116, ['#d8d2c4', '#bdb5a4']);
-    // janelas vazadas
-    for (let x = 30; x < BUS_W - 30; x += 64) { c.clearRect(x, 46, 52, 44); R(c, x - 2, 44, 56, 2, '#7a7468'); R(c, x - 2, 90, 56, 3, '#7a7468'); R(c, x + 25, 46, 2, 44, '#7a7468'); }
-    R(c, 0, 104, BUS_W, 3, '#8a8478');
-    pixText(c, 'PROIBIDO FALAR COM O MOTORISTA', 90, 98, '#5a5448'); pixText(c, 'ASSENTO PREFERENCIAL', 400, 98, '#5a5448');
-    // bancos ao fundo
-    for (let x = 40; x < BUS_W - 70; x += 46) { R(c, x, 116, 30, 18, '#2a4a8a'); R(c, x, 116, 30, 3, '#3a5aa0'); R(c, x + 2, 108, 26, 10, '#2a4a8a'); R(c, x, 134, 30, 3, '#888'); R(c, x + 4, 137, 2, 13, '#666'); R(c, x + 24, 137, 2, 13, '#666'); }
+    // teto com luminárias
+    R(c, 0, 0, BUS_W, 30, '#20252f'); R(c, 0, 30, BUS_W, 4, '#c9cdd2');
+    for (let x = 60; x < BUS_W; x += 90) { R(c, x, 31, 40, 3, '#f4f8ff'); }
+    // costado interno (bege) e faixa de anúncios
+    vgrad(c, 0, 34, BUS_W, 116, ['#e2dccd', '#c4bba8']);
+    R(c, 0, 36, BUS_W, 9, '#3a3f4a');
+    const ads = ['CORP.AI: TRABALHE ENQUANTO DORME', 'CURSO: SEJA SUBSTITUIDO COM DIGNIDADE', 'SEU CHEFE JA USA IA. E VOCE?', 'CORP.AI - ELA NAO PEDE AUMENTO'];
+    for (let i = 0, x = 110; x < BUS_W - 80; x += 170, i++) { R(c, x, 37, 150, 7, i % 2 ? '#d8323c' : '#1f4a6a'); pixText(c, ads[i % ads.length], x + 75, 38, '#fff', 1, 'center'); }
+    // janelas com basculante (vazadas para ver a rua)
+    for (let x = 100; x < BUS_W - 20; x += 60) {
+      if (x > 380 && x < 470) continue; // porta do meio
+      c.clearRect(x, 48, 54, 44);
+      R(c, x - 2, 46, 58, 2, '#6a6458'); R(c, x - 2, 92, 58, 3, '#6a6458'); R(c, x + 26, 48, 2, 44, '#6a6458'); R(c, x - 2, 48, 2, 44, '#6a6458');
+      R(c, x, 48, 54, 12, 'rgba(160,200,230,.35)'); R(c, x, 60, 54, 1, '#6a6458');
+      if ((x / 60) % 3 === 1) { R(c, x + 30, 82, 22, 7, '#d8323c'); pixText(c, 'SAIDA', x + 41, 83, '#fff', 1, 'center'); }
+    }
+    R(c, 0, 95, BUS_W, 2, '#8a8478');
+    // frente: para-brisa, motorista, porta dianteira e catraca
+    c.clearRect(0, 40, 22, 60); R(c, 0, 40, 22, 2, '#555'); R(c, 20, 40, 3, 60, '#555');
+    R(c, 0, 100, 34, 50, '#3a3f4a'); R(c, 6, 108, 16, 26, '#2a2f38'); R(c, 24, 104, 3, 14, '#222'); R(c, 18, 102, 14, 3, '#111');
+    R(c, 36, 50, 26, 100, '#4a5058'); R(c, 38, 52, 10, 96, '#9ac4e0'); R(c, 50, 52, 10, 96, '#9ac4e0'); R(c, 48, 52, 2, 96, '#333');
+    pixText(c, 'EMBARQUE', 49, 44, '#ffd54a', 1, 'center');
+    R(c, 70, 112, 16, 22, '#7a7f88'); R(c, 70, 112, 16, 2, '#a0a5ae'); R(c, 74, 120, 22, 2, '#c9cdd2'); R(c, 74, 126, 22, 2, '#c9cdd2'); pixText(c, 'CATRACA', 80, 104, '#5a5448', 1, 'center');
+    R(c, 66, 100, 2, 50, '#e3c34a');
+    // porta do meio (desembarque)
+    R(c, 386, 50, 82, 100, '#4a5058'); R(c, 390, 54, 36, 92, '#9ac4e0'); R(c, 428, 54, 36, 92, '#9ac4e0'); R(c, 426, 54, 2, 92, '#333');
+    R(c, 386, 146, 82, 4, '#ffd54a'); pixText(c, 'DESEMBARQUE', 427, 44, '#ffd54a', 1, 'center');
+    R(c, 382, 80, 3, 5, '#d8323c'); R(c, 470, 80, 3, 5, '#d8323c');
+    // caixa da roda traseira
+    R(c, 560, 136, 60, 14, '#3a3a40'); R(c, 560, 136, 60, 2, '#5a5a62');
+    // bancos ao fundo (de perfil, todos virados para a frente)
+    for (let x = 118; x < 380; x += 28) seatP(c, x, 150);
+    for (let x = 498; x < 560; x += 28) seatP(c, x, 150);
+    for (let x = 640; x < 690; x += 28) seatP(c, x, 150);
     // banco do fundo (destino)
-    R(c, 700, 106, 76, 30, '#2a4a8a'); R(c, 700, 106, 76, 3, '#3a5aa0'); R(c, 700, 134, 76, 3, '#888');
-    for (let x = 704; x < 776; x += 18) R(c, x, 110, 16, 22, '#34549a');
-    // piso
-    R(c, 0, 150, BUS_W, 30, '#2a2a2e'); for (let x = 0; x < BUS_W; x += 4) R(c, x, 150, 2, 30, '#323236');
-    R(c, 0, 150, BUS_W, 2, '#ffd54a');
-    // barra de apoio
-    R(c, 0, 40, BUS_W, 2, '#c9c9c9');
-    // motorista à esquerda
-    R(c, 0, 34, 24, 116, '#3a3a40'); R(c, 4, 60, 16, 20, '#222');
+    R(c, 704, 112, 74, 38, '#6a6458'); seatP(c, 744, 150, '#2a5aa8'); seatP(c, 770, 150, '#2a5aa8');
+    R(c, 712, 126, 8, 6, '#2a5aa8');
+    // piso emborrachado
+    R(c, 0, 150, BUS_W, 30, '#2f3034'); for (let x = 0; x < BUS_W; x += 4) R(c, x, 151, 2, 29, '#37383d');
+    R(c, 0, 150, BUS_W, 1, '#55565c');
+    // barra de apoio horizontal
+    R(c, 0, 50, BUS_W, 2, '#d0d4d8');
+    pixText(c, 'NAO FALE COM O MOTORISTA', 160, 98, '#6a6458');
   });
   const city = makeCanvas(W * 2, 60, (c, w, h) => { vgrad(c, 0, 0, w, h, ['#e88a5a', '#f2b47a']); skyline(c, 0, w, h, rng, { col: '#9a5a48', win: '#b07a62', lit: '#ffe0a0', litP: .1, hmin: 20, hmax: 55 }); });
-  const hero = new Hero(30, BUS_FLOOR - 24, LOOKS.mirango); hero.speed = 58;
+  const hero = new Hero(96, BUS_FLOOR - 24, LOOKS.mirango); hero.speed = 58;
   const mA = heroActor(hero);
   const parts = new Parts();
   const obs = [
@@ -599,7 +629,7 @@ SCENES.c2_bus = () => {
     { t: 'stand', x: 318, look: LOOKS.passB, grumpy: true }, { t: 'bag', x: 380, w: 16, h: 22 }, { t: 'stand', x: 446, look: LOOKS.passD, backpack: true },
     { t: 'legs', x: 520, look: LOOKS.colegaA }, { t: 'stand', x: 594, look: LOOKS.passC, grumpy: true }, { t: 'bag', x: 640, w: 20, h: 12 }
   ];
-  const seated = [[62, LOOKS.passB], [154, LOOKS.passD], [292, LOOKS.colegaB], [384, LOOKS.passA], [476, LOOKS.passC], [568, LOOKS.passB], [660, LOOKS.passD]];
+  const seated = [[118, LOOKS.passB], [174, LOOKS.passD], [258, LOOKS.colegaB], [342, LOOKS.passA], [498, LOOKS.passC], [526, LOOKS.passB], [668, LOOKS.passD]];
   const floor = { x: -20, y: BUS_FLOOR, w: BUS_W + 40, h: 30 };
   function solids() {
     const s = [floor];
@@ -638,7 +668,7 @@ SCENES.c2_bus = () => {
       // segurar
       this.hold = hero.onGround && Input.down('down') && !this.qte && !hero.frozen;
       const sol = solids();
-      hero.update(dt, sol, { minX: 26, maxX: BUS_W - 6, parts: this.parts, speedMul: this.hold ? 0 : 1, upJump: false });
+      hero.update(dt, sol, { minX: 92, maxX: BUS_W - 6, parts: this.parts, speedMul: this.hold ? 0 : 1, upJump: false });
       hero.pose = this.hold ? { arms: 'up' } : hero.stun > 0 ? { rot: hero.face * -1.3, eyes: 'closed' } : {};
       // força do balanço
       if (!this.hold && !hero.frozen && !this.qte) {
@@ -704,32 +734,44 @@ SCENES.c2_bus = () => {
     },
     draw(c) {
       const cx = Math.round(this.cam.x);
-      // cidade passando pela janela
-      const ox = -Math.round(this.cityX) % (W * 2);
+      // rua passando pela janela (o ônibus anda para a esquerda)
+      const ox = (Math.round(this.cityX) % (W * 2)) - W * 2;
       c.drawImage(city, ox, 46); c.drawImage(city, ox + W * 2, 46);
+      for (let i = 0; i < 6; i++) { const px = ((i * 70 + this.cityX * 2.2) % 420) - 50; R(c, px, 60, 2, 40, '#3a2a2a'); R(c, px - 4, 60, 10, 2, '#3a2a2a'); }
       c.save(); c.translate(-cx, 0);
       c.drawImage(inner, 0, 0);
       const lean = Math.round(this.sway * 2);
-      // alças balançando
-      for (let x = 20; x < BUS_W; x += 22) { const dx = Math.round(this.sway * 4); c.fillStyle = '#9a9a9a'; for (let k = 0; k < 8; k++) c.fillRect(x + Math.round(dx * k / 8), 42 + k, 1, 1); R(c, x + dx - 2, 50, 5, 5, '#e8e8e8'); R(c, x + dx - 1, 51, 3, 3, '#bdb5a4'); }
-      for (let x = 120; x < BUS_W; x += 150) { R(c, x, 42, 3, 108, '#e3c34a'); R(c, x, 42, 1, 108, '#f8e08a'); }
-      for (const [x, L] of seated) { drawPerson(c, x + 15 + lean, BUS_FLOOR - 16, L, { face: 1, sit: true, eyes: Math.random() < .005 ? 'closed' : null }); }
+      // alças balançando e balaústres
+      for (let x = 96; x < BUS_W; x += 22) { const dx = Math.round(this.sway * 4); c.fillStyle = '#9a9a9a'; for (let k = 0; k < 8; k++) c.fillRect(x + Math.round(dx * k / 8), 52 + k, 1, 1); R(c, x + dx - 2, 60, 5, 5, '#e8e8e8'); R(c, x + dx - 1, 61, 3, 3, '#bdb5a4'); }
+      for (const x of [150, 300, 480, 620]) { R(c, x, 52, 3, 98, '#e3c34a'); R(c, x, 52, 1, 98, '#f8e08a'); R(c, x - 2, 112, 7, 4, '#d8323c'); }
+      // passageiros sentados (fundo, mais apagados)
+      for (const [x, L] of seated) drawPerson(c, x - 5 + lean, BUS_FLOOR, L, { face: -1, sit: true, eyes: Math.random() < .005 ? 'closed' : null, noOutline: true });
+      c.globalAlpha = .28; R(c, cx, 96, W, 54, '#3a3a50'); c.globalAlpha = 1;
+      // obstáculos: primeiro plano, contorno amarelo pulsante e alerta
+      const pulse = Math.floor(G.t * 4) % 2 ? '#ffd54a' : '#ff9a2a';
+      const mark = (x, y) => { R(c, x - 2, y - 9, 5, 8, OUT); R(c, x - 1, y - 8, 3, 6, pulse); R(c, x - 1, y - 8, 3, 1, OUT); R(c, x, y - 3, 1, 1, OUT); R(c, x - 1, y - 7, 3, 3, pulse); R(c, x, y - 7, 1, 3, OUT); R(c, x, y - 3, 1, 1, OUT); };
       for (const o of obs) {
         if (o.t === 'bag') {
-          R(c, o.x, BUS_FLOOR - o.h, o.w, o.h, OUT); R(c, o.x + 1, BUS_FLOOR - o.h + 1, o.w - 2, o.h - 1, '#5a6a3a'); R(c, o.x + 1, BUS_FLOOR - o.h + 1, o.w - 2, 3, '#6a7a4a');
-          R(c, o.x + 3, BUS_FLOOR - o.h + 6, o.w - 6, 4, '#4a5a2a'); R(c, o.x + o.w / 2 - 2, BUS_FLOOR - o.h - 2, 4, 2, '#333');
+          const y = BUS_FLOOR - o.h;
+          R(c, o.x - 2, y - 2, o.w + 4, o.h + 2, pulse); R(c, o.x - 1, y - 1, o.w + 2, o.h + 1, OUT);
+          R(c, o.x, y, o.w, o.h, '#e0503a'); R(c, o.x, y, o.w, 3, '#ff8a6a'); R(c, o.x + 3, y + 6, o.w - 6, 4, '#a82a1a'); R(c, o.x + o.w / 2 - 3, y - 3, 6, 2, '#333');
+          mark(o.x + o.w / 2, y - 4);
         } else if (o.t === 'legs') {
-          drawPerson(c, o.x - 2, BUS_FLOOR - 14, o.look, { face: 1, sit: true, eyes: 'closed', slump: 1 });
-          R(c, o.x + 4, BUS_FLOOR - 5, 12, 3, o.look.pants); R(c, o.x + 14, BUS_FLOOR - 5, 4, 5, '#222');
-          if (Math.floor(this.t * 1.5) % 2) pixText(c, 'Z', o.x + 6, BUS_FLOOR - 50 - (this.t % 1) * 4, '#5a5448');
+          seatP(c, o.x - 2, BUS_FLOOR, '#2a5aa8');
+          drawPerson(c, o.x - 7, BUS_FLOOR, o.look, { face: 1, sit: true, eyes: 'closed', slump: 1, outline: pulse });
+          R(c, o.x - 2, BUS_FLOOR - 6, 18, 5, OUT); R(c, o.x - 1, BUS_FLOOR - 5, 16, 3, o.look.pants); R(c, o.x + 13, BUS_FLOOR - 7, 4, 7, '#222');
+          for (let i = 0; i < 16; i += 4) R(c, o.x - 1 + i, BUS_FLOOR - 1, 2, 1, pulse);
+          if (Math.floor(this.t * 1.5) % 2) pixText(c, 'ZZZ', o.x - 6, BUS_FLOOR - 44 - (this.t % 1) * 4, '#5a5448');
+          mark(o.x + 7, BUS_FLOOR - 8);
         } else {
           const off = o.cleared ? (o.shoved ? 14 : 10) : o.moving ? 5 : 0;
-          drawPerson(c, o.x + lean + (o.cleared ? -6 : 0), BUS_FLOOR - off * .4, o.look, { face: hero.cx < o.x ? -1 : 1, arms: 'up', alpha: o.cleared ? .85 : 1, eyes: o.shoved ? 'wide' : null, mouth: o.shoved ? 'open' : null });
-          if (o.backpack) R(c, o.x + lean + (hero.cx < o.x ? 4 : -12), BUS_FLOOR - 24, 8, 12, '#8a3a3a');
+          drawPerson(c, o.x + lean + (o.cleared ? -6 : 0), BUS_FLOOR - off * .4, o.look, { face: hero.cx < o.x ? -1 : 1, arms: 'up', alpha: o.cleared ? .6 : 1, eyes: o.shoved ? 'wide' : null, mouth: o.shoved ? 'open' : null, outline: o.cleared ? OUT : pulse });
+          if (o.backpack) { const bx2 = o.x + lean + (hero.cx < o.x ? 4 : -12); R(c, bx2 - 1, BUS_FLOOR - 25, 10, 14, OUT); R(c, bx2, BUS_FLOOR - 24, 8, 12, '#e0503a'); }
+          if (!o.cleared && !o.moving) mark(o.x + lean, BUS_FLOOR - 34);
         }
       }
       if (this.qte) drawPerson(c, this.qte.rx, BUS_FLOOR, LOOKS.rival, { face: -1, walk: this.t * 3, arms: 'out' });
-      if (this.seated) drawPerson(c, 734, BUS_FLOOR - 16, LOOKS.mirango, { face: 1, sit: true, eyes: 'closed', mouth: 'smile' });
+      if (this.seated) drawPerson(c, 735, BUS_FLOOR, LOOKS.mirango, { face: -1, sit: true, eyes: 'closed', mouth: 'smile' });
       else hero.draw(c);
       parts.draw(c);
       c.restore();
@@ -762,8 +804,13 @@ SCENES.c2_bus = () => {
 /* ---------- Encerramento do capítulo 2: a janela ---------- */
 SCENES.c2_end = () => {
   const rng = srand(8);
-  const far = makeCanvas(W * 2, 110, (c, w, h) => { vgrad(c, 0, 0, w, h, ['#5a3a7a', '#c86a6a', '#f2a65a']); skyline(c, 0, w, h, rng, { col: '#4a2a4a', win: '#5a3a5a', lit: '#ffd77a', litP: .2, hmin: 20, hmax: 70 }); });
-  const near = makeCanvas(W * 2, 110, (c, w, h) => { skyline(c, 0, w, h, rng, { col: '#2a1a2a', win: '#3a2a3a', lit: '#ffe9a0', litP: .25, hmin: 10, hmax: 40 }); for (let x = 0; x < w; x += 60) { R(c, x, 30, 2, 80, '#1a101a'); R(c, x, 30, 10, 2, '#1a101a'); } });
+  const far = makeCanvas(W * 2, 120, (c, w, h) => { vgrad(c, 0, 0, w, h, ['#5a3a7a', '#c86a6a', '#f2a65a']); skyline(c, 0, w, h, rng, { col: '#6a3a5a', win: '#7a4a6a', lit: '#ffd77a', litP: .15, hmin: 30, hmax: 80 }); });
+  const near = makeCanvas(W * 2, 120, (c, w, h) => {
+    let x = 0;
+    while (x < w) { const bw = 30 + Math.floor(rng() * 40), bh = 40 + Math.floor(rng() * 50); R(c, x, h - bh, bw - 2, bh, pick(['#3a2438', '#2e2234', '#40283a'])); for (let yy = h - bh + 4; yy < h - 6; yy += 7) for (let xx = x + 3; xx < x + bw - 6; xx += 6) R(c, xx, yy, 3, 4, rng() < .3 ? '#ffd77a' : '#4a3448'); x += bw; }
+    R(c, 300, 30, 90, 30, '#1a1018'); R(c, 302, 32, 86, 26, '#1f4a6a'); pixText(c, 'CORP.AI', 345, 36, '#fff', 2, 'center'); pixText(c, 'O FUTURO NAO TIRA FERIAS', 345, 50, '#7fd4ff', 1, 'center');
+  });
+  const cars = [];
   const parts = new Parts();
   const sc = {
     music: 'calm', amb: 'bus', t: 0, sx: 0, eat: 0, eyes: null, tower: -200, shown: 0,
@@ -774,9 +821,9 @@ SCENES.c2_end = () => {
       yield caption('Ele encosta a cabeça no vidro frio, que vibra com o motor.', { auto: 3 });
       this.eat = 1; sfx('slurp');
       yield caption('As mãos ainda tremem. Mas o semblante, enfim, relaxa.', { auto: 3 });
-      this.tower = W + 20;
+      this.tower = -60;
       yield caption('O prédio antigo fica para trás.', { auto: 3.2 });
-      const mA = { x: 214, y: 128, h: 50 };
+      const mA = { x: 206, y: 132, h: 6 };
       yield think(mA, 'Não sei o dia de amanhã...', { auto: 2.4 });
       yield think(mA, '...mas eu não volto.', { auto: 2.6 });
       G.unlock(3);
@@ -789,31 +836,45 @@ SCENES.c2_end = () => {
     update(dt) {
       this.t += dt; this.sx += dt * 40;
       if (this.script) this.script.update(dt);
-      if (this.tower > -200) this.tower -= dt * 30;
-      if (this.eat && Math.random() < .05) parts.add({ x: 236, y: 106, vx: rnd(-6, 6), vy: rnd(5, 20), g: 40, life: 1, col: '#c9a05a' });
+      if (this.tower > -200 && this.tower < W + 40) this.tower += dt * 26;
+      if (this.eat && Math.random() < .05) parts.add({ x: 194, y: 132, vx: rnd(-6, 6), vy: rnd(5, 20), g: 40, life: 1, col: '#c9a05a' });
+      if (Math.random() < dt * .6) cars.push({ x: -40, v: rnd(30, 80), col: pick(CAR_COLS) });
+      for (const v of cars) v.x += v.v * dt; for (let i = cars.length - 1; i >= 0; i--) if (cars[i].x > W) cars.splice(i, 1);
       parts.update(dt);
     },
     draw(c) {
-      R(c, 0, 0, W, H, '#2a2430');
-      // janela grande
-      c.save(); c.beginPath(); c.rect(24, 16, 200, 112); c.clip();
-      const a = -Math.round(this.sx * .3) % (W * 2), b = -Math.round(this.sx) % (W * 2);
-      c.drawImage(far, a, 16); c.drawImage(far, a + W * 2, 16);
+      R(c, 0, 0, W, H, '#cfc6b2');
+      // janela grande: a rua em movimento (o ônibus segue para a esquerda)
+      const WX = 12, WY = 10, WW = 244, WH = 138;
+      c.save(); c.beginPath(); c.rect(WX, WY, WW, WH); c.clip();
+      const a = (Math.round(this.sx * .25) % (W * 2)) - W * 2, b = (Math.round(this.sx * .8) % (W * 2)) - W * 2;
+      c.drawImage(far, a, WY); c.drawImage(far, a + W * 2, WY);
       if (this.tower > -200) {
         const tx = Math.round(this.tower);
-        R(c, tx, 20, 60, 108, '#1a1424'); for (let y = 26; y < 126; y += 6) for (let x = tx + 4; x < tx + 56; x += 6) R(c, x, y, 3, 3, (x + y) % 5 ? '#2a2a3a' : '#ffe9a0');
-        R(c, tx + 6, 24, 48, 9, '#d8323c'); pixText(c, 'CORP S.A.', tx + 30, 26, '#fff', 1, 'center');
+        R(c, tx, 14, 60, 104, '#1a1424'); for (let y = 22; y < 116; y += 6) for (let x = tx + 4; x < tx + 56; x += 6) R(c, x, y, 3, 3, (x + y) % 5 ? '#2a2a3a' : '#ffe9a0');
+        R(c, tx + 6, 18, 48, 9, '#d8323c'); pixText(c, 'CORP S.A.', tx + 30, 20, '#fff', 1, 'center');
       }
-      c.drawImage(near, b, 26); c.drawImage(near, b + W * 2, 26);
-      c.globalAlpha = .12; R(c, 24, 16, 200, 112, '#9ac4e0'); c.globalAlpha = 1;
-      for (let i = 0; i < 6; i++) { c.globalAlpha = .1; R(c, 40 + i * 30 + Math.sin(this.t + i) * 2, 20, 1, 100, '#fff'); c.globalAlpha = 1; }
+      c.drawImage(near, b, 4); c.drawImage(near, b + W * 2, 4);
+      // calçada, postes e rua
+      R(c, WX, 118, WW, 6, '#8a7e78'); R(c, WX, 124, WW, 24, '#3a3640'); for (let i = 0; i < 8; i++) R(c, ((i * 40 + this.sx * 2.4) % 320) - 30, 135, 16, 2, '#e8e0c8');
+      for (let i = 0; i < 4; i++) { const px = ((i * 90 + this.sx * 1.6) % 360) - 40; R(c, px, 64, 3, 56, '#241a24'); R(c, px - 6, 64, 14, 3, '#241a24'); R(c, px + 4, 67, 4, 2, '#ffe9a0'); }
+      for (const v of cars) { const x = Math.round(v.x); R(c, x, 128, 34, 10, OUT); R(c, x + 1, 129, 32, 8, v.col); R(c, x + 6, 124, 18, 5, OUT); R(c, x + 7, 125, 16, 4, '#9ac4e0'); R(c, x + 4, 136, 6, 4, '#111'); R(c, x + 24, 136, 6, 4, '#111'); }
+      c.globalAlpha = .1; R(c, WX, WY, WW, WH, '#9ac4e0'); c.globalAlpha = 1;
+      for (let i = 0; i < 5; i++) { c.globalAlpha = .08; R(c, 30 + i * 46 + Math.sin(this.t + i) * 2, WY + 4, 2, WH - 8, '#fff'); c.globalAlpha = 1; }
       c.restore();
-      R(c, 20, 12, 208, 4, '#8a8478'); R(c, 20, 128, 208, 6, '#8a8478'); R(c, 20, 12, 4, 120, '#8a8478'); R(c, 224, 12, 4, 120, '#8a8478');
-      R(c, 0, 134, W, 46, '#2a4a8a'); R(c, 0, 134, W, 3, '#3a5aa0'); dither(c, 0, 138, W, 42, '#34549a', 3);
-      // Mirango encostado no vidro (close-up)
+      // moldura da janela, basculante e parede
+      R(c, WX - 4, WY - 4, WW + 8, 4, '#6a6458'); R(c, WX - 4, WY + WH, WW + 8, 6, '#6a6458'); R(c, WX - 4, WY, 4, WH, '#6a6458'); R(c, WX + WW, WY, 4, WH, '#6a6458');
+      R(c, WX + WW / 2 - 1, WY, 3, WH, '#6a6458'); R(c, WX, WY + 28, WW, 2, '#6a6458');
+      R(c, 0, 154, W, 26, '#b8af9a');
+      // assento de ônibus de perfil (encosto atrás, à direita)
+      const sx0 = 168;
+      R(c, sx0 + 58, 104, 14, 62, OUT); R(c, sx0 + 60, 106, 10, 58, '#2a5aa8'); R(c, sx0 + 60, 106, 3, 58, '#5a8ad8'); R(c, sx0 + 56, 100, 18, 6, '#c9c9c9');
+      R(c, sx0 + 4, 152, 70, 12, OUT); R(c, sx0 + 6, 154, 66, 8, '#2a5aa8'); R(c, sx0 + 6, 154, 66, 2, '#5a8ad8');
+      R(c, sx0 + 20, 164, 4, 16, '#777'); R(c, sx0 + 56, 164, 4, 16, '#777');
+      // Mirango sentado, cabeça encostada no vidro
       const vib = Math.floor(this.t * 12) % 2;
-      drawPersonBig(c, 238, 178 + vib, LOOKS.mirango, { face: -1, sit: true, slump: .4, eyes: this.eyes || (Math.floor(this.t * 1.3) % 6 === 0 ? 'closed' : null), mouth: this.eat && Math.floor(this.t * 2) % 3 === 0 ? 'eat' : null, arms: this.eat ? 'drink' : undefined, rot2: -.12, tremble: !this.eyes && Math.random() < .2 }, 2);
-      if (this.eat && !this.eyes) { R(c, 222, 100, 8, 6, '#c9a05a'); R(c, 222, 100, 8, 2, '#e3c88a'); }
+      drawPersonBig(c, sx0 + 46, 174 + vib, LOOKS.mirango, { face: -1, sit: true, slump: .4, eyes: this.eyes || (Math.floor(this.t * 1.3) % 6 === 0 ? 'closed' : null), mouth: this.eat && Math.floor(this.t * 2) % 3 === 0 ? 'eat' : null, arms: this.eat ? 'drink' : undefined, rot2: -.1, tremble: !this.eyes && Math.random() < .2 }, 2);
+      if (this.eat && !this.eyes) { R(c, sx0 + 22, 126, 8, 6, '#c9a05a'); R(c, sx0 + 22, 126, 8, 2, '#e3c88a'); }
       parts.draw(c);
     }
   };

@@ -56,6 +56,14 @@ function buildNight() {
   });
   return (_night = { sky, far, main });
 }
+// linguagem visual de AMEAÇA: aura vermelha pulsante + contorno vermelho (nada inofensivo usa essas cores)
+function threat(c, x, y, w, h) {
+  const p = .25 + Math.sin(G.t * 7) * .12;
+  c.globalCompositeOperation = 'lighter'; c.globalAlpha = p; R(c, x - 4, y - 4, w + 8, h + 8, '#ff1a3a'); c.globalAlpha = p * .6; R(c, x - 7, y - 7, w + 14, h + 14, '#a0102a');
+  c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
+  R(c, x - 2, y - 2, w + 4, 1, '#ff2a4a'); R(c, x - 2, y + h + 1, w + 4, 1, '#ff2a4a'); R(c, x - 2, y - 2, 1, h + 4, '#ff2a4a'); R(c, x + w + 1, y - 2, 1, h + 4, '#ff2a4a');
+}
+function angryEyes(c, x, y) { R(c, x, y, 3, 2, '#ff3040'); R(c, x + 5, y, 3, 2, '#ff3040'); R(c, x, y - 1, 2, 1, '#0a0a10'); R(c, x + 6, y - 1, 2, 1, '#0a0a10'); }
 SCENES.c4_street = () => {
   const B = buildNight();
   const hero = new Hero(56, NIGHT_FLOOR - 24, LOOKS.mirangoNight); hero.speed = 56; hero.slump = 1; hero.frozen = true;
@@ -78,7 +86,7 @@ SCENES.c4_street = () => {
     enter() { this.script = new Script(this.intro()); },
     *intro() {
       G.fadeA = 1;
-      yield titleCard('CAPÍTULO 4', 'DEPRESSÃO', 'O labirinto de pensamentos intrusivos');
+      yield titleCard('CAPÍTULO 4', 'DEPRESSÃO');
       G.fadeA = 0; this.busX = -150; this.busV = 120;
       sfx('brake');
       yield Tk.until(() => sc.busX >= 0);
@@ -182,27 +190,33 @@ SCENES.c4_street = () => {
         c.globalAlpha = a * 2; R(c, lx - 10, NIGHT_FLOOR, 56, 3, '#a8c0ff'); c.globalAlpha = 1;
       });
       c.globalCompositeOperation = 'source-over';
-      for (const lx of LAMPS) R(c, lx + 12, 74, 8, 2, this.lit[lx] ? '#e8f0ff' : '#a8b8d8');
+      for (const lx of LAMPS) { R(c, lx + 12, 74, 8, 2, this.lit[lx] ? '#e8f0ff' : '#a8b8d8'); if (!this.lit[lx] && lx > 100) { const b = Math.round(Math.sin(G.t * 4) * 2); pixText(c, '+', lx + 8, 140 + b, '#ffe9a0'); } }
+      // outdoor iluminado de IA (único ponto vivo da rua)
+      R(c, 1180, 34, 104, 40, '#141620'); R(c, 1182, 36, 100, 36, '#1f4a6a'); pixText(c, 'CORP.AI', 1232, 40, '#fff', 2, 'center'); pixText(c, 'ELA NAO CANSA.', 1232, 54, '#7fd4ff', 1, 'center'); pixText(c, 'ELA NAO DORME.', 1232, 61, '#7fd4ff', 1, 'center');
+      R(c, 1200, 74, 3, 30, '#141620'); R(c, 1262, 74, 3, 30, '#141620');
       if (this.busX > -140 && this.busX < NIGHT_W) drawBusSide(c, this.busX, NIGHT_FLOOR - 2, '#2a3a5a', true);
       // perigos
       for (const h of HZ) {
         if (h.used && h.t !== 'shadow') continue;
         if (h.t === 'trash') {
-          R(c, h.x, NIGHT_FLOOR - 12, 14, 12, OUT); R(c, h.x + 1, NIGHT_FLOOR - 11, 12, 11, '#3a5a3a'); R(c, h.x - 2, NIGHT_FLOOR - 13, 18, 2, '#2a4a2a');
-          R(c, h.x + 14, NIGHT_FLOOR - 3, 6, 3, '#6a6a5a'); R(c, h.x - 5, NIGHT_FLOOR - 2, 4, 2, '#8a7a5a');
-          if (Math.floor(G.t * 8) % 2) { R(c, h.x + 4 + Math.sin(G.t * 9) * 4, NIGHT_FLOOR - 18, 1, 1, '#888'); R(c, h.x + 9 + Math.cos(G.t * 7) * 3, NIGHT_FLOOR - 20, 1, 1, '#888'); }
+          threat(c, h.x, NIGHT_FLOOR - 12, 14, 12);
+          R(c, h.x, NIGHT_FLOOR - 12, 14, 12, OUT); R(c, h.x + 1, NIGHT_FLOOR - 11, 12, 11, '#2a2a34'); R(c, h.x - 2, NIGHT_FLOOR - 14 + (Math.floor(G.t * 3) % 2), 18, 2, '#1a1a22');
+          R(c, h.x + 2, NIGHT_FLOOR - 11, 10, 4, '#05050a'); angryEyes(c, h.x + 3, NIGHT_FLOOR - 10);
+          for (let i = 0; i < 5; i++) R(c, h.x + 2 + i * 2, NIGHT_FLOOR - 7, 1, 2, '#e8e8e0');
         } else if (h.t === 'flyer') {
           const x = Math.round(h.x + h.fx), y = Math.round(124 + Math.sin(h.t0 * 3) * 4);
-          R(c, x - 1, y - 1, 13, 12, OUT); R(c, x, y, 11, 10, '#e8e4d0'); R(c, x, y, 11, 3, '#c43b3b'); pixText(c, 'VAGA', x + 6, y + 4, '#2a2a2a', 1, 'center');
+          threat(c, x, y, 11, 10);
+          R(c, x - 1, y - 1, 13, 12, OUT); R(c, x, y, 11, 10, '#3a1a24'); R(c, x, y, 11, 3, '#ff2a4a'); pixText(c, 'VAGA', x + 6, y + 4, '#ffb0b8', 1, 'center');
         } else if (h.t === 'shadow') {
           if (h.used) continue;
           const x = h.x;
-          if (h.st === 0) { c.globalAlpha = .75; drawPerson(c, x, NIGHT_FLOOR, LOOKS.chefe, { face: -1, mono: '#0a0b12', outline: '#0a0b12' }); c.globalAlpha = 1; }
+          if (h.st === 0) { threat(c, x - 5, NIGHT_FLOOR - 30, 10, 30); drawPerson(c, x, NIGHT_FLOOR, LOOKS.chefe, { face: -1, mono: '#0a0b12', outline: '#ff2a4a' }); R(c, x - 3, NIGHT_FLOOR - 23, 2, 1, '#ff3040'); R(c, x, NIGHT_FLOOR - 23, 2, 1, '#ff3040'); }
           else {
             const grow = h.st === 1 ? Math.min(1, h.t0 / .55) : 1, fade = h.st === 3 ? Math.max(0, 1 - h.t0 / .6) : 1;
             c.globalAlpha = fade;
             const fw = Math.round(16 + 20 * grow), fh = Math.round(18 + 24 * grow), fx = x - fw / 2, fy = NIGHT_FLOOR - 30 - fh;
-            R(c, fx - 1, fy - 1, fw + 2, fh + 2, '#05060a'); R(c, fx, fy, fw, fh, '#5a6070');
+            threat(c, fx, fy, fw, fh);
+            R(c, fx - 1, fy - 1, fw + 2, fh + 2, '#05060a'); R(c, fx, fy, fw, fh, '#5a6070'); R(c, fx + 3, fy + fh * .32 - 1, 2, 2, '#ff3040'); R(c, fx + fw * .62, fy + fh * .32 - 1, 2, 2, '#ff3040');
             R(c, fx + 3, fy + fh * .32, fw * .3, 3, '#05060a'); R(c, fx + fw * .58, fy + fh * .32, fw * .3, 3, '#05060a');
             R(c, fx + fw * .1, fy + fh * .25, fw * .35, 1, '#05060a'); R(c, fx + fw * .55, fy + fh * .22, fw * .35, 1, '#05060a');
             R(c, fx + fw * .3, fy + fh * .7, fw * .4, 2, '#05060a');
@@ -214,7 +228,8 @@ SCENES.c4_street = () => {
       }
       for (const p of proj) {
         const x = Math.round(p.x), y = Math.round(p.y);
-        if (p.k === 'email') iconMail(c, x, y, '#c8d0f0', 2);
+        threat(c, x, y, 18, 12);
+        if (p.k === 'email') iconMail(c, x, y, '#ffb0b8', 2);
         else { R(c, x - 1, y - 1, 18, 14, OUT); R(c, x + 2, y, 12, 12, '#d8a040'); R(c, x + 4, y + 2, 8, 8, '#f3efe6'); R(c, x + 7, y + 3, 1, 4, '#222'); R(c, x + 7, y + 6, 3, 1, '#222'); R(c, x, y - 1, 4, 3, '#d8a040'); R(c, x + 12, y - 1, 4, 3, '#d8a040'); }
       }
       if (this.showHero) hero.draw(c);
@@ -234,55 +249,62 @@ SCENES.c4_street = () => {
 };
 
 /* ---------- Mini-game 2: Sufocado pelo Próprio Teto ---------- */
-const HOUSE_W = 640, HOUSE_FLOOR = 150;
+const HOUSE_W = 580, HOUSE_FLOOR = 150, HOUSE_CEIL = 92;
 let _house = null;
 function buildHouse() {
+  // móveis na escala do personagem (≈26 px de altura): porta ≈34, pé-direito ≈58
   if (_house) return _house;
   const rng = srand(13);
   _house = makeCanvas(HOUSE_W, H, (c) => {
-    R(c, 0, 0, HOUSE_W, 26, '#0c0d14'); R(c, 0, 26, HOUSE_W, 2, '#1a1a22');
-    vgrad(c, 0, 28, HOUSE_W, 122, ['#2a2c3a', '#22242e']);
-    dither(c, 0, 28, HOUSE_W, 122, '#262836', 6);
-    // descascados na parede
-    for (let i = 0; i < 30; i++) R(c, Math.floor(rng() * HOUSE_W), 30 + Math.floor(rng() * 100), 3 + Math.floor(rng() * 6), 2, '#30323e');
+    // telhado / sótão escuro acima do forro
+    R(c, 0, 0, HOUSE_W, HOUSE_CEIL, '#07080e');
+    for (let x = -60; x < HOUSE_W; x += 12) { c.fillStyle = '#0d0e16'; c.fillRect(x + 60, 40 + ((x / 12) % 2) * 2, 10, 2); }
+    c.fillStyle = '#12131c'; c.beginPath(); c.moveTo(0, HOUSE_CEIL - 4); c.lineTo(HOUSE_W / 2, 30); c.lineTo(HOUSE_W, HOUSE_CEIL - 4); c.closePath(); c.fill();
+    R(c, 0, HOUSE_CEIL - 4, HOUSE_W, 4, '#1a1a22');
+    // paredes
+    vgrad(c, 0, HOUSE_CEIL, HOUSE_W, HOUSE_FLOOR - HOUSE_CEIL, ['#2c2e3c', '#22242e']);
+    dither(c, 0, HOUSE_CEIL, HOUSE_W, HOUSE_FLOOR - HOUSE_CEIL, '#262836', 6);
+    for (let i = 0; i < 24; i++) R(c, Math.floor(rng() * HOUSE_W), HOUSE_CEIL + 4 + Math.floor(rng() * 40), 2 + Math.floor(rng() * 4), 1, '#30323e');
+    R(c, 0, 146, HOUSE_W, 4, '#1a1c24');
     // piso de tábuas
-    R(c, 0, 150, HOUSE_W, 30, '#2a2018'); for (let x = 0; x < HOUSE_W; x += 18) R(c, x, 150, 1, 30, '#1e1610'); R(c, 0, 150, HOUSE_W, 2, '#3a2c20');
-    R(c, 0, 148, HOUSE_W, 2, '#14161c');
-    // porta de entrada
-    R(c, 6, 82, 24, 68, '#3a2a22'); R(c, 8, 84, 20, 64, '#4a3628'); R(c, 24, 116, 2, 4, '#8a6a4a');
-    // sofá
-    R(c, 34, 124, 60, 26, '#3a3050'); R(c, 34, 116, 60, 10, '#443a5c'); R(c, 30, 120, 6, 30, '#3a3050'); R(c, 92, 120, 6, 30, '#3a3050'); R(c, 40, 130, 24, 2, '#2a2240');
+    R(c, 0, 150, HOUSE_W, 30, '#2a2018'); for (let x = 0; x < HOUSE_W; x += 14) R(c, x, 150, 1, 30, '#1e1610'); R(c, 0, 150, HOUSE_W, 2, '#3a2c20');
+    // SALA — porta de entrada (34)
+    R(c, 6, 115, 20, 35, '#3a2a22'); R(c, 8, 117, 16, 33, '#4a3628'); R(c, 21, 133, 2, 2, '#8a6a4a');
+    // sofá (assento a 10, encosto a 20)
+    R(c, 32, 138, 46, 12, '#3a3050'); R(c, 32, 130, 46, 8, '#443a5c'); R(c, 30, 134, 4, 16, '#3a3050'); R(c, 76, 134, 4, 16, '#3a3050'); R(c, 36, 139, 18, 1, '#2a2240'); R(c, 56, 139, 18, 1, '#2a2240');
     // rack e TV
-    R(c, 106, 130, 40, 20, '#3a2e24'); R(c, 108, 104, 34, 26, '#141418'); R(c, 110, 106, 30, 20, '#1e2028'); R(c, 120, 128, 10, 2, '#141418');
+    R(c, 92, 140, 30, 10, '#3a2e24'); R(c, 92, 140, 30, 1, '#4a3e34'); R(c, 98, 126, 18, 13, '#141418'); R(c, 99, 127, 16, 10, '#1e2028'); R(c, 105, 139, 4, 1, '#141418');
     // janela da sala
-    R(c, 160, 60, 40, 44, '#0a0c16'); R(c, 160, 60, 40, 2, '#3a3a44'); R(c, 160, 102, 40, 3, '#3a3a44'); R(c, 179, 60, 2, 44, '#3a3a44');
-    for (let i = 0; i < 6; i++) R(c, 164 + i * 6, 74 + (i % 2) * 6, 4, 6, '#1a1e30');
-    // cozinha
-    R(c, 222, 40, 3, 110, '#1a1a22');
-    R(c, 234, 92, 20, 58, '#c8ccd0'); R(c, 234, 92, 20, 2, '#e8ecf0'); R(c, 234, 116, 20, 1, '#9a9ea8'); R(c, 250, 100, 2, 10, '#888'); R(c, 238, 96, 5, 4, '#ffd54a');
-    R(c, 262, 122, 64, 28, '#5a4a3a'); R(c, 262, 118, 64, 4, '#8a8a8a'); R(c, 278, 120, 26, 4, '#4a4a52');
-    for (let i = 0; i < 6; i++) R(c, 280 + (i % 3) * 7, 108 - Math.floor(i / 3) * 5, 8, 4, pick(['#d8d8d0', '#c8c0b0', '#e0e0d8']));
-    R(c, 270, 60, 50, 22, '#3a3020'); R(c, 272, 62, 46, 18, '#2a2418');
-    R(c, 340, 126, 52, 4, '#6a4a32'); R(c, 344, 130, 3, 20, '#4a3424'); R(c, 386, 130, 3, 20, '#4a3424');
-    for (let i = 0; i < 5; i++) R(c, 346 + i * 8, 122 - (i % 2), 7, 4, i % 2 ? '#f4f4ee' : '#e8d8d0');
-    R(c, 396, 118, 10, 32, '#4a3a2a'); R(c, 396, 116, 12, 3, '#5a4a3a');
-    // corredor
-    R(c, 418, 40, 3, 110, '#1a1a22');
-    R(c, 428, 70, 16, 20, '#3a3020'); R(c, 430, 72, 12, 16, '#4a6a8a'); pixText(c, 'CORP', 436, 77, '#fff', 1, 'center');
-    R(c, 452, 66, 14, 12, '#3a3020'); R(c, 454, 68, 10, 8, '#5a5040');
-    R(c, 444, 134, 22, 16, '#6a5a3a'); R(c, 446, 128, 18, 8, '#7a6a8a');
-    // parede do quarto e porta
-    R(c, 480, 40, 12, 110, '#1e2028');
-    // quarto
-    R(c, 500, 80, 26, 70, '#3a2a22'); R(c, 502, 82, 10, 66, '#4a3628'); R(c, 514, 82, 10, 66, '#4a3628'); R(c, 511, 110, 1, 6, '#8a6a4a'); R(c, 514, 110, 1, 6, '#8a6a4a');
-    R(c, 556, 58, 46, 40, '#0a0c16'); for (let y = 60; y < 98; y += 4) R(c, 556, y, 46, 2, '#2a2c38');
-    R(c, 540, 128, 76, 22, '#3a2e24'); R(c, 542, 120, 72, 10, '#5a6a8a'); R(c, 542, 120, 72, 2, '#7a8aaa'); R(c, 600, 114, 16, 8, '#c8ccd8'); R(c, 538, 108, 6, 42, '#3a2e24');
-    R(c, 620, 132, 14, 18, '#3a2e24'); R(c, 620, 130, 14, 2, '#4a3e34');
-    R(c, 0, 26, 6, 124, '#0c0d14'); R(c, HOUSE_W - 4, 26, 4, 124, '#0c0d14');
+    R(c, 140, 100, 34, 26, '#0a0c16'); R(c, 140, 100, 34, 2, '#3a3a44'); R(c, 140, 124, 34, 3, '#3a3a44'); R(c, 156, 100, 2, 26, '#3a3a44');
+    for (let i = 0; i < 5; i++) R(c, 143 + i * 6, 110 + (i % 2) * 5, 3, 4, '#1a1e30');
+    // arco para a cozinha
+    R(c, 192, HOUSE_CEIL, 6, 18, '#1a1a22');
+    // COZINHA — geladeira (34), bancada (14) com pia e louça, armário aéreo, mesa (14)
+    R(c, 204, 116, 16, 34, '#c8ccd0'); R(c, 204, 116, 16, 1, '#e8ecf0'); R(c, 204, 128, 16, 1, '#9a9ea8'); R(c, 217, 120, 1, 5, '#888'); R(c, 207, 119, 4, 3, '#ffd54a');
+    R(c, 226, 136, 50, 14, '#5a4a3a'); R(c, 226, 135, 50, 2, '#8a8a8a'); R(c, 240, 135, 16, 2, '#4a4a52'); for (let i = 0; i < 4; i++) R(c, 230 + i * 12, 140, 10, 9, '#4e4032');
+    for (let i = 0; i < 6; i++) R(c, 241 + (i % 3) * 5, 131 - Math.floor(i / 3) * 3, 5, 3, pick(['#d8d8d0', '#c8c0b0', '#e0e0d8']));
+    R(c, 230, 104, 42, 12, '#3a3020'); R(c, 232, 106, 18, 8, '#2a2418'); R(c, 252, 106, 18, 8, '#2a2418');
+    R(c, 290, 136, 32, 2, '#6a4a32'); R(c, 292, 138, 2, 12, '#4a3424'); R(c, 318, 138, 2, 12, '#4a3424');
+    for (let i = 0; i < 4; i++) R(c, 294 + i * 6, 134 - (i % 2), 5, 2, i % 2 ? '#f4f4ee' : '#e8d8d0');
+    R(c, 326, 140, 4, 10, '#4a3a2a'); R(c, 326, 130, 2, 10, '#4a3a2a'); R(c, 326, 139, 8, 2, '#5a4a3a');
+    R(c, 340, 142, 7, 8, '#3a3a40');
+    // CORREDOR — fotos e cesto de roupa
+    R(c, 352, HOUSE_CEIL, 4, 58, '#1a1a22');
+    R(c, 364, 108, 10, 12, '#3a3020'); R(c, 365, 109, 8, 10, '#4a6a8a'); pixText(c, 'C', 369, 111, '#fff', 1, 'center');
+    R(c, 380, 104, 9, 8, '#3a3020'); R(c, 381, 105, 7, 6, '#5a5040');
+    R(c, 378, 142, 14, 8, '#6a5a3a'); R(c, 379, 139, 12, 4, '#7a6a8a');
+    // parede do quarto (a porta é desenhada à parte)
+    R(c, 404, HOUSE_CEIL, 8, 24, '#1e2028');
+    // QUARTO — guarda-roupa (38), janela com persiana, cama (12) e criado-mudo (10)
+    R(c, 422, 112, 22, 38, '#3a2a22'); R(c, 423, 113, 10, 36, '#4a3628'); R(c, 434, 113, 9, 36, '#4a3628'); R(c, 432, 128, 1, 4, '#8a6a4a'); R(c, 435, 128, 1, 4, '#8a6a4a');
+    R(c, 462, 100, 30, 24, '#0a0c16'); for (let y = 101; y < 124; y += 3) R(c, 462, y, 30, 1, '#2a2c38');
+    R(c, 484, 138, 46, 12, '#3a2e24'); R(c, 484, 134, 46, 5, '#5a6a8a'); R(c, 484, 134, 46, 1, '#7a8aaa'); R(c, 528, 126, 4, 24, '#3a2e24');
+    R(c, 538, 140, 10, 10, '#3a2e24'); R(c, 538, 139, 10, 2, '#4a3e34'); R(c, 540, 135, 6, 4, '#1a1a1a'); R(c, 541, 136, 4, 1, '#ff3030');
+    R(c, 0, HOUSE_CEIL, 3, 58, '#0c0d14'); R(c, HOUSE_W - 3, HOUSE_CEIL, 3, 58, '#0c0d14');
   });
   return _house;
 }
-const ORB_SPOTS = [[66, 'MENSAGENS: 47'], [125, 'TV: CRISE'], [180, 'VIZINHOS'], [244, 'GELADEIRA VAZIA'], [296, 'LOUÇA'], [366, 'CONTAS'], [404, 'ALUGUEL'], [436, 'CRACHÁ'], [456, 'ROUPA SUJA']];
+const ORB_SPOTS = [[56, 'MENSAGENS: 47'], [107, 'TV: CRISE'], [157, 'VIZINHOS'], [212, 'GELADEIRA VAZIA'], [250, 'LOUÇA'], [306, 'CONTAS'], [338, 'ALUGUEL'], [369, 'CRACHÁ'], [385, 'ROUPA SUJA']];
 SCENES.c4_house = () => {
   const bg = buildHouse();
   const hero = new Hero(34, HOUSE_FLOOR - 24, LOOKS.mirangoNight); hero.speed = 46; hero.slump = 1; hero.frozen = true;
@@ -290,10 +312,10 @@ SCENES.c4_house = () => {
   const parts = new Parts();
   const dark = makeCanvas(W, H);
   const dc = dark.getContext('2d');
-  const wall = { x: 482, y: 40, w: 10, h: 110 };
+  const wall = { x: 404, y: HOUSE_CEIL, w: 8, h: 58 };
   const solids = [{ x: -20, y: HOUSE_FLOOR, w: HOUSE_W + 40, h: 30 }, { x: -10, y: 0, w: 14, h: H }, wall];
   const sc = {
-    cam: { x: 0, y: 0 }, music: 'house', amb: 'house', capY: 32, hero, botTarget() { if (this.open) return 576; let b = null; for (const o of this.orbs) if (!b || Math.abs(o.x - hero.cx) < Math.abs(b.x - hero.cx)) b = o; return b ? b.x : hero.cx; }, t: 0, orbs: [], spawnT: 2.5, count: 0, press: 0, pressV: 0, open: false, doorA: 0, done: false, vig: .4,
+    cam: { x: 0, y: 0 }, music: 'house', amb: 'house', capY: 32, hero, botTarget() { if (this.open) return 506; let b = null; for (const o of this.orbs) if (!b || Math.abs(o.x - hero.cx) < Math.abs(b.x - hero.cx)) b = o; return b ? b.x : hero.cx; }, t: 0, orbs: [], spawnT: 2.5, count: 0, press: 0, pressV: 0, open: false, doorA: 0, done: false, vig: .4,
     enter() {
       this.script = new Script((function* () {
         sfx('door'); yield .4; sfx('click');
@@ -313,7 +335,7 @@ SCENES.c4_house = () => {
     },
     *finish() {
       this.done = true; hero.frozen = true; this.orbs.forEach(o => o.fade = true);
-      yield heroTo(hero, 576);
+      yield heroTo(hero, 500);
       hero.face = 1;
       yield caption('Mirango desaba de bruços na cama, sem tirar os sapatos.', { auto: 2.6 });
       this.lying = true; sfx('thud');
@@ -331,7 +353,7 @@ SCENES.c4_house = () => {
         const maxOrbs = this.count < 4 ? 2 : 3;
         if (this.spawnT <= 0 && this.orbs.length < maxOrbs) {
           const free = ORB_SPOTS.filter(([x]) => !this.orbs.some(o => o.x === x) && Math.abs(x - hero.cx) > 30);
-          if (free.length) { const [x, l] = pick(free); this.orbs.push({ x, y: rnd(96, 124), t: 0, life: rnd(6, 7.5), label: l }); sfx('notif'); }
+          if (free.length) { const [x, l] = pick(free); this.orbs.push({ x, y: rnd(106, 130), t: 0, life: rnd(6, 7.5), label: l }); sfx('notif'); }
           this.spawnT = Math.max(1.6, 2.8 - this.count * .12);
         }
       }
@@ -366,7 +388,7 @@ SCENES.c4_house = () => {
       if (this.open) this.doorA = Math.min(1, this.doorA + dt);
       this.pressV = lerp(this.pressV, this.press, dt * 3);
       this.vig = .4 + this.pressV * .1;
-      this.bed = this.open && !this.done && !hero.frozen && Math.abs(hero.cx - 576) < 28;
+      this.bed = this.open && !this.done && !hero.frozen && Math.abs(hero.cx - 506) < 24;
       if (this.bed && Input.pressed('a')) this.script = new Script(this.finish());
       parts.update(dt);
       const tx = clamp(hero.cx - W / 2, 0, HOUSE_W - W);
@@ -377,11 +399,11 @@ SCENES.c4_house = () => {
       c.drawImage(bg, -cx, 0);
       c.save(); c.translate(-cx, 0);
       // porta do quarto
-      if (!this.open) { R(c, 482, 82, 10, 68, '#4a3628'); R(c, 488, 114, 2, 4, '#8a6a4a'); }
-      else { R(c, 482, 82, Math.round(10 * (1 - this.doorA)) + 2, 68, '#4a3628'); }
+      if (!this.open) { R(c, 404, 116, 8, 34, '#4a3628'); R(c, 409, 132, 2, 2, '#8a6a4a'); }
+      else { R(c, 404, 116, Math.round(6 * (1 - this.doorA)) + 2, 34, '#4a3628'); }
       if (this.lying) {
-        drawPerson(c, 590, 121, LOOKS.mirangoNight, { rot: Math.PI / 2, eyes: 'closed' });
-        R(c, 596, 112, 16, 9, '#c8ccd8'); R(c, 596, 112, 16, 2, '#e8ecf0');
+        drawPerson(c, 498, 130, LOOKS.mirangoNight, { rot: Math.PI / 2, eyes: 'closed' });
+        R(c, 514, 126, 12, 7, '#c8ccd8'); R(c, 514, 126, 12, 2, '#e8ecf0');
       } else hero.draw(c);
       parts.draw(c);
       c.restore();
@@ -391,12 +413,12 @@ SCENES.c4_house = () => {
       dc.globalCompositeOperation = 'destination-out';
       const hole = (x, y, r, a = 1) => { const g = dc.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, `rgba(0,0,0,${a})`); g.addColorStop(1, 'rgba(0,0,0,0)'); dc.fillStyle = g; dc.fillRect(x - r, y - r, r * 2, r * 2); };
       hole(hero.cx - cx, hero.y + 8, 56, .9);
-      hole(180 - cx, 90, 50, .8); hole(579 - cx, 90, 52, .7); hole(240 - cx, 98, 18, .4);
+      hole(157 - cx, 114, 40, .8); hole(477 - cx, 114, 40, .7); hole(212 - cx, 122, 14, .4);
       for (const o of this.orbs) hole(o.x - cx, o.y, 20 + o.t * 3, .8);
       c.drawImage(dark, 0, 0);
       // feixes de luz do poste pela janela
       c.globalCompositeOperation = 'lighter'; c.globalAlpha = .08;
-      c.fillStyle = '#a8c0ff'; c.beginPath(); c.moveTo(160 - cx, 62); c.lineTo(200 - cx, 62); c.lineTo(240 - cx, 150); c.lineTo(170 - cx, 150); c.fill();
+      c.fillStyle = '#a8c0ff'; c.beginPath(); c.moveTo(140 - cx, 102); c.lineTo(174 - cx, 102); c.lineTo(200 - cx, 150); c.lineTo(150 - cx, 150); c.fill();
       c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
       // esferas
       for (const o of this.orbs) {
@@ -427,37 +449,42 @@ SCENES.c4_house = () => {
       T(c, 'Afastadas: ' + this.count + '/8', 10, 8, { f: FONT2, size: 9, col: '#c8d0f0' });
       T(c, 'Pressão: ' + '■'.repeat(this.press) + '□'.repeat(Math.max(0, 4 - this.press)), 10, 17, { f: FONT2, size: 9, col: this.press >= 3 ? '#ff8a8a' : '#c8d0f0' });
       if (this.cur) promptAt(c, this.cur.x - this.cam.x, this.cur.y + 18, 'a', 'Afastar');
-      if (this.bed) promptAt(c, 576 - this.cam.x, 90, 'a', 'Desabar na cama');
-      if (this.open && !this.done && !this.bed) objectiveUI(c, this, 'Vá para o quarto', 576, 110);
+      if (this.bed) promptAt(c, 506 - this.cam.x, 96, 'a', 'Desabar na cama');
+      if (this.open && !this.done && !this.bed) objectiveUI(c, this, 'Vá para o quarto', 506, 120);
     }
   };
   return sc;
 };
 
 /* ---------- Quarto (usado no fim do cap. 4 e início do cap. 5) ---------- */
+// O quarto é desenhado em meia resolução (160x90) e ampliado 2x: assim a cama, a porta e o
+// guarda-roupa ficam na escala correta em relação ao Mirango, como em um close.
+const BR_FLOOR = 75;
+const _brc = makeCanvas(160, 90);
+function bedroomFrame(c, fn) { const x = _brc.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, 160, 90); fn(x); c.drawImage(_brc, 0, 0, 320, 180); }
 function drawBedroom(c, mode, t) {
-  const night = mode === 'night';
-  vgrad(c, 0, 0, W, 150, night ? ['#10121c', '#181a26'] : ['#5a6070', '#7a808e']);
-  R(c, 0, 150, W, 30, night ? '#1a1410' : '#4a3a2c'); for (let x = 0; x < W; x += 18) R(c, x, 150, 1, 30, night ? '#120e0a' : '#3a2c20');
+  const night = mode === 'night', wood = night ? '#2a2018' : '#5a4430', woodL = night ? '#34281e' : '#6a5038';
+  vgrad(c, 0, 0, 160, BR_FLOOR, night ? ['#10121c', '#181a26'] : ['#5a6070', '#7a808e'], 12);
+  R(c, 0, BR_FLOOR - 2, 160, 2, night ? '#0c0d14' : '#4a4e58');
+  R(c, 0, BR_FLOOR, 160, 15, night ? '#1a1410' : '#4a3a2c'); for (let x = 0; x < 160; x += 9) R(c, x, BR_FLOOR, 1, 15, night ? '#120e0a' : '#3a2c20');
   // janela com persiana
-  R(c, 190, 30, 70, 56, night ? '#06070e' : '#b8c0cc');
-  for (let y = 32; y < 86; y += 5) R(c, 190, y, 70, 3, night ? '#20222c' : '#d8dce4');
-  R(c, 188, 28, 74, 3, '#3a3020'); R(c, 188, 86, 74, 3, '#3a3020');
-  // guarda-roupa
-  R(c, 30, 60, 46, 90, night ? '#2a2018' : '#5a4430'); R(c, 32, 62, 20, 86, night ? '#34281e' : '#6a5038'); R(c, 54, 62, 20, 86, night ? '#34281e' : '#6a5038'); R(c, 50, 100, 2, 6, '#8a6a4a'); R(c, 54, 100, 2, 6, '#8a6a4a');
-  // cama
-  R(c, 120, 126, 120, 24, night ? '#2a2018' : '#5a4430'); R(c, 120, 116, 120, 12, night ? '#2a3448' : '#5a6a8a'); R(c, 120, 116, 120, 2, night ? '#3a4458' : '#7a8aaa'); R(c, 114, 100, 8, 50, night ? '#2a2018' : '#5a4430');
-  // criado-mudo + despertador
-  R(c, 250, 126, 22, 24, night ? '#2a2018' : '#5a4430'); R(c, 250, 124, 22, 3, night ? '#34281e' : '#6a5038');
-  R(c, 254, 114, 14, 10, '#1a1a1a'); pixText(c, '06:00', 261, 117, mode === 'alarm' && Math.floor(t * 4) % 2 ? '#1a1a1a' : '#ff3030', 1, 'center');
-  // porta
-  R(c, 292, 74, 24, 76, night ? '#2a2018' : '#5a4430'); R(c, 294, 76, 20, 72, night ? '#34281e' : '#6a5038'); R(c, 310, 112, 2, 4, '#8a6a4a');
+  R(c, 63, 21, 32, 24, '#3a3020'); R(c, 64, 22, 30, 22, night ? '#06070e' : '#b8c0cc');
+  for (let y = 22; y < 44; y += 3) R(c, 64, y, 30, 2, night ? '#20222c' : '#d8dce4');
+  // guarda-roupa (38)
+  R(c, 12, 37, 19, 38, wood); R(c, 13, 38, 8, 37, woodL); R(c, 22, 38, 8, 37, woodL); R(c, 20, 54, 1, 3, '#8a6a4a'); R(c, 23, 54, 1, 3, '#8a6a4a');
+  // cama (12) com cabeceira
+  R(c, 60, 66, 44, 9, wood); R(c, 60, 62, 44, 4, night ? '#2a3448' : '#5a6a8a'); R(c, 60, 62, 44, 1, night ? '#3a4458' : '#7a8aaa'); R(c, 102, 54, 4, 21, wood); R(c, 58, 60, 3, 15, wood);
+  // criado-mudo (10) e despertador
+  R(c, 110, 65, 10, 10, wood); R(c, 110, 64, 10, 2, woodL);
+  R(c, 111, 59, 8, 5, '#1a1a1a'); if (!(mode === 'alarm' && Math.floor(t * 4) % 2)) { R(c, 112, 61, 2, 1, '#ff3030'); R(c, 116, 61, 2, 1, '#ff3030'); R(c, 115, 60, 1, 1, '#ff3030'); R(c, 115, 62, 1, 1, '#ff3030'); }
+  // porta (34)
+  R(c, 137, 40, 18, 35, wood); R(c, 138, 41, 16, 34, woodL); R(c, 151, 58, 1, 2, '#8a6a4a');
 }
 function blindsLight(c, a, col) {
   c.globalCompositeOperation = 'lighter';
-  for (let i = 0; i < 11; i++) {
+  for (let i = 0; i < 8; i++) {
     c.globalAlpha = a; c.fillStyle = col; c.beginPath();
-    const y = 32 + i * 5; c.moveTo(190, y); c.lineTo(260, y); c.lineTo(230, y + 90); c.lineTo(150, y + 90); c.closePath(); c.fill();
+    const y = 22 + i * 3; c.moveTo(64, y); c.lineTo(94, y); c.lineTo(84, y + 45); c.lineTo(48, y + 45); c.closePath(); c.fill();
   }
   c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
 }
@@ -477,11 +504,12 @@ SCENES.c4_end = () => {
     },
     update(dt) { this.t += dt; if (this.script) this.script.update(dt); },
     draw(c) {
-      drawBedroom(c, 'night', this.t);
-      drawPerson(c, 186, 118, LOOKS.mirangoNight, { rot: Math.PI / 2, eyes: 'closed' });
-      R(c, 202, 108, 22, 10, '#c8ccd8'); R(c, 202, 108, 22, 2, '#e8ecf0');
-      blindsLight(c, .05, '#ffd890');
-      if (Math.floor(this.t * .5) % 2) { R(c, 196, 104, 1, 1, '#9fd3ff'); }
+      bedroomFrame(c, (x) => {
+        drawBedroom(x, 'night', this.t);
+        drawPerson(x, 72, 58, LOOKS.mirangoNight, { rot: Math.PI / 2, eyes: 'closed' });
+        R(x, 92, 55, 10, 6, '#c8ccd8'); R(x, 92, 55, 10, 1, '#e8ecf0');
+        blindsLight(x, .05, '#ffd890');
+      });
     }
   };
   return sc;

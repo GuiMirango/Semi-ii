@@ -51,7 +51,7 @@ function frame(ts) {
     G.flashA = Math.max(0, G.flashA - dt * 3);
   }
   // desenho
-  bx.setTransform(1, 0, 0, 1, 0, 0); bx.globalAlpha = 1; bx.globalCompositeOperation = 'source-over';
+  bx.setTransform(1, 0, 0, 1, 0, 0); bx.imageSmoothingEnabled = false; bx.globalAlpha = 1; bx.globalCompositeOperation = 'source-over';
   R(bx, 0, 0, W, H, '#000');
   if (sc) { bx.save(); sc.draw(bx); bx.restore(); postFX(sc); }
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = 1;

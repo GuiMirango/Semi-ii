@@ -25,11 +25,11 @@ SCENES.title = () => {
     music: 'title', amb: 'office', noPause: true, state: 'press', sel: 0, sub: null, csel: 0, t: 0, vig: .5,
     items: ['Novo jogo', 'Capítulos', 'Controles', 'Tela cheia'],
     chapters: [
-      ['1', 'Negação', 'O cérebro institucionalizado', 'c1_office'],
-      ['2', 'Raiva', 'A subversão da matriz centralizada', 'c2_reject'],
-      ['3', 'Barganha', 'O infundíbulo cronossinclástico', 'c3_beach'],
-      ['4', 'Depressão', 'O labirinto de pensamentos intrusivos', 'c4_street'],
-      ['5', 'Aceitação', 'O ciclo eterno e a falsa promoção', 'c5_wake']
+      ['1', 'Negação', '', 'c1_office'],
+      ['2', 'Raiva', '', 'c2_reject'],
+      ['3', 'Barganha', '', 'c3_beach'],
+      ['4', 'Depressão', '', 'c4_street'],
+      ['5', 'Aceitação', '', 'c5_wake']
     ],
     update(dt) {
       this.t += dt;
@@ -71,7 +71,6 @@ SCENES.title = () => {
       c.globalAlpha = k;
       T(c, 'O INFUNDÍBULO', W / 2, 16, { size: 14, align: 'center', col: '#f3efe6', shc: '#5a0d16', sd: 1.5 });
       T(c, 'DE MIRANGO', W / 2, 34, { size: 14, align: 'center', col: '#d8323c', shc: '#2a0408', sd: 1.5 });
-      T(c, 'S = E × I × P', W / 2, 54, { f: FONT2, size: 11, align: 'center', col: '#8f9bc0' });
       c.globalAlpha = 1;
       if (this.state === 'press') {
         if (Math.floor(this.t * 2) % 2 === 0) T(c, 'PRESSIONE QUALQUER TECLA', W / 2, 150, { size: 6, align: 'center', col: '#ffd54a' });
@@ -85,8 +84,7 @@ SCENES.title = () => {
           const on = i === this.csel, y = 86 + i * 16;
           if (on) R(c, 38, y - 2, 244, 15, 'rgba(216,50,60,.25)');
           T(c, ch[0], 46, y + 2, { size: 6, col: on ? '#ffd54a' : '#8a84a0' });
-          T(c, ch[1], 60, y - 1, { f: FONT2, size: 11, col: on ? '#fff' : '#cfc8dc' });
-          T(c, ch[2], 60, y + 6, { f: FONT2, size: 8, col: '#8a84a0' });
+          T(c, ch[1], 60, y + 1, { f: FONT2, size: 12, col: on ? '#fff' : '#cfc8dc' });
         });
         return;
       }
@@ -103,7 +101,6 @@ SCENES.title = () => {
         if (on) { T(c, '▶', 118, y + 1, { size: 6, col: '#d8323c' }); }
         T(c, it, 130, y, { f: FONT2, size: 12, col: on ? '#ffd54a' : '#cfc8dc' });
       });
-      T(c, 'Nicolelis · van Peborgh · Vonnegut', W - 4, 171, { f: FONT2, size: 8, align: 'right', col: '#5d5874' });
     }
   };
   return sc;

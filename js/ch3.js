@@ -83,6 +83,14 @@ function drawBeach(c, cx, tod, o = {}) {
   if (!o.noProps) c.drawImage(B.props, -cx, 0);
 }
 
+function drawAdPlane(c, t) {
+  // até no paraíso a propaganda chega: um aviãozinho com faixa
+  const x = Math.round(((t * 16) % 760) - 260), y = 34 + Math.round(Math.sin(t) * 2);
+  R(c, x + 196, y, 14, 4, '#e8e8e8'); R(c, x + 206, y - 3, 3, 3, '#d8323c'); R(c, x + 200, y + 3, 6, 1, '#888'); R(c, x + 210, y + 1, 2, 2, '#333');
+  for (let i = 0; i < 12; i++) R(c, x + 186 + i, y + 2 + Math.round(Math.sin(t * 6 + i)), 1, 1, '#aaa');
+  R(c, x, y - 3 + Math.round(Math.sin(t * 5)), 186, 11, '#f3efe6'); R(c, x, y - 3 + Math.round(Math.sin(t * 5)), 186, 1, '#d8323c');
+  pixText(c, 'CORP.AI: FERIAS? A IA TRABALHA POR VOCE', x + 93, y - 1 + Math.round(Math.sin(t * 5)), '#1f4a6a', 1, 'center');
+}
 /* ---------- Cena 4: o paraíso vazio + a moeda sem valor ---------- */
 SCENES.c3_beach = () => {
   const hero = new Hero(40, BEACH_FLOOR - 24, LOOKS.mirangoBeach); hero.speed = 66; hero.frozen = true;
@@ -96,7 +104,7 @@ SCENES.c3_beach = () => {
     cam: { x: 0, y: 0 }, music: 'beach', amb: 'waves', t: 0, stage: 0, items: null, hero, botTarget: () => 608,
     enter() {
       this.script = new Script((function* () {
-        yield titleCard('CAPÍTULO 3', 'BARGANHA', 'O Paraíso Vazio');
+        yield titleCard('CAPÍTULO 3', 'BARGANHA');
         yield caption('Areia branca. Mar turquesa. Sol dourado. Nenhuma notificação.', { auto: 3 });
         yield think(mA, 'Eu... consegui? Então é isso? A fuga definitiva?');
         hero.frozen = false; sc.stage = 1;
@@ -137,6 +145,7 @@ SCENES.c3_beach = () => {
     draw(c) {
       const cx = Math.round(this.cam.x);
       drawBeach(c, cx, 0);
+      drawAdPlane(c, this.t);
       c.save(); c.translate(-cx, 0);
       for (const g of gulls) { const f = Math.floor(G.t * 4 + g.ph) % 2; R(c, Math.round(g.x) - 3, Math.round(g.y) + (f ? 0 : -1), 3, 1, '#fff'); R(c, Math.round(g.x) + 1, Math.round(g.y) + (f ? 0 : -1), 3, 1, '#fff'); R(c, Math.round(g.x), Math.round(g.y) + 1, 1, 1, '#ddd'); }
       for (const cb of crabs) { const x = Math.round(cb.x); R(c, x - 3, 160, 7, 3, '#e04a3a'); R(c, x - 4, 159, 1, 2, '#e04a3a'); R(c, x + 4, 159, 1, 2, '#e04a3a'); R(c, x - 1, 159, 1, 1, '#111'); R(c, x + 1, 159, 1, 1, '#111'); }
@@ -351,24 +360,48 @@ SCENES.c3_sunset = () => {
     music: 'calm', amb: 'waves', tod: 0, t: 0, pose: { sit: true, arms: 'drink', face: -1 }, qs: [],
     enter() { this.script = new Script(this.run()); },
     *run() {
+      const sit = (o = {}) => { this.pose = Object.assign({ sit: true, face: -1 }, o); };
       sfx('slurp');
-      yield think(m, 'Ahh... água de coco gelada. À sombra. Paz. Paz de verdade.');
+      yield think(m, 'Ahh... água de coco gelada. À sombra. Paz.');
       yield caption('Um breve momento de paz genuína.', { auto: 2.4 });
-      this.pose = { sit: true, face: -1 };
-      Music.play(null);
-      yield caption('O sol baixa. Horas se passam.', { auto: 2 });
-      yield { t: 0, update(dt) { this.t += dt; sc.tod = Math.min(1, this.t / 7); return this.t > 7; } };
-      this.pose = { sit: true, face: -1, tic: true };
+      sit(); Music.play(null);
+      yield 3;
+      yield say(m, 'É isso...', { auto: 1.8 });
+      yield 3;
+      yield say(m, '...legal.', { auto: 1.4 });
+      yield 3.5;
+      sit({ face: 1 });
+      yield 1.5;
+      yield say(m, 'Bonito, né. O mar.', { auto: 1.8 });
+      yield 3;
+      yield caption('O sol baixa. Uma hora. Duas.', { auto: 2.2 });
+      yield { t: 0, update(dt) { this.t += dt; sc.tod = Math.min(.6, this.t / 7); return this.t > 4.5; } };
+      yield say(m, 'Uma onda... duas ondas...', { auto: 2 });
+      yield { t: 0, update(dt) { this.t += dt; sc.tod = Math.min(1, .6 + this.t / 8); return this.t > 2.5; } };
+      yield say(m, '...trezentas e doze ondas.', { auto: 2 });
+      yield 2.5;
+      sit({ face: 1, arms: 'out' }); sfx('swoosh');
+      parts.add({ x: m.x + 8, y: 140, vx: 70, vy: -60, g: 120, life: 1.4, col: '#8a8490', s: 2 });
+      yield 1.5; sit({ face: 1 });
+      yield say(m, 'Legal.', { auto: 1.2 });
+      yield 3.5;
+      sit({ face: 1, mouth: 'open', eyes: 'closed' });
+      yield say(m, '*bocejo*', { auto: 1.4 });
+      sit({ face: 1 });
+      yield 3;
+      sit({ face: -1, tic: true });
       sfx('notif'); this.qs.push({ x: m.x + 10, y: 120, t: 0 });
       yield think(m, '...Isso foi uma notificação?');
-      this.pose = { sit: true, face: -1, arms: 'phone' };
+      sit({ face: -1, arms: 'phone' });
       yield think(m, 'Cadê meu celular? Que horas são? Tem alguma meta? Algum prazo?');
       AU.amb('ring');
       sfx('notif'); this.qs.push({ x: m.x - 20, y: 110, t: 0 });
-      this.pose = { sit: true, face: 1, tic: true, eyes: 'wide' };
-      yield caption('Sem metas, sem relógio, sem chefes. A mente — viciada em dopamina barata, cortisol e notificações a cada 13 segundos — entra em abstinência.', { auto: 5.4 });
-      yield caption('O "zumbi digital orgânico" sente falta da coleira.', { auto: 3 });
+      sit({ face: 1, tic: true, eyes: 'wide' });
+      yield caption('Sem metas, sem relógio, sem chefes. A mente, viciada em notificações a cada 13 segundos, entra em abstinência.', { auto: 4.6 });
       yield { t: 0, update(dt) { this.t += dt; sc.tod = 1 + Math.min(.6, this.t / 4); sc.desat = Math.min(.4, this.t / 6); return this.t > 3; } };
+      sit({ face: 1 });
+      yield say(m, 'É isso. Isso é tudo.', { auto: 2 });
+      yield 2.5;
       yield caption('O silêncio da ilha soa ensurdecedor.', { auto: 2.6 });
       this.pose = { face: -1, tremble: 1, eyes: 'wide' };
       yield think(m, 'Eu preciso... produzir alguma coisa. QUALQUER coisa.');
@@ -378,6 +411,7 @@ SCENES.c3_sunset = () => {
     draw(c) {
       const cx = BEACH_W - W;
       drawBeach(c, cx, this.tod);
+      if (this.tod < .9) drawAdPlane(c, this.t + 20);
       // sombra comprida
       c.globalAlpha = .25; R(c, m.x - cx - 30 - this.tod * 30, BEACH_FLOOR - 1, 30 + this.tod * 30, 3, '#3a2a1a'); c.globalAlpha = 1;
       drawPerson(c, m.x - cx, m.y, LOOKS.mirangoBeach, this.pose);
@@ -396,27 +430,27 @@ SCENES.c3_dream = () => {
   const mA = heroActor(hero);
   const parts = new Parts();
   const solids = [{ x: -20, y: BEACH_FLOOR, w: BEACH_W + 40, h: 30 }];
-  const LBL = ['PROTOCOLO', 'CARIMBO', 'ANEXO 3', 'VIA 2', 'FORMULARIO', 'PARECER', 'ATA', 'PENDENCIA'];
-  const blocks = Array.from({ length: 7 }, (_, i) => ({ x: 90 + i * 78 + rnd(-10, 10), y0: rnd(96, 140), y: 0, w: LBL[i % LBL.length].length * 4 + 5, h: 12, ph: rnd(6), amp: rnd(6, 14), sp: rnd(.6, 1.2), vx: rnd(-8, 8), label: LBL[i % LBL.length] }));
+  // caranguejos que andam de lado (pule por cima) e uma gaivota que mergulha avisando antes
+  const crabs = [[200, 160, 250], [400, 370, 470], [590, 560, 620]].map(([x, a, b]) => ({ x, a, b, d: Math.random() < .5 ? -1 : 1, snap: 0 }));
+  const diver = { st: 'off', t: 0, x: 0, y: -20, tx: 0 };
   const shells = [70, 190, 260, 420, 600].map(x => ({ x, got: false }));
   const gulls = Array.from({ length: 3 }, (_, i) => ({ x: 100 + i * 200, y: 50 + i * 8, v: 14 }));
-  const meteors = [];
   const sc = {
     cam: { x: 0, y: 0 }, music: 'dream', amb: 'dream', t: 0, bore: 100, shellsDone: false, sheet: 0, sheetDone: false, waveHits: 0, waveDone: false,
     hero, botTarget() { const s = shells.find(s => !s.got); if (s) return s.x; if (!this.shellsDone) return 120; if (!this.sheetDone) return 330; return 545; },
-    waveGame: null, metT: 2, tint: ['#b8a0ff', .22, 'multiply'], desat: .3, aligned: false, melt: false, climax: false, rocks: [[150, 0], [470, 0]],
+    waveGame: null, diveT: 5, tint: ['#b8a0ff', .22, 'multiply'], desat: .3, aligned: false, melt: false, climax: false, rocks: [[150, 0], [470, 0]],
     enter() {
       this.script = new Script((function* () {
         hero.frozen = true;
         yield bigText('O CONSTRUTOR DE ILUSÕES', 1.6, { size: 11, zoom: true, col: '#d8c0ff' });
-        yield caption('A paleta do paraíso desbota. Blocos de burocracia flutuam. E-mails fantasmas caem como meteoros.', { auto: 4 });
-        Balloons.add(null, 'Recrie o trabalho: alinhe 5 conchas, desenhe uma planilha na areia e cronometre as ondas.', { type: 'caption', auto: 6, bottom: true });
+        yield caption('A paleta do paraíso desbota. Caranguejos e gaivotas não ligam para produtividade.', { auto: 3.4 });
+        Balloons.add(null, 'Recrie o trabalho: alinhe 5 conchas, desenhe uma planilha na areia e cronometre as ondas. Pule os caranguejos; fuja da sombra da gaivota.', { type: 'caption', auto: 6.5, bottom: true });
         hero.frozen = false;
       })());
     },
     hurt(src) {
       if (hero.inv > 0) return;
-      hero.inv = 1.2; hero.stun = .4; hero.vx = (hero.cx < src ? -1 : 1) * 110; hero.vy = -100; this.bore -= 12; sfx('hurt'); sfx('glitch'); G.shake(3); G.glitch = .5;
+      hero.inv = 1.6; hero.stun = .2; hero.vx = (hero.cx < src ? -1 : 1) * 80; hero.vy = -70; this.bore -= 8; sfx('hurt'); G.shake(2);
     },
     *meltdown() {
       this.melt = true; hero.frozen = true; hero.vx = 0;
@@ -432,8 +466,8 @@ SCENES.c3_dream = () => {
       this.climax = true; hero.frozen = true; hero.vx = 0; Music.play(null); sfx('glitch');
       yield { t: 0, update(dt) { this.t += dt; G.glitch = Math.min(1, this.t / 1.5); sc.redSun = Math.floor(this.t * 6) % 2 === 0; if (Math.random() < .2) sfx('glitch'); return this.t > 1.6; } };
       yield caption('O paraíso sofre um glitch massivo. A mente hiper-institucionalizada não suporta a paz.', { auto: 3 });
-      // tropeça num bloco de burocracia
-      const b = blocks[0]; b.x = hero.cx + 6; b.y0 = BEACH_FLOOR - 12; b.amp = 0;
+      // tropeça num caranguejo
+      const cb = crabs[0]; cb.a = cb.b = cb.x = hero.cx + hero.face * 14; cb.d = 0;
       hero.auto = hero.cx + 30; hero.frozen = false;
       yield .35; hero.auto = null; hero.frozen = true;
       yield { t: 0, update(dt) { this.t += dt; hero.pose = { rot: hero.face * Math.min(1.5, this.t * 5), eyes: 'wide', mouth: 'shout' }; return this.t > .4; } };
@@ -464,21 +498,20 @@ SCENES.c3_dream = () => {
       }
       const lack = 1 - clamp(this.bore / 100, 0, 1);
       if (!this.climax) { this.desat = .25 + lack * .5; this.vig = lack * .7; G.glitch = Math.max(0, G.glitch - dt * 1.5); if (lack > .7 && Math.random() < .02) G.glitch = .25; }
-      // blocos de burocracia
-      for (const b of blocks) {
-        b.x += b.vx * dt; if (b.x < 40 || b.x > BEACH_W - 40) b.vx *= -1;
-        b.y = b.y0 + Math.sin(this.t * b.sp + b.ph) * b.amp;
-        if (!this.climax && overlap(hero, { x: b.x, y: b.y, w: b.w, h: b.h })) this.hurt(b.x + b.w / 2);
+      // caranguejos
+      for (const cb of crabs) {
+        cb.x += cb.d * 13 * dt; if (cb.x < cb.a) cb.d = 1; if (cb.x > cb.b) cb.d = -1;
+        cb.snap = Math.abs(hero.cx - cb.x) < 28 ? cb.snap + dt : 0;
+        if (!this.climax && overlap(hero, { x: cb.x - 4, y: BEACH_FLOOR - 5, w: 9, h: 5 })) { this.hurt(cb.x); if (hero.inv > 1.5) sayAuto(mA, 'Ai! Belisco não tem prazo!', 1.2, {}); }
       }
-      // meteoros de e-mail
-      if (!this.climax) { this.metT -= dt; if (this.metT <= 0) { this.metT = rnd(1.1, 2) * (.6 + this.bore / 200); const x = clamp(hero.cx + rnd(-110, 110), 10, BEACH_W - 10); meteors.push({ x, y: -20, vx: rnd(-15, 15), vy: rnd(85, 115) }); } }
-      for (const mt of meteors) {
-        mt.x += mt.vx * dt; mt.y += mt.vy * dt;
-        if (Math.random() < .7) parts.add({ x: mt.x + 4, y: mt.y, vx: rnd(-6, 6), vy: -20, life: .5, col: pick(['#ff8a5a', '#ffd54a', '#ff5252']), s: 2 });
-        if (overlap(hero, { x: mt.x - 1, y: mt.y - 1, w: 11, h: 8 })) { mt.dead = true; this.hurt(mt.x); }
-        if (mt.y > BEACH_FLOOR - 6) { mt.dead = true; sfx('pop'); parts.burst(mt.x + 4, BEACH_FLOOR - 2, 10, { col: ['#e8d8f8', '#fff'], min: 20, max: 60, g: 160 }); }
-      }
-      for (let i = meteors.length - 1; i >= 0; i--) if (meteors[i].dead) meteors.splice(i, 1);
+      // gaivota mergulhadora (aviso → mergulho → vai embora)
+      if (!this.climax && !this.melt) {
+        const d = diver;
+        if (d.st === 'off') { this.diveT -= dt; if (this.diveT <= 0) { d.st = 'warn'; d.t = 0; d.tx = hero.cx; d.x = hero.cx - 80; d.y = 30; sfx('gull'); } }
+        else if (d.st === 'warn') { d.t += dt; d.x = lerp(d.x, d.tx + Math.cos(d.t * 5) * 20, dt * 3); d.y = 30 + Math.sin(d.t * 5) * 4; if (d.t > 1.4) { d.st = 'dive'; d.t = 0; d.sx = d.x; d.sy = d.y; sfx('swoosh'); } }
+        else if (d.st === 'dive') { d.t += dt; const k = Math.min(1, d.t / .45); d.x = lerp(d.sx, d.tx, k); d.y = lerp(d.sy, BEACH_FLOOR - 10, k * k); if (d.y > BEACH_FLOOR - 26 && overlap(hero, { x: d.x - 6, y: d.y - 4, w: 12, h: 8 })) { this.hurt(d.x); sayAuto(mA, 'Sai, gaivota!', 1, {}); } if (k >= 1) { d.st = 'up'; d.t = 0; } }
+        else if (d.st === 'up') { d.t += dt; d.x += 90 * dt; d.y -= 70 * dt; if (d.y < -20) { d.st = 'off'; this.diveT = rnd(3.5, 5.5); } }
+      } else diver.st = 'off';
       // conchas
       for (const s of shells) if (!s.got && Math.abs(hero.cx - s.x) < 8 && hero.fy > BEACH_FLOOR - 4) { s.got = true; sfx('coin'); }
       for (const g of gulls) { g.x += g.v * dt; if (g.x > BEACH_W + 20) g.x = -20; }
@@ -529,16 +562,27 @@ SCENES.c3_dream = () => {
       // pedras
       for (const [x] of this.rocks) { R(c, x, 154, 10, 6, '#7a7488'); R(c, x + 1, 154, 8, 2, '#9a94a8'); }
       for (const g of gulls) { const f = Math.floor(G.t * 4) % 2; R(c, Math.round(g.x) - 3, g.y + (f ? 0 : -1), 3, 1, '#eee'); R(c, Math.round(g.x) + 1, g.y + (f ? 0 : -1), 3, 1, '#eee'); }
-      // sombras de alerta dos meteoros
-      for (const mt of meteors) { const k = clamp(mt.y / BEACH_FLOOR, 0, 1); c.globalAlpha = .2 + k * .4; R(c, Math.round(mt.x + mt.vx * (BEACH_FLOOR - mt.y) / mt.vy) - 2, BEACH_FLOOR, 8 + Math.round(k * 6), 2, '#2a1a3a'); c.globalAlpha = 1; }
-      for (const b of blocks) {
-        c.globalAlpha = this.climax ? 1 : .82;
-        R(c, Math.round(b.x) - 1, Math.round(b.y) - 1, b.w + 2, b.h + 2, '#2a2438'); R(c, Math.round(b.x), Math.round(b.y), b.w, b.h, '#8a8698'); R(c, Math.round(b.x), Math.round(b.y), b.w, 2, '#aaa6b8');
-        pixText(c, b.label, Math.round(b.x) + b.w / 2 + 1, Math.round(b.y) + 4, '#2a2438', 1, 'center');
-        c.globalAlpha = 1;
+      // caranguejos (vermelho vivo, garras abrindo quando você chega perto)
+      for (const cb of crabs) {
+        const x = Math.round(cb.x), y = BEACH_FLOOR, op = Math.floor(cb.snap * 8) % 2;
+        R(c, x - 5, y - 5, 11, 5, OUT); R(c, x - 4, y - 4, 9, 3, '#e8402a'); R(c, x - 4, y - 4, 9, 1, '#ff8a6a');
+        R(c, x - 7, y - 7 - op, 3, 3, '#e8402a'); R(c, x + 5, y - 7 - op, 3, 3, '#e8402a'); R(c, x - 7, y - 7 - op, 1, 1, OUT); R(c, x + 7, y - 7 - op, 1, 1, OUT);
+        R(c, x - 2, y - 7, 1, 2, '#111'); R(c, x + 2, y - 7, 1, 2, '#111');
+        for (let i = -3; i <= 3; i += 2) R(c, x + i, y - 1, 1, 1, '#a82a1a');
+      }
+      // gaivota: sombra de aviso no chão e o mergulho
+      const d = diver;
+      if (d.st === 'warn' || d.st === 'dive') {
+        const k = d.st === 'warn' ? Math.min(1, d.t / 1.4) : 1;
+        c.globalAlpha = .25 + k * .45; R(c, Math.round(d.tx) - 8, BEACH_FLOOR, 16, 3, '#2a0a1a'); c.globalAlpha = 1;
+        if (d.st === 'warn' && Math.floor(G.t * 8) % 2) pixText(c, '!', Math.round(d.tx), BEACH_FLOOR - 40, '#ff5252', 2, 'center');
+      }
+      if (d.st !== 'off') {
+        const x = Math.round(d.x), y = Math.round(d.y), f = d.st === 'dive' ? 0 : Math.floor(G.t * 8) % 2;
+        R(c, x - 4, y - 2, 9, 4, OUT); R(c, x - 3, y - 1, 7, 2, '#f4f4f4'); R(c, x + 3, y - 1, 3, 1, '#ffb030');
+        R(c, x - 9, y - 2 - (f ? 2 : 0), 6, 1, '#d8d8d8'); R(c, x + 3, y - 2 - (f ? 2 : 0), 6, 1, '#d8d8d8'); R(c, x + 1, y - 2, 1, 1, '#111');
       }
       hero.draw(c);
-      for (const mt of meteors) iconMail(c, Math.round(mt.x), Math.round(mt.y), '#f0e8ff');
       parts.draw(c);
       c.restore();
     },

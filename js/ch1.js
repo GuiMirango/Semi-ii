@@ -46,8 +46,8 @@ function buildOffice(auto) {
     pixText(c, 'SALA DE REUNIAO', 580, 71, '#cfd8e3', 1, 'center');
     // cartazes motivacionais
     const posters = auto
-      ? [[96, 'AUTOMATIZE', 'SE', '#2a6a9a'], [298, 'S=E×I×P', '×IA', '#3a3a5a'], [420, 'OBRIGADO', 'PELA IA', '#7a2a3a'], [690, 'VISTA A', 'NUVEM', '#2a5a4a'], [866, 'GRATIDAO', 'ALGORIT.', '#5a4a2a']]
-      : [[96, 'FOCO', '100%', '#2a6a9a'], [298, 'S=E×I×P', 'SISTEMA', '#3a3a5a'], [420, 'SINERGIA', 'SEMPRE', '#7a2a3a'], [690, 'VISTA A', 'CAMISA', '#2a5a4a'], [866, 'GRATIDAO', '#BORA', '#5a4a2a']];
+      ? [[96, 'AUTOMATIZE', 'SE', '#2a6a9a'], [298, 'PRODUZA', '24/7 IA', '#3a3a5a'], [420, 'OBRIGADO', 'PELA IA', '#7a2a3a'], [690, 'VISTA A', 'NUVEM', '#2a5a4a'], [866, 'GRATIDAO', 'ALGORIT.', '#5a4a2a']]
+      : [[96, 'FOCO', '100%', '#2a6a9a'], [298, 'CORP.AI', 'EM BREVE', '#1f4a6a'], [420, 'SINERGIA', 'SEMPRE', '#7a2a3a'], [690, 'VISTA A', 'CAMISA', '#2a5a4a'], [866, 'GRATIDAO', '#BORA', '#5a4a2a']];
     for (const [x, a, b, col] of posters) {
       R(c, x - 1, 71, 40, 28, '#1d2028'); R(c, x, 72, 38, 26, col); R(c, x + 2, 74, 34, 14, 'rgba(255,255,255,.12)');
       pixText(c, a, x + 19, 77, '#f3efe6', 1, 'center'); pixText(c, b, x + 19, 89, '#ffd54a', 1, 'center');
@@ -63,10 +63,8 @@ function buildOffice(auto) {
     R(c, 266, 129, 5, 5, '#e8e8e8'); R(c, 271, 130, 1, 3, '#e8e8e8'); pixText(c, 'S', 267, 129, '#d8323c');
     R(c, 243, 131, 8, 3, '#f4f4ee'); R(c, 243, 130, 8, 1, '#ddd');
     // arquivo, caixas, prateleira
-    cabinetP(c, 330, FLOOR, 14, 22); boxP(c, 452, FLOOR, 18, 12); boxP(c, 470, FLOOR, 18, 24); boxP(c, 473, FLOOR - 24, 12, 8);
     R(c, 758, 118, 54, 3, '#8a6b4c'); R(c, 760, 121, 2, 6, '#555'); R(c, 806, 121, 2, 6, '#555');
     for (let i = 0; i < 5; i++) R(c, 772 + i * 5, 110, 4, 8, ['#3b6fb0', '#c43b3b', '#e3c34a', '#4a7a5a', '#7a4a9a'][i]);
-    cabinetP(c, 900, FLOOR, 14, 16);
     // máquina de café
     R(c, 384, 136, 24, 14, '#6a4f36'); R(c, 386, 112, 20, 24, '#30343c'); R(c, 388, 115, 16, 6, '#1a1d22'); R(c, 390, 117, 8, 2, '#5aff8a');
     R(c, 393, 124, 6, 4, '#111'); R(c, 394, 129, 4, 5, '#eee'); pixText(c, 'CAFE', 396, 106, '#ffd54a', 1, 'center');
@@ -86,6 +84,30 @@ function buildOffice(auto) {
     chairP(c, 162, FLOOR, '#2f3440'); chairP(c, 262, FLOOR, '#7a2a30'); chairP(c, 700, FLOOR, '#2f3440');
   });
   return (_offCache[key] = { far, bg });
+}
+// obstáculos do escritório: cores fortes, contorno escuro e faixa de alerta para não se confundirem com a decoração
+const OFFICE_OBST = [
+  { x: 326, w: 16, h: 22, k: 'arquivo' }, { x: 450, w: 18, h: 12, k: 'caixa' }, { x: 468, w: 20, h: 26, k: 'caixa' },
+  { x: 534, w: 22, h: 10, k: 'cadeiras' }, { x: 896, w: 18, h: 18, k: 'arquivo' }
+];
+function officeObstSolids() { return OFFICE_OBST.map(o => ({ x: o.x, y: FLOOR - o.h, w: o.w, h: o.h })); }
+function drawOfficeObst(c) {
+  for (const o of OFFICE_OBST) {
+    const x = o.x, y = FLOOR - o.h, w = o.w, h = o.h;
+    c.globalAlpha = .35; R(c, x - 2, FLOOR - 1, w + 4, 2, '#000'); c.globalAlpha = 1;
+    R(c, x - 1, y - 1, w + 2, h + 1, OUT);
+    if (o.k === 'caixa') {
+      R(c, x, y, w, h, '#e0913a'); R(c, x, y, w, 2, '#ffbf6a'); R(c, x + w - 2, y, 2, h, '#a8641e');
+      R(c, x + Math.floor(w / 2) - 1, y, 3, h, '#ffe27a'); if (h > 16) pixText(c, 'FRAGIL', x + w / 2, y + 5, '#c4141e', 1, 'center'); else pixText(c, '!', x + w / 2, y + 3, '#c4141e', 1, 'center');
+    } else if (o.k === 'cadeiras') {
+      R(c, x, y, w, h, '#2a7ad8'); R(c, x, y, w, 2, '#6ab0ff'); for (let i = 2; i < w; i += 6) R(c, x + i, y + 3, 2, h - 3, '#1a4a8a');
+    } else {
+      R(c, x, y, w, h, '#d8463a'); R(c, x, y, w, 2, '#ff8a6a'); R(c, x + w - 2, y, 2, h, '#8a201a');
+      for (let yy = y + 5; yy < FLOOR - 3; yy += 7) { R(c, x + 1, yy + 4, w - 2, 1, '#8a201a'); R(c, x + w / 2 - 2, yy + 1, 4, 1, '#ffe0d0'); }
+    }
+    // faixa zebrada de alerta na base
+    for (let i = 0; i < w; i += 4) { R(c, x + i, FLOOR - 3, 2, 3, '#ffd54a'); R(c, x + i + 2, FLOOR - 3, 2, 3, '#111'); }
+  }
 }
 // cabeças de colegas atrás das divisórias
 const BG_HEADS = [[104, '#7a4b31', '#120c0a'], [186, '#e3b78f', '#6b4a2b'], [312, '#c98e6a', '#2a1a10'], [356, '#f0d0b0', '#c79a4a'], [668, '#5e3a26', '#111'], [742, '#e8c4a0', '#5a3a22'], [818, '#b07a52', '#999'], [920, '#6e432b', '#111']];
@@ -147,19 +169,19 @@ SCENES.c1_office = (o) => (o.resume && G.store.c1) ? G.store.c1 : (G.store.c1 = 
 function makeOffice() {
   const L = buildOffice(false);
   const hero = new Hero(33, FLOOR - 24, LOOKS.mirango);
-  hero.slump = .8; hero.frozen = true; hero.speed = 62;
+  hero.slump = .8; hero.frozen = true; hero.speed = 84; hero.jumpV = 225;
   const mA = heroActor(hero);
   const plinio = npc(LOOKS.plinio, 162, FLOOR, { face: -1, pose: { sit: true, arms: 'type' }, home: 162 });
   const sueli = npc(LOOKS.sueli, 702, FLOOR, { face: -1, pose: { sit: true, arms: 'type' }, home: 702 });
-  const diretor = npc(LOOKS.diretor, 1080, FLOOR, { active: false, busy: false, bt: 3, tx: 900, wait: 0, spd: 46 });
+  const diretor = npc(LOOKS.diretor, 1080, FLOOR, { active: false, busy: false, bt: 3, tx: 900, wait: 0, spd: 56 });
   const chefe = npc(LOOKS.chefe, 580, FLOOR, { active: false });
   const intern = npc(LOOKS.colegaB, 760, FLOOR);
-  const cart = { x: 740, dir: 1, w: 20, h: 14, spd: 30, active: false };
+  const cart = { x: 740, dir: 1, w: 22, h: 16, spd: 40, active: false };
   const solids = [
     { x: -40, y: FLOOR, w: OFFICE_W + 80, h: 40 },
     { x: 128, y: 134, w: 42, h: 4, oneway: true }, { x: 228, y: 134, w: 48, h: 4, oneway: true }, { x: 668, y: 134, w: 42, h: 4, oneway: true },
-    { x: 330, y: 128, w: 14, h: 22 }, { x: 452, y: 138, w: 18, h: 12 }, { x: 470, y: 126, w: 18, h: 24 },
-    { x: 758, y: 118, w: 54, h: 3, oneway: true }, { x: 900, y: 134, w: 14, h: 16 }, { x: 384, y: 136, w: 24, h: 3, oneway: true }
+    ...officeObstSolids(),
+    { x: 758, y: 118, w: 54, h: 3, oneway: true }, { x: 384, y: 136, w: 24, h: 3, oneway: true }
   ];
   const sc = {
     cam: { x: 0, y: 0 }, music: 'office', amb: 'office', capY: 44, parts: new Parts(), hero, phase: 0, showHUD: false,
@@ -178,10 +200,10 @@ function makeOffice() {
       yield .6; sfx('ding'); yield fadeTo(0, 1.4);
       yield { t: 0, update(dt) { this.t += dt; sc.elevOpen = Math.min(1, this.t / .9); return this.t >= .9; } };
       yield .4;
-      this.inElev = false; hero.speed = 34; yield heroTo(hero, 104); hero.speed = 62;
+      this.inElev = false; hero.speed = 40; yield heroTo(hero, 104); hero.speed = 84;
       yield think(mA, 'Só mais um dia, tudo bem... eu dou conta.');
       yield { t: 0, update(dt) { this.t += dt; sc.elevOpen = Math.max(0, 1 - this.t / .9); return this.t >= .9; } };
-      yield titleCard('CAPÍTULO 1', 'NEGAÇÃO', 'O cérebro institucionalizado');
+      yield titleCard('CAPÍTULO 1', 'NEGAÇÃO');
       plinio.pose = {}; plinio.face = -1;
       yield walkTo(plinio, hero.cx + 20, 50);
       plinio.face = -1;
@@ -305,9 +327,9 @@ function makeOffice() {
       // fase 2: pedidos extras de impressão
       if (this.phase === 2 && this.showHUD && !this.script) {
         this.p2t += dt;
-        if (this.p2jobs === 0 && this.p2t > 9) { this.p2jobs = 1; this.jobs.push({ for: sueli, st: 'queued', t: 0 }); sueli.pose = { arms: 'up' }; sayAuto(sueli, 'Mirango! Imprime o relatório trimestral pra mim?', 3, { name: 'SUELI' }); setTimeout(() => { sueli.pose = { sit: true, arms: 'type' }; }, 2500); }
-        if (this.p2jobs === 1 && this.p2t > 30) { this.p2jobs = 2; this.jobs.push({ for: plinio, st: 'queued', t: 0 }); sayAuto(plinio, 'Mirangão! Mais uma cópia daqueles contratos? :)', 3, { name: 'PLÍNIO' }); }
-        if (this.answered >= 5 && this.p2jobs === 2 && this.jobs.every(j => j.st === 'done')) this.startPhase3();
+        if (this.p2jobs === 0 && this.p2t > 5) { this.p2jobs = 1; this.jobs.push({ for: sueli, st: 'queued', t: 0 }); sueli.pose = { arms: 'up' }; sayAuto(sueli, 'Mirango! Imprime o relatório trimestral pra mim?', 3, { name: 'SUELI' }); setTimeout(() => { sueli.pose = { sit: true, arms: 'type' }; }, 2500); }
+        if (this.p2jobs === 1 && this.p2t > 18) { this.p2jobs = 2; this.jobs.push({ for: plinio, st: 'queued', t: 0 }); sayAuto(plinio, 'Mirangão! Mais uma cópia daqueles contratos? :)', 3, { name: 'PLÍNIO' }); }
+        if (this.answered >= 4 && this.p2jobs === 2 && this.jobs.every(j => j.st === 'done')) this.startPhase3();
       }
       // diretor andarilho
       if (diretor.active) {
@@ -365,7 +387,7 @@ function makeOffice() {
         else if (J('ready')) { t = 'Pegue as impressões na impressora'; x = 984; }
         else if (J('queued')) { t = 'Envie a impressão no seu terminal'; x = 254; }
         else if (J('printing')) { t = 'Imprimindo...'; x = 984; }
-        else if (this.phase === 2 && this.showHUD) { t = 'Responda os e-mails (' + Math.min(this.answered, 5) + '/5)'; x = 254; }
+        else if (this.phase === 2 && this.showHUD) { t = 'Responda os e-mails (' + Math.min(this.answered, 4) + '/4)'; x = 254; }
       } else if (this.phase === 3) {
         if (!this.hasDocs && this.signs === 0) { t = 'Fale com a Sueli'; x = sueli.x; }
         else if (this.signs < 3) { t = 'Pegue a assinatura do Diretor (' + this.signs + '/3)'; x = diretor.x; }
@@ -399,11 +421,14 @@ function makeOffice() {
       if (chefe.active) chefe.draw(c);
       if (cart.active) {
         intern.draw(c);
-        R(c, cart.x, FLOOR - 14, cart.w, 10, '#5a6a8a'); R(c, cart.x, FLOOR - 14, cart.w, 2, '#7a8aaa');
-        R(c, cart.x + 2, FLOOR - 18, 7, 4, '#d9c8a0'); R(c, cart.x + 10, FLOOR - 17, 8, 3, '#f4f4ee');
-        R(c, cart.x + 2, FLOOR - 3, 3, 3, '#222'); R(c, cart.x + cart.w - 5, FLOOR - 3, 3, 3, '#222');
+        R(c, cart.x - 1, FLOOR - 17, cart.w + 2, 15, OUT); R(c, cart.x, FLOOR - 16, cart.w, 12, '#e8c42a'); R(c, cart.x, FLOOR - 16, cart.w, 2, '#fff07a');
+        for (let i = 0; i < cart.w; i += 4) R(c, cart.x + i, FLOOR - 7, 2, 3, '#111');
+        R(c, cart.x + 3, FLOOR - 21, 7, 5, '#d9c8a0'); R(c, cart.x + 11, FLOOR - 20, 8, 4, '#f4f4ee');
+        R(c, cart.x + cart.w / 2 - 1, FLOOR - 24, 3, 3, Math.floor(G.t * 6) % 2 ? '#ff3030' : '#7a1010');
+        R(c, cart.x + 2, FLOOR - 3, 4, 3, '#222'); R(c, cart.x + cart.w - 6, FLOOR - 3, 4, 3, '#222');
       }
       if (this.donut) { const b = Math.sin(G.t * 3) > 0 ? 0 : 1; R(c, 780, 111 + b, 7, 6, '#eee'); R(c, 781, 112 + b, 5, 4, '#6a3a1a'); R(c, 787, 112 + b, 2, 3, '#eee'); if (Math.floor(G.t * 4) % 4 === 0) R(c, 782, 106 + b, 1, 2, '#fff'); }
+      drawOfficeObst(c);
       if (!this.inElev) hero.draw(c);
       this.parts.draw(c);
       for (const p of this.mailPops) { c.globalAlpha = 1 - p.t / 1.4; iconMail(c, Math.round(p.x), Math.round(p.y), '#fff'); c.globalAlpha = 1; }
@@ -438,8 +463,8 @@ function makeOffice() {
       cond: () => sc.phase >= 1 && !sc.ringing && (sc.jobs.some(j => j.st === 'queued') || (sc.emails > 0 && sc.showHUD)),
       label: () => sc.jobs.some(j => j.st === 'queued') ? 'Enviar impressão' : 'Responder e-mail',
       act: () => {
-        if (sc.jobs.some(j => j.st === 'queued')) startBusy(.9, () => { for (const j of sc.jobs) if (j.st === 'queued') { j.st = 'printing'; j.t = 2.6; } sfx('print'); sc.floatTx.push({ x: 256, y: 110, t: 0, s: 'ENVIADO!', col: '#7ad0ff' }); });
-        else startBusy(sc.phase === 5 ? 1.1 : .75, () => { if (sc.emails > 0) { sc.emails--; sc.answered++; sc.sanity = Math.min(100, sc.sanity + (sc.phase === 5 ? 2 : 3)); sfx('ok'); sc.floatTx.push({ x: 256, y: 110, t: 0, s: pick(['RESPONDIDO', 'OK!', 'CIENTE', 'DE ACORDO', 'SEGUE ANEXO']), col: '#7aff9a' }); } });
+        if (sc.jobs.some(j => j.st === 'queued')) startBusy(.45, () => { for (const j of sc.jobs) if (j.st === 'queued') { j.st = 'printing'; j.t = 1.4; } sfx('print'); sc.floatTx.push({ x: 256, y: 110, t: 0, s: 'ENVIADO!', col: '#7ad0ff' }); });
+        else startBusy(sc.phase === 5 ? .7 : .4, () => { if (sc.emails > 0) { sc.emails--; sc.answered++; sc.sanity = Math.min(100, sc.sanity + (sc.phase === 5 ? 2 : 3)); sfx('ok'); sc.floatTx.push({ x: 256, y: 110, t: 0, s: pick(['RESPONDIDO', 'OK!', 'CIENTE', 'DE ACORDO', 'SEGUE ANEXO']), col: '#7aff9a' }); } });
       } },
     { x: 238, y: FLOOR, r: 16, py: 104, cond: () => sc.ringing, label: () => 'Atender telefone', act: () => { sc.script = new Script(sc.phoneCall()); } },
     { x: 984, y: FLOOR, r: 22, py: 98, cond: () => sc.jobs.some(j => j.st === 'ready'), label: () => 'Pegar impressões', act: () => { for (const j of sc.jobs) if (j.st === 'ready') j.st = 'carry'; sfx('paper'); } },
@@ -454,14 +479,14 @@ function makeOffice() {
     { get x() { return sueli.x; }, y: FLOOR, r: 18, py: 100, cond: () => sc.phase === 3 && sc.signs >= 3, label: () => 'Entregar documentos', act: () => { sc.script = new Script(sc.sueliDeliver()); } },
     { get x() { return diretor.x; }, y: FLOOR, r: 16, py: 100, cond: () => sc.phase === 3 && diretor.active && sc.hasDocs && sc.signs < 3, label: () => 'Pedir assinatura',
       act: () => {
-        if (diretor.busy) { sayAuto(diretor, pick(['Agora não! Tô numa call!', 'Depois, depois!', 'Manda por e-mail!']), 1.6, { name: 'DR. MOURA' }); diretor.tx = hero.cx < 690 ? rnd(820, 1000) : rnd(380, 520); diretor.wait = 0; diretor.spd = 70; setTimeout(() => diretor.spd = 46, 1800); sfx('hurt'); }
+        if (diretor.busy) { sayAuto(diretor, pick(['Agora não! Tô numa call!', 'Depois, depois!', 'Manda por e-mail!']), 1.6, { name: 'DR. MOURA' }); diretor.tx = hero.cx < 690 ? rnd(820, 1000) : rnd(380, 520); diretor.wait = 0; diretor.spd = 70; setTimeout(() => diretor.spd = 56, 1400); sfx('hurt'); }
         else {
           sc.signs++; sfx('paper'); sc.floatTx.push({ x: diretor.x, y: 110, t: 0, s: 'ASSINATURA ' + sc.signs + '/3', col: '#ffd54a' });
           sayAuto(diretor, ['Rabisca aqui... pronto. Próximo!', 'Assinado. Não me interrompa de novo.', 'Isso é urgente mesmo? Tá, tá.'][sc.signs - 1], 1.8, { name: 'DR. MOURA' });
           diretor.busy = true; diretor.bt = 3.5; diretor.tx = hero.cx < 690 ? rnd(800, 1000) : rnd(380, 520); diretor.wait = 0;
         }
       } },
-    { x: 396, y: FLOOR, r: 14, py: 92, cond: () => sc.showHUD && sc.coffeeCD <= 0 && sc.phase < 6, label: () => 'Tomar café', act: () => { sc.coffeeCD = 14; sc.energy = Math.min(100, sc.energy + 28); sfx('slurp'); sc.floatTx.push({ x: 396, y: 100, t: 0, s: '+28 ENERGIA', col: '#ffd54a' }); hero.pose = { arms: 'drink' }; hero.frozen = true; setTimeout(() => { hero.pose = {}; hero.frozen = false; }, 700); } },
+    { x: 396, y: FLOOR, r: 14, py: 92, cond: () => sc.showHUD && sc.coffeeCD <= 0 && sc.phase < 6, label: () => 'Tomar café', act: () => { sc.coffeeCD = 14; sc.energy = Math.min(100, sc.energy + 28); sfx('slurp'); sc.floatTx.push({ x: 396, y: 100, t: 0, s: '+28 ENERGIA', col: '#ffd54a' }); hero.pose = { arms: 'drink' }; hero.frozen = true; setTimeout(() => { hero.pose = {}; hero.frozen = false; }, 350); } },
     { x: 582, y: FLOOR, r: 14, py: 70, cond: () => sc.phase === 4 && !sc.script, label: () => 'Entrar na reunião', act: () => { sfx('door'); G.go('c1_meeting'); } }
   ];
   return sc;
@@ -473,11 +498,11 @@ SCENES.c1_meeting = () => {
   const chefe = npc(LOOKS.chefe, 252, 150, { face: -1 });
   const mir = { x: 112, y: 140, h: 30 };
   const slides = [
-    ['ALINHAMENTO', 'ESTRATEGICO Q3', 0], ['S = E × I × P', 'SISTEMA = VOCES', 1], ['KPI DOS KPIS', '+ METAS', 2],
+    ['ALINHAMENTO', 'ESTRATEGICO Q3', 0], ['PILOTO CORP.AI', 'EFICIENCIA +300%', 1], ['KPI DOS KPIS', '+ METAS', 2],
     ['CULTURA DE DONO', 'SEM SER DONO', 3], ['MAIS INTERCONEXAO', 'EMAIL A CADA 13S', 4], ['REUNIAO PARA', 'ALINHAR A PROX.', 5]
   ];
   const lines = [
-    'Então, pessoal, rapidinho, cinco minutinhos...', 'Lembrem: S = E × I × P. Vocês são o E! Os Elementos!',
+    'Então, pessoal, rapidinho, cinco minutinhos...', 'Ah, e no Q4 chega o piloto da CORP.AI. Nada com que se preocupar. Por enquanto.',
     'Precisamos sinergizar as sinergias. KPI do KPI.', 'Aqui todo mundo é dono. Menos do lucro, claro.',
     'Mais interconectividade! E-mail a cada 13 segundos é POUCO.', 'Quem não se alinha... se desalinha.'
   ];
@@ -548,7 +573,7 @@ SCENES.c1_meeting = () => {
       pixText(c, s[1], 246, 80, '#2a4a7a', 1, 'center');
       // gráficos
       const k = s[2];
-      if (k === 1) { pixText(c, 'S=E×I×P', 246, 42, '#d8323c', 3, 'center'); }
+      if (k === 1) { pixText(c, 'CORP.AI', 246, 36, '#1f4a6a', 3, 'center'); pixText(c, 'NUNCA DORME', 246, 58, '#d8323c', 1, 'center'); R(c, 238, 66, 4, 4, '#7fd4ff'); R(c, 250, 66, 4, 4, '#7fd4ff'); R(c, 240, 72, 12, 1, '#7fd4ff'); }
       else if (k === 2 || k === 4) { for (let i = 0; i < 7; i++) R(c, 200 + i * 14, 72 - (i * i + 3) * .9, 9, (i * i + 3) * .9, i % 2 ? '#d8323c' : '#2a4a7a'); R(c, 196, 72, 100, 1, '#333'); }
       else if (k === 3) { R(c, 226, 36, 40, 36, '#d8323c'); R(c, 232, 30, 28, 8, '#d8323c'); pixText(c, 'DONO', 246, 50, '#fff', 1, 'center'); }
       else if (k === 5) { for (let i = 0; i < 4; i++) { R(c, 200 + i * 26, 40, 18, 14, '#2a4a7a'); if (i < 3) R(c, 218 + i * 26, 46, 8, 2, '#333'); pixText(c, 'R' + (i + 1), 209 + i * 26, 44, '#fff', 1, 'center'); } pixText(c, '∞', 246, 62, '#d8323c'); }

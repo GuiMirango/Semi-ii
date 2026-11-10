@@ -7,7 +7,7 @@ const W = 320, H = 180;
 const cv = document.getElementById('game');
 const ctx = cv.getContext('2d');
 const buf = document.createElement('canvas'); buf.width = W; buf.height = H;
-const bx = buf.getContext('2d');
+const bx = buf.getContext('2d'); bx.imageSmoothingEnabled = false;
 let S = 1;
 const FONT = '"Press Start 2P", monospace';
 const FONT2 = '"VT323", monospace';

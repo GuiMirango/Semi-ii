@@ -45,6 +45,3 @@ Atalho de desenvolvimento: abrir com `#nome_da_cena` (ex.: `index.html#c3_climb`
 
 Nenhum arquivo de imagem ou som externo é usado; as únicas dependências externas são as fontes *Press Start 2P* e *VT323* do Google Fonts (com fallback monoespaçado).
 
-## Fundamentação
-
-Miguel Nicolelis (o cérebro relativístico), Ernesto van Peborgh (S = E × I × P) e Kurt Vonnegut (Tralfamadore e o infundíbulo cronossinclástico).
