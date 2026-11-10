@@ -49,6 +49,7 @@ const Balloons = {
   l: [],
   clear() { this.l = []; },
   add(actor, text, o = {}) {
+    if (o.auto && actor) this.l = this.l.filter(x => !(x.o.auto && x.actor === actor) && !(x.o.auto && actor.x != null && x.actor && Math.abs((x.actor.x || 0) - actor.x) < 1 && Math.abs((x.actor.y || 0) - actor.y) < 1));
     const b = { actor, text, o, shown: 0, age: 0, done: false, type: o.type || 'speech', hold: 0 };
     this.l.push(b); return b;
   },
@@ -87,6 +88,7 @@ function drawBalloon(c, b, cam) {
   let tw = 0; for (const l of lines) tw = Math.max(tw, c.measureText(l).width);
   const lh = size * .82, padX = 5, padY = 3;
   const nameH = b.o.name ? 7 : 0;
+  if (b.o.name) { c.font = '4.5px ' + FONT; tw = Math.max(tw, c.measureText(b.o.name).width); c.font = font; }
   const bw = Math.ceil(tw + padX * 2), bh = Math.ceil(lines.length * lh + padY * 2 + nameH + 1);
   const a = b.actor || {};
   let ax = (a.x != null ? a.x : 160) - (b.o.world === false ? 0 : cam.x);
@@ -207,10 +209,10 @@ function promptAt(c, x, y, act, label) {
   keyCap(c, kl, bx0 + 2, by0 + 1.5);
   T(c, label, bx0 + kw + 5, by0 + 2, { f: FONT2, size: 9, col: '#fff', sh: false });
 }
-function objectiveUI(c, sc, text, tx, ty) {
+function objectiveUI(c, sc, text, tx, ty, by = 15) {
   if (!text) return;
   c.font = '10px ' + FONT2; const w = c.measureText(text).width + 14;
-  const x = (W - w) / 2, y = 15;
+  const x = (W - w) / 2, y = by;
   pxBox(c, x, y, w, 11, 'rgba(22,18,28,.82)', '#d8323c');
   T(c, '◆', x + 4, y + 3.3, { size: 4, col: '#d8323c', sh: false });
   T(c, text, x + 10, y + 1.2, { f: FONT2, size: 10, col: '#f3efe6', sh: false });

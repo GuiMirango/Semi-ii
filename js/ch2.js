@@ -306,7 +306,7 @@ function buildStreet() {
     R(c, 0, 140, W, 4, '#b8b0a0'); R(c, 0, 143, W, 1, '#6a665e');
     R(c, 0, 144, W, 36, '#a39a8c'); for (let x = 0; x < W; x += 16) R(c, x, 144, 1, 36, '#8f877a'); R(c, 0, 160, W, 1, '#8f877a');
     // poste e lixeira
-    R(c, 20, 60, 3, 98, '#3a3a40'); R(c, 20, 60, 14, 3, '#3a3a40'); R(c, 30, 62, 6, 3, '#ffe9a0');
+    R(c, 2, 60, 3, 98, '#3a3a40'); R(c, 2, 60, 14, 3, '#3a3a40'); R(c, 12, 62, 6, 3, '#ffe9a0');
     R(c, 300, 140, 10, 18, '#2e7d32'); R(c, 299, 139, 12, 2, '#1f5a22');
   });
   return _streetBG;
@@ -335,7 +335,7 @@ function drawCart(c, x, y) {
 SCENES.c2_stop = () => {
   const bg = buildStreet();
   const m = npc(LOOKS.mirango, -10, STREET_FLOOR, { face: 1 });
-  const zé = npc(LOOKS.vendedor, 268, STREET_FLOOR, { face: -1 });
+  const zé = npc(LOOKS.vendedor, 298, STREET_FLOOR, { face: -1 });
   const ap = npc(LOOKS.apressado, 340, STREET_FLOOR, { face: -1 });
   const parts = new Parts();
   const sc = {
@@ -356,7 +356,7 @@ SCENES.c2_stop = () => {
       yield say(m, 'Uma paçoca, por favor.');
       zé.pose = { arms: 'out' };
       yield say(zé, 'É a última, freguês! Saindo...', { name: 'SEU ZÉ' });
-      yield walkTo(ap, 290, 140);
+      yield walkTo(ap, 322, 140);
       ap.pose = { arms: 'point', mouth: 'open' };
       yield say(ap, 'EI! Essa paçoca é MINHA! Tô atrasado pra uma reunião de alinhamento!', { name: 'APRESSADO' });
       m.face = 1; m.pose = { arms: 'fist' };
@@ -451,7 +451,7 @@ SCENES.c2_fight = () => {
     reset() { A.x = 92; A.y = 162; A.rot = 0; A.pose = {}; B.x = 228; B.y = 162; B.rot = 0; B.pose = {}; this.reveal = null; },
     *run() {
       yield bigText('O DUELO DA PAÇOCA', 1.6, { size: 13, zoom: true, col: '#ffd54a' });
-      sayAuto(zé, 'Melhor de três! Cada vitória tira metade da vida. Duas e é nocaute!', 2.6, { name: 'SEU ZÉ — JUIZ' });
+      yield say(zé, 'Melhor de três! Cada vitória tira metade da vida. Duas e é nocaute!', { name: 'SEU ZÉ — JUIZ', auto: 2.6 });
       for (let r = 1; r <= 3; r++) {
         this.round = r; this.reset();
         sfx('punch'); yield bigText('ROUND ' + r, 1.1, { size: 18, zoom: true });
@@ -635,7 +635,7 @@ SCENES.c2_bus = () => {
   function solids() {
     const s = [floor];
     for (const o of obs) {
-      if (o.t === 'stand' && !o.cleared) s.push({ x: o.x - 4, y: BUS_FLOOR - 24, w: 8, h: 24 });
+      if (o.t === 'stand' && !o.cleared) s.push({ x: o.x - 4, y: 40, w: 8, h: BUS_FLOOR - 40 });
       if (o.t === 'bag') s.push({ x: o.x, y: BUS_FLOOR - o.h, w: o.w, h: o.h });
       if (o.t === 'legs') s.push({ x: o.x, y: BUS_FLOOR - 5, w: 14, h: 5 });
     }
@@ -647,7 +647,7 @@ SCENES.c2_bus = () => {
       this.script = new Script((function* () {
         hero.frozen = true;
         yield bigText('TETRIS HUMANO', 1.4, { size: 14, zoom: true, col: '#ffd54a' });
-        Balloons.add(null, 'Chegue ao banco livre no fundo  •  ' + Input.label('down') + ' segurar nas curvas  •  ' + Input.label('a') + ' "Com licença!"  •  ' + Input.label('b') + ' empurrar', { type: 'caption', auto: 6, bottom: true });
+        Balloons.add(null, 'Chegue ao banco livre no fundo  •  ' + Input.label('down') + ' segurar nas curvas  •  ' + Input.label('a') + ' "Com licença!"  •  ' + Input.label('b') + ' empurrar', { type: 'caption', auto: 6, y: 4 });
         hero.frozen = false;
       })());
     },
@@ -808,7 +808,7 @@ SCENES.c2_end = () => {
   const near = makeCanvas(W * 2, 120, (c, w, h) => {
     let x = 0;
     while (x < w) { const bw = 30 + Math.floor(rng() * 40), bh = 40 + Math.floor(rng() * 50); R(c, x, h - bh, bw - 2, bh, pick(['#3a2438', '#2e2234', '#40283a'])); for (let yy = h - bh + 4; yy < h - 6; yy += 7) for (let xx = x + 3; xx < x + bw - 6; xx += 6) R(c, xx, yy, 3, 4, rng() < .3 ? '#ffd77a' : '#4a3448'); x += bw; }
-    R(c, 300, 30, 90, 30, '#1a1018'); R(c, 302, 32, 86, 26, '#1f4a6a'); pixText(c, 'GAUDE AI', 345, 36, '#fff', 2, 'center'); pixText(c, 'O FUTURO NAO TIRA FERIAS', 345, 50, '#7fd4ff', 1, 'center');
+    R(c, 300, 30, 90, 30, '#1a1018'); R(c, 302, 32, 86, 26, '#1f4a6a'); pixText(c, 'GAUDE AI', 345, 36, '#fff', 2, 'center'); pixText(c, 'SEM FERIAS. NUNCA.', 345, 50, '#7fd4ff', 1, 'center');
   });
   const cars = [];
   const parts = new Parts();
@@ -865,7 +865,7 @@ SCENES.c2_end = () => {
       // moldura da janela, basculante e parede
       R(c, WX - 4, WY - 4, WW + 8, 4, '#6a6458'); R(c, WX - 4, WY + WH, WW + 8, 6, '#6a6458'); R(c, WX - 4, WY, 4, WH, '#6a6458'); R(c, WX + WW, WY, 4, WH, '#6a6458');
       R(c, WX + WW / 2 - 1, WY, 3, WH, '#6a6458'); R(c, WX, WY + 28, WW, 2, '#6a6458');
-      R(c, 262, 14, 54, 14, '#111'); pixText(c, '310 LAPA', 289, 16, '#ffb030', 1, 'center'); pixText(c, 'PROX: CENTRO', 289, 22, '#ff7a30', 1, 'center');
+      R(c, 256, 14, 64, 14, '#111'); pixText(c, '310 LAPA', 288, 16, '#ffb030', 1, 'center'); pixText(c, 'PROX: CENTRO', 288, 22, '#ff7a30', 1, 'center');
       R(c, 0, 154, W, 26, '#b8af9a');
       // assento de ônibus de perfil (encosto atrás, à direita)
       const sx0 = 168;

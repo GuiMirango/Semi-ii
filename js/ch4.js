@@ -94,7 +94,7 @@ SCENES.c4_street = () => {
       yield .5;
       this.showHero = true;
       yield 1.2;
-      this.busV = 40;
+      this.busV = 160;
       yield 1.2;
       yield think(mA, 'Só... chegar em casa.');
       Balloons.add(null, 'Pular: ' + Input.label('jump') + '  •  Agachar: ' + Input.label('down') + '  •  Esquivar: ' + Input.label('dash'), { type: 'caption', auto: 6, bottom: true });
@@ -141,7 +141,7 @@ SCENES.c4_street = () => {
           if (h.st) { h.fx -= 16 * dt; h.t0 += dt; }
           const fx = h.x + h.fx, fy = 124 + Math.sin(h.t0 * 3) * 4;
           h.cx = fx; h.cy = fy;
-          if (overlap(hero, { x: fx, y: fy, w: 11, h: 10 })) { this.hit(fx); h.used = true; parts.burst(fx + 5, fy + 5, 8, { col: ['#e8e8e0', '#d8d040'], min: 10, max: 40, g: 40 }); }
+          if (overlap(hero, { x: fx, y: fy, w: 19, h: 11 })) { this.hit(fx); h.used = true; parts.burst(fx + 5, fy + 5, 8, { col: ['#e8e8e0', '#d8d040'], min: 10, max: 40, g: 40 }); }
         } else if (h.t === 'shadow') {
           if (h.st === 0 && hero.cx > h.x - 92) { h.st = 1; h.t0 = 0; sfx('glitch'); }
           if (h.st > 0) h.t0 += dt;
@@ -205,8 +205,8 @@ SCENES.c4_street = () => {
           for (let i = 0; i < 5; i++) R(c, h.x + 2 + i * 2, NIGHT_FLOOR - 7, 1, 2, '#e8e8e0');
         } else if (h.t === 'flyer') {
           const x = Math.round(h.x + h.fx), y = Math.round(124 + Math.sin(h.t0 * 3) * 4);
-          threat(c, x, y, 11, 10);
-          R(c, x - 1, y - 1, 13, 12, OUT); R(c, x, y, 11, 10, '#3a1a24'); R(c, x, y, 11, 3, '#ff2a4a'); pixText(c, 'VAGA', x + 6, y + 4, '#ffb0b8', 1, 'center');
+          threat(c, x, y, 19, 11);
+          R(c, x - 1, y - 1, 21, 13, OUT); R(c, x, y, 19, 11, '#3a1a24'); R(c, x, y, 19, 3, '#ff2a4a'); pixText(c, 'VAGA', x + 10, y + 5, '#ffb0b8', 1, 'center');
         } else if (h.t === 'shadow') {
           if (h.used) continue;
           const x = h.x;

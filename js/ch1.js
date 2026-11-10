@@ -49,11 +49,11 @@ function buildOffice(auto) {
       ? [[96, 'AUTOMATIZE', 'SE', '#2a6a9a'], [298, 'PRODUZA', '24/7 IA', '#3a3a5a'], [420, 'OBRIGADO', 'PELA IA', '#7a2a3a'], [690, 'VISTA A', 'NUVEM', '#2a5a4a'], [866, 'GRATIDAO', 'ALGORIT.', '#5a4a2a']]
       : [[96, 'FOCO', '100%', '#2a6a9a'], [298, 'GAUDE AI', 'EM BREVE', '#1f4a6a'], [420, 'SINERGIA', 'SEMPRE', '#7a2a3a'], [690, 'VISTA A', 'CAMISA', '#2a5a4a'], [866, 'GAUDE AI', 'NOVO COLEGA', '#1f4a6a']];
     for (const [x, a, b, col] of posters) {
-      R(c, x - 1, 71, 40, 28, '#1d2028'); R(c, x, 72, 38, 26, col); R(c, x + 2, 74, 34, 14, 'rgba(255,255,255,.12)');
-      pixText(c, a, x + 19, 77, '#f3efe6', 1, 'center'); pixText(c, b, x + 19, 89, '#ffd54a', 1, 'center');
+      R(c, x - 1, 71, 50, 28, '#1d2028'); R(c, x, 72, 48, 26, col); R(c, x + 2, 74, 44, 14, 'rgba(255,255,255,.12)');
+      pixText(c, a, x + 24, 77, '#f3efe6', 1, 'center'); pixText(c, b, x + 24, 89, '#ffd54a', 1, 'center');
     }
     // extintor e bebedouro
-    R(c, 504, 128, 6, 14, '#c62828'); R(c, 505, 125, 4, 3, '#333'); R(c, 503, 112, 8, 10, '#ddd'); pixText(c, 'EXT', 507, 115, '#c62828', 1, 'center');
+    R(c, 504, 128, 6, 14, '#c62828'); R(c, 505, 125, 4, 3, '#333'); R(c, 500, 112, 14, 10, '#ddd'); pixText(c, 'EXT', 507, 115, '#c62828', 1, 'center');
     R(c, 72, 126, 14, 24, '#dfe6ee'); R(c, 72, 126, 14, 2, '#fff'); R(c, 74, 132, 4, 3, '#4a90e2'); R(c, 80, 132, 4, 3, '#e24a4a');
     c.globalAlpha = .75; R(c, 74, 110, 10, 16, '#7fc4ef'); c.globalAlpha = 1; R(c, 75, 108, 8, 3, '#5aa0d0');
     // mesas
@@ -87,7 +87,7 @@ function buildOffice(auto) {
 }
 // obstáculos do escritório: cores fortes, contorno escuro e faixa de alerta para não se confundirem com a decoração
 const OFFICE_OBST = [
-  { x: 326, w: 16, h: 22, k: 'arquivo' }, { x: 450, w: 18, h: 12, k: 'caixa' }, { x: 468, w: 20, h: 26, k: 'caixa' },
+  { x: 326, w: 16, h: 22, k: 'arquivo' }, { x: 450, w: 18, h: 12, k: 'caixa' }, { x: 468, w: 26, h: 26, k: 'caixa' },
   { x: 534, w: 22, h: 10, k: 'cadeiras' }, { x: 896, w: 18, h: 18, k: 'arquivo' }
 ];
 function officeObstSolids() { return OFFICE_OBST.map(o => ({ x: o.x, y: FLOOR - o.h, w: o.w, h: o.h })); }
@@ -127,7 +127,7 @@ function drawOfficeDyn(c, sc, o = {}) {
     R(c, x + 4, 98, 10, 7, '#2a2d33'); R(c, x + 5, 99, 8, 5, (i + Math.floor(t)) % 4 === 0 ? '#4a7fb0' : '#3b6a9a');
   });
   // relógio de parede
-  const cx = 472, cy = 82;
+  const cx = 486, cy = 82;
   R(c, cx - 7, cy - 7, 14, 14, '#1d2028'); R(c, cx - 6, cy - 6, 12, 12, '#f3efe6');
   const mins = (sc.clockMin != null ? sc.clockMin : 9 * 60 + t * 4) % 720;
   const am = (mins % 60) / 60 * Math.PI * 2, ah = mins / 720 * Math.PI * 2;
@@ -330,6 +330,7 @@ function makeOffice() {
         this.prod = clamp(100 - this.emails * 6, 0, 100);
       }
       this.badge = Math.max(0, this.badge - dt);
+      if (this.showHUD) this.prod = clamp(100 - this.emails * 6, 0, 100);
       for (const p of this.mailPops) { p.t += dt; p.y -= 16 * dt; }
       this.mailPops = this.mailPops.filter(p => p.t < 1.4);
       for (const f of this.floatTx) { f.t += dt; f.y -= 12 * dt; }
@@ -476,7 +477,7 @@ function makeOffice() {
         R(c, bx0 + 34, 12, 18, 3, '#2c2638'); R(c, bx0 + 34, 12, Math.round(18 * k), 3, k < .3 ? '#ff5252' : '#7ad0ff');
         T(c, 'PRODUTIVIDADE ' + Math.round(this.prod) + '%', W - 6, 36, { f: FONT2, size: 8, align: 'right', col: this.prod < 50 ? '#ff8a8a' : '#8f9bc0' });
       }
-      if (this.obj && !Balloons.l.some(b => b.type === 'caption' && !b.o.bottom)) objectiveUI(c, this, this.obj, this.objX, FLOOR - 40);
+      if (this.obj && !Balloons.l.some(b => b.type === 'caption')) objectiveUI(c, this, this.obj, this.objX, FLOOR - 40, this.showHUD ? H - 14 : 15);
       if (this.cur) promptAt(c, this.cur.x - cam.x, (this.cur.py || 96) - cam.y, 'a', this.cur.label());
       if (this.panel) {
         const pn = this.panel;
@@ -547,7 +548,7 @@ SCENES.c1_meeting = (o) => {
     'Mais interconectividade! E-mail a cada 13 segundos é POUCO.', 'Quem não se alinha... se desalinha.'
   ];
   const sc = {
-    music: 'office', amb: 'office', capY: 44, t: 0, slide: 0, st: 0, qte: null, nextQ: 2.5, minute: 0, vig: .35, eng: 0,
+    restartOpts: { n: N }, music: 'office', amb: 'office', capY: 44, t: 0, slide: 0, st: 0, qte: null, nextQ: 2.5, minute: 0, vig: .35, eng: 0,
     pops: [], script: null, moveWarn: 0,
     enter() {
       Music.tempo = 1.15;

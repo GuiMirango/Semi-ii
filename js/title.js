@@ -14,9 +14,9 @@ SCENES.title = () => {
     R(c, 0, 18, W, 3, '#2b3044'); R(c, 0, 111, W, 4, '#2b3044');
     // piso e mesas
     R(c, 0, 115, W, 65, '#151722'); dither(c, 0, 115, W, 65, '#1b1e2b', 3);
-    deskP(c, 120, 160, 60, '#3a3238', '#2a2328');
-    chairP(c, 172, 160, '#1d2028');
-    cabinetP(c, 20, 160, 16, 26, '#3b404c'); cabinetP(c, 270, 160, 16, 20, '#3b404c');
+    deskP(c, 214, 160, 60, '#3a3238', '#2a2328');
+    chairP(c, 266, 160, '#1d2028');
+    cabinetP(c, 20, 160, 16, 26, '#3b404c'); cabinetP(c, 190, 160, 16, 20, '#3b404c');
     plantP(c, 300, 160, 1, rng);
   });
   const rain = Array.from({ length: 60 }, () => ({ x: rnd(W), y: rnd(20, 112), v: rnd(80, 140) }));
@@ -61,10 +61,10 @@ SCENES.title = () => {
       for (const m of mails) { c.globalAlpha = .25; iconMail(c, Math.round(m.x), Math.round(m.y), '#7f8cb0'); c.globalAlpha = 1; }
       // brilho do monitor
       const fl = .55 + Math.sin(this.t * 7) * .03 + (Math.random() < .03 ? -.2 : 0);
-      c.globalAlpha = fl * .35; c.fillStyle = '#6fa8ff'; c.beginPath(); c.moveTo(150, 132); c.lineTo(110, 160); c.lineTo(200, 160); c.closePath(); c.fill(); c.globalAlpha = 1;
-      monitorP(c, 140, 144, '#3b7fd0', '#cfe3ff');
-      drawPerson(c, 170, 160, LOOKS.mirango, { face: -1, sit: true, slump: 1, arms: 'type', eyes: Math.floor(this.t) % 5 === 0 ? 'closed' : null });
-      R(c, 125, 141, 6, 4, '#ddd'); R(c, 126, 139, 4, 2, '#8a5a3a');
+      c.globalAlpha = fl * .35; c.fillStyle = '#6fa8ff'; c.beginPath(); c.moveTo(244, 132); c.lineTo(204, 160); c.lineTo(294, 160); c.closePath(); c.fill(); c.globalAlpha = 1;
+      monitorP(c, 234, 144, '#3b7fd0', '#cfe3ff');
+      drawPerson(c, 264, 160, LOOKS.mirango, { face: -1, sit: true, slump: 1, arms: 'type', eyes: Math.floor(this.t) % 5 === 0 ? 'closed' : null });
+      R(c, 219, 141, 6, 4, '#ddd'); R(c, 220, 139, 4, 2, '#8a5a3a');
     },
     ui(c) {
       const k = Math.min(1, this.t / 1.5);
@@ -90,17 +90,17 @@ SCENES.title = () => {
         return;
       }
       if (this.sub === 'ctrl') {
-        pxBox(c, 30, 64, 260, 110, 'rgba(14,12,20,.94)', '#d8323c');
-        T(c, 'CONTROLES', W / 2, 70, { size: 6, align: 'center', col: '#f3efe6' });
+        pxBox(c, 30, 58, 260, 118, 'rgba(14,12,20,.94)', '#d8323c');
+        T(c, 'CONTROLES', W / 2, 63, { size: 6, align: 'center', col: '#f3efe6' });
         const rows = [['← → / A D', 'Mover'], ['ESPAÇO / ↑ / W', 'Pular'], ['↓ / S', 'Agachar · segurar'], ['E / Z / ENTER', 'Interagir · confirmar'], ['X / Q', 'Gritar · rejeitar · empurrar'], ['SHIFT / C', 'Esquivar (cap. 4)'], ['ESC / P', 'Pausa'], ['M · F', 'Som · Tela cheia']];
-        rows.forEach((r, i) => { T(c, r[0], 44, 84 + i * 10.5, { f: FONT2, size: 10, col: '#ffd54a' }); T(c, r[1], 150, 84 + i * 10.5, { f: FONT2, size: 10, col: '#e8e4f0' }); });
-        T(c, 'Gamepad: A pular · X interagir · B gritar · RB esquivar', W / 2, 166, { f: FONT2, size: 8, align: 'center', col: '#8a84a0' });
+        rows.forEach((r, i) => { T(c, r[0], 44, 75 + i * 10.5, { f: FONT2, size: 10, col: '#ffd54a' }); T(c, r[1], 150, 75 + i * 10.5, { f: FONT2, size: 10, col: '#e8e4f0' }); });
+        T(c, 'Gamepad: A pular · X interagir · B gritar · RB esquivar', W / 2, 162, { f: FONT2, size: 8, align: 'center', col: '#8a84a0' });
         return;
       }
       this.items.forEach((it, i) => {
-        const on = i === this.sel, y = 112 + i * 13;
-        if (on) { T(c, '▶', 118, y + 1, { size: 6, col: '#d8323c' }); }
-        T(c, it, 130, y, { f: FONT2, size: 12, col: on ? '#ffd54a' : '#cfc8dc' });
+        const on = i === this.sel, y = 104 + i * 14;
+        if (on) { T(c, '▶', 46, y + 1, { size: 6, col: '#d8323c' }); }
+        T(c, it, 58, y, { f: FONT2, size: 12, col: on ? '#ffd54a' : '#cfc8dc' });
       });
     }
   };

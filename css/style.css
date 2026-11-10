@@ -15,5 +15,6 @@ body.touch #touch{display:block}
 .btns .bx{right:22px;bottom:78px}
 .btns .bd{right:96px;bottom:74px;width:46px;height:46px;font-size:14px}
 .pause{right:calc(12px + env(safe-area-inset-right));top:calc(12px + env(safe-area-inset-top));width:44px;height:36px;font-size:10px}
-#rotate{display:none;position:fixed;left:0;right:0;bottom:24%;text-align:center;color:#ffd54a;font:10px "Press Start 2P",monospace;pointer-events:none;padding:0 16px;line-height:1.8}
-@media (orientation:portrait){body.touch #rotate{display:block}}
+#rotate{display:none;position:fixed;left:0;right:0;top:calc(56.25vw + 4vh + 14px);text-align:center;color:#ffd54a;font:10px "Press Start 2P",monospace;pointer-events:none;padding:0 16px;line-height:1.8}
+@media (orientation:portrait){body.touch #rotate{display:block}body.touch #wrap{align-items:flex-start;padding-top:4vh}body.touch .pause{top:calc(56.25vw + 4vh + 64px)}}
+@media (max-height:460px){.pad{width:120px;height:120px}.pad .tb{width:40px;height:40px}.pad .up,.pad .down{left:40px}.pad .left,.pad .right{top:40px}.btns{width:140px;height:124px}.btns .tb{width:46px;height:46px}.btns .bj{width:54px;height:54px}.btns .be{right:58px}.btns .bx{right:16px;bottom:62px}.btns .bd{right:76px;bottom:60px;width:38px;height:38px}}

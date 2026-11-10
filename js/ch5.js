@@ -73,7 +73,7 @@ SCENES.c5_street = () => {
     R(c, 0, 114, DAY_W, 26, '#4a4c52'); for (let x = 0; x < DAY_W; x += 20) R(c, x, 126, 10, 1, '#c8c8c8');
     R(c, 0, 140, DAY_W, 4, '#9a968e'); R(c, 0, 144, DAY_W, 36, '#86827a'); for (let x = 0; x < DAY_W; x += 16) R(c, x, 144, 1, 36, '#76726a');
     // banca de jornal e outdoor
-    R(c, 180, 104, 44, 40, '#2e5a3a'); R(c, 180, 104, 44, 4, '#1e4a2a'); R(c, 184, 112, 36, 18, '#e8e4d8');
+    R(c, 172, 104, 60, 40, '#2e5a3a'); R(c, 172, 104, 60, 4, '#1e4a2a'); R(c, 175, 111, 54, 21, '#e8e4d8');
     pixText(c, 'IA SUBSTITUI', 202, 114, '#c43b3b', 1, 'center'); pixText(c, '40% DOS', 202, 120, '#222', 1, 'center'); pixText(c, 'ESCRITORIOS', 202, 126, '#222', 1, 'center');
     R(c, 380, 30, 110, 50, '#2a2a30'); R(c, 383, 33, 104, 44, '#d8323c'); pixText(c, 'SEJA PROMOVIDO', 435, 42, '#fff', 1, 'center'); pixText(c, 'TRABALHE MAIS', 435, 52, '#ffd54a', 1, 'center'); pixText(c, 'COM GAUDE AI', 435, 64, '#fff', 1, 'center');
     R(c, 400, 80, 3, 34, '#2a2a30'); R(c, 466, 80, 3, 34, '#2a2a30');
@@ -268,7 +268,7 @@ SCENES.c5_office = () => {
 /* ---------- Créditos ---------- */
 SCENES.credits = () => {
   const lines = [
-    ['O CICLO DE MIRANGO', 10, '#f3efe6'], ['', 6], ['Um jogo em cinco estágios e um ciclo.', 11, '#a9a3b8'], ['', 14],
+    ['O CICLO DE MIRANGO', 7, '#f3efe6'], ['', 6], ['Um jogo em cinco estágios e um ciclo.', 11, '#a9a3b8'], ['', 14],
     ['IDEALIZAÇÃO', 7, '#ffd54a'], ['', 4], ['@guimirango', 14, '#f3efe6'], ['', 18],
     ['NEGAÇÃO · RAIVA · BARGANHA', 11, '#d8323c'], ['DEPRESSÃO · ACEITAÇÃO', 11, '#d8323c'], ['', 18],
     ['ELENCO', 7, '#ffd54a'], ['', 4],
@@ -295,7 +295,7 @@ SCENES.credits = () => {
     ui(c) {
       let y = this.y;
       for (const [s, size, col] of lines) {
-        if (s && y > -20 && y < H + 10) T(c, s, W / 2, y, { f: size >= 10 ? FONT2 : FONT, size: size >= 10 ? size + 2 : size - 1, align: 'center', col: col || '#fff' });
+        if (s && y > -20 && y < H + 10) T(c, s, W / 2, y, { f: size >= 8 ? FONT2 : FONT, size: size >= 8 ? size + 2 : size - 1, align: 'center', col: col || '#fff' });
         y += size + 4;
       }
       if (this.y + total < 70) {

@@ -80,12 +80,13 @@ function drawBeach(c, cx, tod, o = {}) {
   c.drawImage(B.sand, -cx, 122);
   c.globalAlpha = .8; R(c, -cx, Math.round(121 + wv), BEACH_W, 2, '#f0fff8'); c.globalAlpha = .35; R(c, -cx, Math.round(123 + wv), BEACH_W, 3, '#9ae0d8'); c.globalAlpha = 1;
   if (tod > 0) { c.globalAlpha = Math.min(.5, tod * .4); R(c, 0, 122, W, 58, tod > 1 ? '#2a2850' : '#d07050'); c.globalAlpha = 1; }
+  if (o.pre) o.pre(c);
   if (!o.noProps) c.drawImage(B.props, -cx, 0);
 }
 
 function drawAdPlane(c, t) {
   // até no paraíso a propaganda chega: um aviãozinho com faixa
-  const x = Math.round(((t * 16) % 760) - 260), y = 34 + Math.round(Math.sin(t) * 2);
+  const x = Math.round(((t * 16) % 760) - 260), y = 18 + Math.round(Math.sin(t) * 2);
   R(c, x + 196, y, 14, 4, '#e8e8e8'); R(c, x + 206, y - 3, 3, 3, '#d8323c'); R(c, x + 200, y + 3, 6, 1, '#888'); R(c, x + 210, y + 1, 2, 2, '#333');
   for (let i = 0; i < 12; i++) R(c, x + 186 + i, y + 2 + Math.round(Math.sin(t * 6 + i)), 1, 1, '#aaa');
   R(c, x, y - 3 + Math.round(Math.sin(t * 5)), 186, 11, '#f3efe6'); R(c, x, y - 3 + Math.round(Math.sin(t * 5)), 186, 1, '#d8323c');
@@ -144,8 +145,7 @@ SCENES.c3_beach = () => {
     },
     draw(c) {
       const cx = Math.round(this.cam.x);
-      drawBeach(c, cx, 0);
-      drawAdPlane(c, this.t);
+      drawBeach(c, cx, 0, { pre: (cc) => drawAdPlane(cc, this.t) });
       c.save(); c.translate(-cx, 0);
       for (const g of gulls) { const f = Math.floor(G.t * 4 + g.ph) % 2; R(c, Math.round(g.x) - 3, Math.round(g.y) + (f ? 0 : -1), 3, 1, '#fff'); R(c, Math.round(g.x) + 1, Math.round(g.y) + (f ? 0 : -1), 3, 1, '#fff'); R(c, Math.round(g.x), Math.round(g.y) + 1, 1, 1, '#ddd'); }
       for (const cb of crabs) { const x = Math.round(cb.x); R(c, x - 3, 160, 7, 3, '#e04a3a'); R(c, x - 4, 159, 1, 2, '#e04a3a'); R(c, x + 4, 159, 1, 2, '#e04a3a'); R(c, x - 1, 159, 1, 1, '#111'); R(c, x + 1, 159, 1, 1, '#111'); }
@@ -156,7 +156,7 @@ SCENES.c3_beach = () => {
       drawPerson(c, nat.x + 2, 127 + sw, LOOKS.nativo, { rot: -Math.PI / 2 + .1, eyes: 'closed', mouth: 'smile', noOutline: false });
       nat.x = 498; nat.y = 124 + sw;
       hero.draw(c);
-      if (this.items) { const x = hero.cx + 9, y = hero.fy - 20; R(c, x, y, 7, 5, '#d8b02e'); R(c, x + 2, y - 3, 6, 4, '#4a9a5a'); R(c, x - 1, y + 4, 6, 4, '#2a6ab0'); pixText(c, 'CORP', x, y + 5, '#fff'); }
+      if (this.items) { const x = hero.cx + 9, y = hero.fy - 20; R(c, x, y, 7, 5, '#d8b02e'); R(c, x + 2, y - 3, 6, 4, '#4a9a5a'); R(c, x - 1, y + 4, 6, 4, '#2a6ab0'); R(c, x, y + 5, 4, 1, '#fff'); }
       parts.draw(c);
       c.restore();
     },
@@ -220,7 +220,7 @@ SCENES.c3_climb = () => {
     enter() {
       this.script = new Script((function* () {
         yield bigText('A COLHEITA DO COCO', 1.4, { size: 13, zoom: true, col: '#ffd54a' });
-        Balloons.add(null, 'Pule de pedra em pedra. Galhos finos quebram se você demorar. Agarre os cipós e balance com ← →; ' + Input.label('jump') + ' para soltar.', { type: 'caption', auto: 6, bottom: true });
+        Balloons.add(null, 'Pule de pedra em pedra. Galhos finos quebram se você demorar. Agarre os cipós e balance com ← →; ' + Input.label('jump') + ' para soltar.', { type: 'caption', auto: 6, y: 20 });
       })());
     },
     update(dt) {
@@ -410,8 +410,7 @@ SCENES.c3_sunset = () => {
     update(dt) { this.t += dt; if (this.script) this.script.update(dt); for (const q of this.qs) { q.t += dt; q.y -= 8 * dt; } this.qs = this.qs.filter(q => q.t < 2); parts.update(dt); },
     draw(c) {
       const cx = BEACH_W - W;
-      drawBeach(c, cx, this.tod);
-      if (this.tod < .9) drawAdPlane(c, this.t + 20);
+      drawBeach(c, cx, this.tod, { pre: (cc) => { if (this.tod < .9) drawAdPlane(cc, this.t + 20); } });
       // sombra comprida
       c.globalAlpha = .25; R(c, m.x - cx - 30 - this.tod * 30, BEACH_FLOOR - 1, 30 + this.tod * 30, 3, '#3a2a1a'); c.globalAlpha = 1;
       drawPerson(c, m.x - cx, m.y, LOOKS.mirangoBeach, this.pose);
@@ -589,7 +588,8 @@ SCENES.c3_dream = () => {
     ui(c) {
       const got = shells.filter(s => s.got).length;
       const row = (y, ok, s) => T(c, (ok ? '☑ ' : '☐ ') + s, 8, y, { f: FONT2, size: 9, col: ok ? '#9aff9a' : '#e8e0f8' });
-      pxBox(c, 4, 4, 108, 36, 'rgba(30,20,44,.75)', '#8a7aa8');
+      c.font = '9px ' + FONT2; const cw = Math.max(...['☐ Conchas 5/5 + alinhar', '☐ Ondas cronometradas 3/3'].map(t => c.measureText(t).width)) + 10;
+      pxBox(c, 4, 4, cw, 36, 'rgba(30,20,44,.75)', '#8a7aa8');
       row(6, this.shellsDone, 'Conchas ' + (this.shellsDone ? 5 : got) + '/5 + alinhar');
       row(16, this.sheetDone, 'Planilha na areia');
       row(26, this.waveDone, 'Ondas cronometradas ' + this.waveHits + '/3');
@@ -650,7 +650,7 @@ SCENES.c3_wake = () => {
       c.restore();
       R(c, WX - 4, WY - 4, WW + 8, 4, '#4a4640'); R(c, WX - 4, WY + WH, WW + 8, 6, '#4a4640'); R(c, WX - 4, WY, 4, WH, '#4a4640'); R(c, WX + WW, WY, 4, WH, '#4a4640');
       R(c, WX + WW / 2 - 1, WY, 3, WH, '#4a4640'); R(c, WX, WY + 28, WW, 2, '#4a4640');
-      R(c, 262, 14, 54, 14, '#111'); pixText(c, '310 LAPA', 289, 16, '#ffb030', 1, 'center'); pixText(c, 'PROX: PERIFERIA', 289, 22, '#ff7a30', 1, 'center');
+      R(c, 256, 14, 64, 14, '#111'); pixText(c, '310 LAPA', 288, 16, '#ffb030', 1, 'center'); pixText(c, 'PROX: PERIFERIA', 288, 22, '#ff7a30', 1, 'center');
       R(c, 0, 154, W, 26, '#4a4438');
       const sx0 = 168;
       R(c, sx0 + 58, 104, 14, 62, OUT); R(c, sx0 + 60, 106, 10, 58, '#1e3a70'); R(c, sx0 + 60, 106, 3, 58, '#3a5a9a'); R(c, sx0 + 56, 100, 18, 6, '#8a8a8a');
