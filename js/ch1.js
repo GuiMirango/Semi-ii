@@ -47,7 +47,7 @@ function buildOffice(auto) {
     // cartazes motivacionais
     const posters = auto
       ? [[96, 'AUTOMATIZE', 'SE', '#2a6a9a'], [298, 'PRODUZA', '24/7 IA', '#3a3a5a'], [420, 'OBRIGADO', 'PELA IA', '#7a2a3a'], [690, 'VISTA A', 'NUVEM', '#2a5a4a'], [866, 'GRATIDAO', 'ALGORIT.', '#5a4a2a']]
-      : [[96, 'FOCO', '100%', '#2a6a9a'], [298, 'CORP.AI', 'EM BREVE', '#1f4a6a'], [420, 'SINERGIA', 'SEMPRE', '#7a2a3a'], [690, 'VISTA A', 'CAMISA', '#2a5a4a'], [866, 'GRATIDAO', '#BORA', '#5a4a2a']];
+      : [[96, 'FOCO', '100%', '#2a6a9a'], [298, 'GAUDE AI', 'EM BREVE', '#1f4a6a'], [420, 'SINERGIA', 'SEMPRE', '#7a2a3a'], [690, 'VISTA A', 'CAMISA', '#2a5a4a'], [866, 'GAUDE AI', 'NOVO COLEGA', '#1f4a6a']];
     for (const [x, a, b, col] of posters) {
       R(c, x - 1, 71, 40, 28, '#1d2028'); R(c, x, 72, 38, 26, col); R(c, x + 2, 74, 34, 14, 'rgba(255,255,255,.12)');
       pixText(c, a, x + 19, 77, '#f3efe6', 1, 'center'); pixText(c, b, x + 19, 89, '#ffd54a', 1, 'center');
@@ -191,7 +191,7 @@ function makeOffice() {
     restartOpts: {},
     elevInside: null,
     enter(o) {
-      if (o.resume) { this.holdBlack = false; this.startPhase5(); return; }
+      if (o.resume) { this.holdBlack = false; if (o.resume === 1) this.startPhase3(); else this.startPhase5(); return; }
       this.script = new Script(this.intro());
     },
     *intro() {
@@ -224,18 +224,19 @@ function makeOffice() {
       hero.pose = {};
       yield think(mA, 'Tudo bem... eu dou conta.');
       hero.frozen = false; this.showHUD = true; this.etimer = 4; this.eint = 13;
-      Balloons.add(null, 'Um e-mail novo chega a cada 13 segundos. Responda no seu terminal antes que sua Sanidade derreta.', { type: 'caption', auto: 5, bottom: true });
       this.p2t = 0; this.p2jobs = 0;
     },
     startPhase3() {
-      this.phase = 3; this.eint = 8; this.etimer = Math.min(this.etimer, 8);
+      // depois da 1ª reunião: o volume de tarefas explode
+      this.phase = 3; this.eint = 7; this.etimer = 2; this.emails += 5; this.p3t = 0; this.p3jobs = 0;
+      hero.x = 578; hero.y = FLOOR - 24; hero.frozen = false;
+      Music.play('office'); Music.tempo = 1.15;
       sueli.pose = {}; sayAuto(sueli, 'MIRANGO! Aqui, AGORA!', 2.2, { name: 'SUELI' }); sfx('alarm');
     },
     *sueliTalk() {
       hero.frozen = true;
       yield say(sueli, 'Preciso de 3 assinaturas do Dr. Moura nesses documentos. PRA ONTEM.', { name: 'SUELI — SUPERVISORA' });
       yield say(sueli, 'Ele tá andando pelo andar. Boa sorte pegando ele parado.', { name: 'SUELI — SUPERVISORA' });
-      yield think(mA, 'E os e-mails agora chegam a cada 8 segundos... ótimo.');
       this.hasDocs = true; diretor.active = true; diretor.x = 1060; diretor.tx = 820;
       sueli.pose = { sit: true, arms: 'type' };
       hero.frozen = false;
@@ -245,23 +246,38 @@ function makeOffice() {
       yield say(sueli, 'Hm. Demorou. Mas tá ok.', { name: 'SUELI — SUPERVISORA' });
       diretor.active = false;
       hero.frozen = false;
-      this.phase = 4; this.chefeCalled = true; chefe.active = true; chefe.x = 584;
+      yield* this.callMeeting(2);
+    },
+    *callMeeting(n) {
+      this.phase = 4; this.meetN = n; this.chefeCalled = true; chefe.active = true; chefe.x = 584;
       yield .3;
-      yield walkTo(chefe, clamp(hero.cx + (hero.cx < 584 ? 26 : -26), 20, 1000), 55);
+      yield walkTo(chefe, clamp(hero.cx + (hero.cx < 584 ? 26 : -26), 20, 1000), 70);
       chefe.face = hero.cx < chefe.x ? -1 : 1;
       hero.frozen = true;
-      yield say(chefe, 'Mirango, chega aqui. Uma reuniãozinha RÁPIDA de alinhamento. Cinco minutinhos.', { name: 'SR. CASTRO — GERENTE' });
-      yield think(mA, 'E os e-mails...?');
-      yield walkTo(chefe, 584, 60); chefe.active = false;
+      if (n === 1) yield say(chefe, 'Mirango, chega aqui. Uma reuniãozinha RÁPIDA de alinhamento. Cinco minutinhos.', { name: 'SR. CASTRO — GERENTE' });
+      else { yield say(chefe, 'Mirango! Mais uma rapidinha. Pra alinhar o que a gente alinhou.', { name: 'SR. CASTRO — GERENTE' }); yield think(mA, 'De novo...?'); }
+      yield walkTo(chefe, 584, 70); chefe.active = false;
       hero.frozen = false;
     },
     startPhase5() {
-      this.phase = 5; this.showHUD = true; this.eint = 5; this.etimer = 2; this.emails += 9;
+      this.phase = 5; this.showHUD = true; this.eint = 4; this.etimer = 1; this.emails += 14;
       hero.x = 578; hero.y = FLOOR - 24; hero.frozen = false; hero.slump = 1; this.p5t = 0;
       this.energy = Math.min(this.energy, 55); this.sanity = Math.min(this.sanity, 45);
       Music.play('office'); Music.tempo = 1.3;
-      Balloons.add(null, 'Os e-mails agora chegam a cada 5 segundos.', { type: 'caption', auto: 4, bottom: true });
-      sayAuto(mA, '...', 2, { type: 'thought' });
+      sayAuto(mA, 'Quanta coisa ficou acumulada...?', 2.4, { type: 'thought' });
+    },
+    *checkTotal() {
+      // depois da 2ª reunião: ele confere o total acumulado... e quebra
+      hero.frozen = true; hero.x = clamp(hero.x, 246, 252); hero.face = 1; hero.pose = { arms: 'type' };
+      this.panel = { t: 0, rows: [] };
+      const rows = [['E-mails não lidos', this.emails + 131], ['Impressões pendentes', 38], ['Assinaturas do Dr. Moura', 12], ['Reuniões de alinhamento', 9], ['Relatórios "pra ontem"', 27]];
+      let total = 0;
+      for (const [k, v] of rows) { this.panel.rows.push([k, v]); total += v; sfx('notif'); G.shake(1); this.sanity = Math.max(0, this.sanity - 9); yield .7; }
+      this.panel.total = total; sfx('alarm'); G.shake(3);
+      yield 1.6;
+      this.panel = null; hero.pose = {};
+      this.energy = 0; this.sanity = 0;
+      yield* this.ending();
     },
     *ending() {
       this.phase = 6; hero.frozen = true; hero.vx = 0; this.showHUD = true; this.obj = null;
@@ -308,7 +324,7 @@ function makeOffice() {
         const pend = Math.min(this.emails, 12);
         let dE = .32 + (hero.moving ? .25 : 0), dS = .3 * pend;
         if (this.phase === 3) { dE *= 1.3; dS *= 1.3; }
-        if (this.phase === 5) { dE = 2.4; dS = 2.1 + pend * .1; }
+        if (this.phase === 5) { dE = 1.4; dS = 1.2 + pend * .05; }
         this.energy -= dE * dt; this.sanity -= dS * dt;
         if (this.phase < 5) { this.energy = Math.max(14, this.energy); this.sanity = Math.max(14, this.sanity); }
         this.prod = clamp(100 - this.emails * 6, 0, 100);
@@ -329,7 +345,13 @@ function makeOffice() {
         this.p2t += dt;
         if (this.p2jobs === 0 && this.p2t > 5) { this.p2jobs = 1; this.jobs.push({ for: sueli, st: 'queued', t: 0 }); sueli.pose = { arms: 'up' }; sayAuto(sueli, 'Mirango! Imprime o relatório trimestral pra mim?', 3, { name: 'SUELI' }); setTimeout(() => { sueli.pose = { sit: true, arms: 'type' }; }, 2500); }
         if (this.p2jobs === 1 && this.p2t > 18) { this.p2jobs = 2; this.jobs.push({ for: plinio, st: 'queued', t: 0 }); sayAuto(plinio, 'Mirangão! Mais uma cópia daqueles contratos? :)', 3, { name: 'PLÍNIO' }); }
-        if (this.answered >= 4 && this.p2jobs === 2 && this.jobs.every(j => j.st === 'done')) this.startPhase3();
+        if (this.answered >= 4 && this.p2jobs === 2 && this.jobs.every(j => j.st === 'done')) this.script = new Script(this.callMeeting(1));
+      }
+      // fase 3: pedidos de impressão extras no meio das assinaturas
+      if (this.phase === 3 && !this.script) {
+        this.p3t += dt;
+        if (this.p3jobs === 0 && this.p3t > 6) { this.p3jobs = 1; this.jobs.push({ for: plinio, st: 'queued', t: 0 }); sayAuto(plinio, 'Mirangão! Imprime a pauta da próxima reunião? :)', 2.6, { name: 'PLÍNIO' }); }
+        if (this.p3jobs === 1 && this.p3t > 22) { this.p3jobs = 2; this.jobs.push({ for: sueli, st: 'queued', t: 0 }); sayAuto(sueli, 'E a ata da reunião! Impressa!', 2.6, { name: 'SUELI' }); }
       }
       // diretor andarilho
       if (diretor.active) {
@@ -368,8 +390,7 @@ function makeOffice() {
         this.flick = clamp(this.p5t / 20, .2, 1);
         Music.tempo = 1.3 + this.p5t / 60; Music.muffle(lerp(6000, 700, clamp(this.p5t / 30, 0, 1)));
         this.heartT -= dt; if (this.heartT <= 0) { sfx('heart'); this.heartT = lerp(.9, .5, clamp(this.p5t / 30, 0, 1)); }
-        if (this.energy <= 0 || this.sanity <= 0) { this.energy -= 8 * dt; this.sanity -= 8 * dt; }
-        if (this.energy <= 0 && this.sanity <= 0) { this.energy = 0; this.sanity = 0; this.script = new Script(this.ending()); }
+        this.energy = Math.max(6, this.energy); this.sanity = Math.max(6, this.sanity);
       }
       this.parts.update(dt);
       // câmera
@@ -389,11 +410,14 @@ function makeOffice() {
         else if (J('printing')) { t = 'Imprimindo...'; x = 984; }
         else if (this.phase === 2 && this.showHUD) { t = 'Responda os e-mails (' + Math.min(this.answered, 4) + '/4)'; x = 254; }
       } else if (this.phase === 3) {
-        if (!this.hasDocs && this.signs === 0) { t = 'Fale com a Sueli'; x = sueli.x; }
+        if (J('carry')) { const j = J('carry'); t = 'Entregue as impressões'; x = j.for.x; }
+        else if (J('ready')) { t = 'Pegue as impressões na impressora'; x = 984; }
+        else if (J('queued') && this.hasDocs) { t = 'Envie a impressão no seu terminal'; x = 254; }
+        else if (!this.hasDocs && this.signs === 0) { t = 'Fale com a Sueli'; x = sueli.x; }
         else if (this.signs < 3) { t = 'Pegue a assinatura do Diretor (' + this.signs + '/3)'; x = diretor.x; }
         else { t = 'Entregue os documentos à Sueli'; x = sueli.x; }
       } else if (this.phase === 4) { if (!this.script) { t = 'Vá para a sala de reunião'; x = 582; } }
-      else if (this.phase === 5) { t = 'Responda os e-mails (' + this.emails + ' pendentes)'; x = 254; }
+      else if (this.phase === 5) { t = 'Confira o total de tarefas no seu terminal'; x = 254; }
       this.obj = t; this.objX = x;
     },
     draw(c) {
@@ -454,15 +478,23 @@ function makeOffice() {
       }
       if (this.obj && !Balloons.l.some(b => b.type === 'caption' && !b.o.bottom)) objectiveUI(c, this, this.obj, this.objX, FLOOR - 40);
       if (this.cur) promptAt(c, this.cur.x - cam.x, (this.cur.py || 96) - cam.y, 'a', this.cur.label());
+      if (this.panel) {
+        const pn = this.panel;
+        pxBox(c, 70, 30, 180, 110, 'rgba(10,8,16,.94)', '#d8323c');
+        T(c, 'SUAS TAREFAS', W / 2, 36, { size: 6, align: 'center', col: '#ff5252' });
+        pn.rows.forEach(([k, v], i) => { T(c, k, 78, 50 + i * 12, { f: FONT2, size: 10, col: '#e8e4f0' }); T(c, String(v), 242, 50 + i * 12, { f: FONT2, size: 10, align: 'right', col: '#ffd54a' }); });
+        if (pn.total) { R(c, 78, 112, 164, 1, '#d8323c'); T(c, 'TOTAL: ' + pn.total, W / 2, 118, { size: 9, align: 'center', col: '#ff3030' }); }
+      }
       if (this.busy > 0) { const k = 1 - this.busy / this.busyMax; pxBox(c, hero.cx - cam.x - 15, hero.y - 14, 30, 5, '#1a1622'); R(c, hero.cx - cam.x - 14, hero.y - 13, 28 * k, 3, '#7ad0ff'); }
     }
   };
   const startBusy = (sec, fn) => { sc.busy = sc.busyMax = sec; sc.busyFn = fn; hero.frozen = true; hero.vx = 0; hero.x = clamp(hero.x, 246, 252); };
   sc.inters = [
     { x: 256, y: FLOOR, r: 18, py: 104,
-      cond: () => sc.phase >= 1 && !sc.ringing && (sc.jobs.some(j => j.st === 'queued') || (sc.emails > 0 && sc.showHUD)),
-      label: () => sc.jobs.some(j => j.st === 'queued') ? 'Enviar impressão' : 'Responder e-mail',
+      cond: () => sc.phase >= 1 && sc.phase !== 4 && !sc.ringing && (sc.phase === 5 || sc.jobs.some(j => j.st === 'queued') || (sc.emails > 0 && sc.showHUD)),
+      label: () => sc.phase === 5 ? 'Conferir total de tarefas' : sc.jobs.some(j => j.st === 'queued') ? 'Enviar impressão' : 'Responder e-mail',
       act: () => {
+        if (sc.phase === 5) { sc.script = new Script(sc.checkTotal()); return; }
         if (sc.jobs.some(j => j.st === 'queued')) startBusy(.45, () => { for (const j of sc.jobs) if (j.st === 'queued') { j.st = 'printing'; j.t = 1.4; } sfx('print'); sc.floatTx.push({ x: 256, y: 110, t: 0, s: 'ENVIADO!', col: '#7ad0ff' }); });
         else startBusy(sc.phase === 5 ? .7 : .4, () => { if (sc.emails > 0) { sc.emails--; sc.answered++; sc.sanity = Math.min(100, sc.sanity + (sc.phase === 5 ? 2 : 3)); sfx('ok'); sc.floatTx.push({ x: 256, y: 110, t: 0, s: pick(['RESPONDIDO', 'OK!', 'CIENTE', 'DE ACORDO', 'SEGUE ANEXO']), col: '#7aff9a' }); } });
       } },
@@ -487,22 +519,30 @@ function makeOffice() {
         }
       } },
     { x: 396, y: FLOOR, r: 14, py: 92, cond: () => sc.showHUD && sc.coffeeCD <= 0 && sc.phase < 6, label: () => 'Tomar café', act: () => { sc.coffeeCD = 14; sc.energy = Math.min(100, sc.energy + 28); sfx('slurp'); sc.floatTx.push({ x: 396, y: 100, t: 0, s: '+28 ENERGIA', col: '#ffd54a' }); hero.pose = { arms: 'drink' }; hero.frozen = true; setTimeout(() => { hero.pose = {}; hero.frozen = false; }, 350); } },
-    { x: 582, y: FLOOR, r: 14, py: 70, cond: () => sc.phase === 4 && !sc.script, label: () => 'Entrar na reunião', act: () => { sfx('door'); G.go('c1_meeting'); } }
+    { x: 582, y: FLOOR, r: 14, py: 70, cond: () => sc.phase === 4 && !sc.script, label: () => 'Entrar na reunião', act: () => { sfx('door'); G.go('c1_meeting', { n: sc.meetN || 1 }); } }
   ];
   return sc;
 }
 
 /* ---------- Fase 4: a reunião rápida de alinhamento ---------- */
-SCENES.c1_meeting = () => {
+SCENES.c1_meeting = (o) => {
+  const N = o.n || 1;
   const off = G.store.c1 || { energy: 60, sanity: 50, emails: 4 };
   const chefe = npc(LOOKS.chefe, 252, 150, { face: -1 });
   const mir = { x: 112, y: 140, h: 30 };
-  const slides = [
-    ['ALINHAMENTO', 'ESTRATEGICO Q3', 0], ['PILOTO CORP.AI', 'EFICIENCIA +300%', 1], ['KPI DOS KPIS', '+ METAS', 2],
+  const slides = N === 2 ? [
+    ['REALINHAMENTO', 'DO ALINHAMENTO', 0], ['GAUDE AI CHEGOU', 'ELA NAO DORME', 1], ['METAS Q4', 'DOBRADAS', 2],
+    ['RESILIENCIA', 'SORRIA :)', 3], ['TAREFAS EXTRAS', 'PARA ONTEM', 4], ['REUNIAO PARA', 'ALINHAR ESTA', 5]
+  ] : [
+    ['ALINHAMENTO', 'ESTRATEGICO Q3', 0], ['PILOTO GAUDE AI', 'EFICIENCIA +300%', 1], ['KPI DOS KPIS', '+ METAS', 2],
     ['CULTURA DE DONO', 'SEM SER DONO', 3], ['MAIS INTERCONEXAO', 'EMAIL A CADA 13S', 4], ['REUNIAO PARA', 'ALINHAR A PROX.', 5]
   ];
-  const lines = [
-    'Então, pessoal, rapidinho, cinco minutinhos...', 'Ah, e no Q4 chega o piloto da CORP.AI. Nada com que se preocupar. Por enquanto.',
+  const lines = N === 2 ? [
+    'Pessoal, rapidinho de novo. Só pra realinhar o alinhamento.', 'A Gaude AI já está em teste. Ela não pede café, nem férias.',
+    'As metas do trimestre? Dobramos. Por motivos de sinergia.', 'Lembrem: problema é oportunidade. Muitas oportunidades.',
+    'Vou mandar umas tarefas extras. Nada demais. Umas quarenta.', 'Ótimo. Depois a gente marca outra pra alinhar essa.'
+  ] : [
+    'Então, pessoal, rapidinho, cinco minutinhos...', 'Ah, e no Q4 chega o piloto da Gaude AI. Nada com que se preocupar. Por enquanto.',
     'Precisamos sinergizar as sinergias. KPI do KPI.', 'Aqui todo mundo é dono. Menos do lucro, claro.',
     'Mais interconectividade! E-mail a cada 13 segundos é POUCO.', 'Quem não se alinha... se desalinha.'
   ];
@@ -512,7 +552,7 @@ SCENES.c1_meeting = () => {
     enter() {
       Music.tempo = 1.15;
       this.script = new Script((function* () {
-        yield caption('Fase 4 — O Abismo do Microgerenciamento', { auto: 2.2 });
+        if (N === 2) return;
         Balloons.add(null, 'Quando o gerente olhar pra você, pressione ' + Input.label('a') + ' para concordar com a cabeça.', { type: 'caption', auto: 4.5, bottom: true });
       })());
     },
@@ -545,10 +585,10 @@ SCENES.c1_meeting = () => {
     finish() {
       this.ending = true; this.qte = null;
       this.script = new Script((function* () {
-        yield say(chefe, 'Perfeito! Super alinhados. Vou marcar outra reunião pra alinhar ESSA.', { name: 'SR. CASTRO' });
-        yield caption('47 minutos depois...', { auto: 1.8 });
+        yield say(chefe, N === 1 ? 'Perfeito! Super alinhados. Vou marcar outra reunião pra alinhar ESSA.' : 'Excelente. Agora, de volta ao trabalho. Tem bastante coisa esperando.', { name: 'SR. CASTRO' });
+        yield caption(N === 1 ? '47 minutos depois...' : '1 hora e 12 minutos depois...', { auto: 1.6 });
         off.emails += 3;
-        G.go('c1_office', { resume: true });
+        G.go('c1_office', { resume: N });
       })());
     },
     draw(c) {
@@ -573,7 +613,7 @@ SCENES.c1_meeting = () => {
       pixText(c, s[1], 246, 80, '#2a4a7a', 1, 'center');
       // gráficos
       const k = s[2];
-      if (k === 1) { pixText(c, 'CORP.AI', 246, 36, '#1f4a6a', 3, 'center'); pixText(c, 'NUNCA DORME', 246, 58, '#d8323c', 1, 'center'); R(c, 238, 66, 4, 4, '#7fd4ff'); R(c, 250, 66, 4, 4, '#7fd4ff'); R(c, 240, 72, 12, 1, '#7fd4ff'); }
+      if (k === 1) { pixText(c, 'GAUDE AI', 246, 36, '#1f4a6a', 3, 'center'); pixText(c, 'NUNCA DORME', 246, 58, '#d8323c', 1, 'center'); R(c, 238, 66, 4, 4, '#7fd4ff'); R(c, 250, 66, 4, 4, '#7fd4ff'); R(c, 240, 72, 12, 1, '#7fd4ff'); }
       else if (k === 2 || k === 4) { for (let i = 0; i < 7; i++) R(c, 200 + i * 14, 72 - (i * i + 3) * .9, 9, (i * i + 3) * .9, i % 2 ? '#d8323c' : '#2a4a7a'); R(c, 196, 72, 100, 1, '#333'); }
       else if (k === 3) { R(c, 226, 36, 40, 36, '#d8323c'); R(c, 232, 30, 28, 8, '#d8323c'); pixText(c, 'DONO', 246, 50, '#fff', 1, 'center'); }
       else if (k === 5) { for (let i = 0; i < 4; i++) { R(c, 200 + i * 26, 40, 18, 14, '#2a4a7a'); if (i < 3) R(c, 218 + i * 26, 46, 8, 2, '#333'); pixText(c, 'R' + (i + 1), 209 + i * 26, 44, '#fff', 1, 'center'); } pixText(c, '∞', 246, 62, '#d8323c'); }

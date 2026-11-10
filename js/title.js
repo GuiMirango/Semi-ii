@@ -69,9 +69,10 @@ SCENES.title = () => {
     ui(c) {
       const k = Math.min(1, this.t / 1.5);
       c.globalAlpha = k;
-      T(c, 'O INFUNDÍBULO', W / 2, 16, { size: 14, align: 'center', col: '#f3efe6', shc: '#5a0d16', sd: 1.5 });
+      T(c, 'O CICLO', W / 2, 16, { size: 14, align: 'center', col: '#f3efe6', shc: '#5a0d16', sd: 1.5 });
       T(c, 'DE MIRANGO', W / 2, 34, { size: 14, align: 'center', col: '#d8323c', shc: '#2a0408', sd: 1.5 });
       c.globalAlpha = 1;
+      T(c, '@guimirango', 5, 170, { f: FONT2, size: 9, col: '#a9a3b8' });
       if (this.state === 'press') {
         if (Math.floor(this.t * 2) % 2 === 0) T(c, 'PRESSIONE QUALQUER TECLA', W / 2, 150, { size: 6, align: 'center', col: '#ffd54a' });
         T(c, 'teclado • toque • gamepad', W / 2, 162, { f: FONT2, size: 9, align: 'center', col: '#8a84a0' });

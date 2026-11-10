@@ -89,7 +89,7 @@ function drawAdPlane(c, t) {
   R(c, x + 196, y, 14, 4, '#e8e8e8'); R(c, x + 206, y - 3, 3, 3, '#d8323c'); R(c, x + 200, y + 3, 6, 1, '#888'); R(c, x + 210, y + 1, 2, 2, '#333');
   for (let i = 0; i < 12; i++) R(c, x + 186 + i, y + 2 + Math.round(Math.sin(t * 6 + i)), 1, 1, '#aaa');
   R(c, x, y - 3 + Math.round(Math.sin(t * 5)), 186, 11, '#f3efe6'); R(c, x, y - 3 + Math.round(Math.sin(t * 5)), 186, 1, '#d8323c');
-  pixText(c, 'CORP.AI: FERIAS? A IA TRABALHA POR VOCE', x + 93, y - 1 + Math.round(Math.sin(t * 5)), '#1f4a6a', 1, 'center');
+  pixText(c, 'GAUDE AI: FERIAS? A IA TRABALHA POR VOCE', x + 93, y - 1 + Math.round(Math.sin(t * 5)), '#1f4a6a', 1, 'center');
 }
 /* ---------- Cena 4: o paraíso vazio + a moeda sem valor ---------- */
 SCENES.c3_beach = () => {
@@ -105,7 +105,7 @@ SCENES.c3_beach = () => {
     enter() {
       this.script = new Script((function* () {
         yield titleCard('CAPÍTULO 3', 'BARGANHA');
-        yield caption('Areia branca. Mar turquesa. Sol dourado. Nenhuma notificação.', { auto: 3 });
+        yield 1.2;
         yield think(mA, 'Eu... consegui? Então é isso? A fuga definitiva?');
         hero.frozen = false; sc.stage = 1;
       })());
@@ -122,7 +122,7 @@ SCENES.c3_beach = () => {
       sc.items = 0; sfx('swoosh');
       for (let i = 0; i < 16; i++) parts.add({ x: hero.cx + 8, y: hero.fy - 16, vx: rnd(10, 70), vy: rnd(-60, -10), g: 20, life: 3, col: pick(['#4a9a5a', '#7aca8a', '#3a7a4a']), s: 3, drag: .3 });
       hero.pose = { arms: 'shrug', eyes: 'wide' };
-      yield caption('A ficha cai: a riqueza acumulada no sistema corporativo não vale absolutamente nada na matriz natural.', { auto: 4.4 });
+      yield 1.2;
       hero.pose = {};
       yield think(mA, 'Esforço orgânico direto... tá bom. Tá bom.');
       yield say(nat, 'O coco mais fresco fica lá no alto daquela palmeira gigante.', { name: 'NATIVO' });
@@ -298,7 +298,7 @@ SCENES.c3_climb = () => {
       this.cocoGone = true;
       yield shout(mA, 'TOMA!', { auto: .8 });
       hero.pose = { arms: 'up' };
-      yield caption('Mirango desce deslizando pelo tronco...', { auto: 1.4 });
+      yield 0.6;
       const y0 = hero.y;
       yield { t: 0, update(dt) { this.t += dt; const k = ease(Math.min(1, this.t / 1.8)); hero.x = lerp(hero.x, 156, .2); hero.y = lerp(y0, 956, k); hero.pose = { arms: 'up', eyes: 'closed' }; if (Math.random() < .6) parts.add({ x: hero.cx, y: hero.y, vx: rnd(-10, 10), vy: -10, life: .5, col: '#a07a44' }); sc.cam.y = clamp(hero.y - 100, 0, CLIMB_H - H); return this.t >= 1.9; } };
       sfx('land');
@@ -363,7 +363,7 @@ SCENES.c3_sunset = () => {
       const sit = (o = {}) => { this.pose = Object.assign({ sit: true, face: -1 }, o); };
       sfx('slurp');
       yield think(m, 'Ahh... água de coco gelada. À sombra. Paz.');
-      yield caption('Um breve momento de paz genuína.', { auto: 2.4 });
+      yield 1.0;
       sit(); Music.play(null);
       yield 3;
       yield say(m, 'É isso...', { auto: 1.8 });
@@ -374,7 +374,7 @@ SCENES.c3_sunset = () => {
       yield 1.5;
       yield say(m, 'Bonito, né. O mar.', { auto: 1.8 });
       yield 3;
-      yield caption('O sol baixa. Uma hora. Duas.', { auto: 2.2 });
+      yield 0.9;
       yield { t: 0, update(dt) { this.t += dt; sc.tod = Math.min(.6, this.t / 7); return this.t > 4.5; } };
       yield say(m, 'Uma onda... duas ondas...', { auto: 2 });
       yield { t: 0, update(dt) { this.t += dt; sc.tod = Math.min(1, .6 + this.t / 8); return this.t > 2.5; } };
@@ -397,7 +397,7 @@ SCENES.c3_sunset = () => {
       AU.amb('ring');
       sfx('notif'); this.qs.push({ x: m.x - 20, y: 110, t: 0 });
       sit({ face: 1, tic: true, eyes: 'wide' });
-      yield caption('Sem metas, sem relógio, sem chefes. A mente, viciada em notificações a cada 13 segundos, entra em abstinência.', { auto: 4.6 });
+      yield 1.2;
       yield { t: 0, update(dt) { this.t += dt; sc.tod = 1 + Math.min(.6, this.t / 4); sc.desat = Math.min(.4, this.t / 6); return this.t > 3; } };
       sit({ face: 1 });
       yield say(m, 'É isso. Isso é tudo.', { auto: 2 });
@@ -443,7 +443,7 @@ SCENES.c3_dream = () => {
       this.script = new Script((function* () {
         hero.frozen = true;
         yield bigText('O CONSTRUTOR DE ILUSÕES', 1.6, { size: 11, zoom: true, col: '#d8c0ff' });
-        yield caption('A paleta do paraíso desbota. Caranguejos e gaivotas não ligam para produtividade.', { auto: 3.4 });
+        yield 1.2;
         Balloons.add(null, 'Recrie o trabalho: alinhe 5 conchas, desenhe uma planilha na areia e cronometre as ondas. Pule os caranguejos; fuja da sombra da gaivota.', { type: 'caption', auto: 6.5, bottom: true });
         hero.frozen = false;
       })());
@@ -465,7 +465,7 @@ SCENES.c3_dream = () => {
     *climaxGen() {
       this.climax = true; hero.frozen = true; hero.vx = 0; Music.play(null); sfx('glitch');
       yield { t: 0, update(dt) { this.t += dt; G.glitch = Math.min(1, this.t / 1.5); sc.redSun = Math.floor(this.t * 6) % 2 === 0; if (Math.random() < .2) sfx('glitch'); return this.t > 1.6; } };
-      yield caption('O paraíso sofre um glitch massivo. A mente hiper-institucionalizada não suporta a paz.', { auto: 3 });
+      yield 1.2;
       // tropeça num caranguejo
       const cb = crabs[0]; cb.a = cb.b = cb.x = hero.cx + hero.face * 14; cb.d = 0;
       hero.auto = hero.cx + 30; hero.frozen = false;
@@ -610,44 +610,56 @@ SCENES.c3_dream = () => {
 
 /* ---------- O despertar no ônibus ---------- */
 SCENES.c3_wake = () => {
+  // mesmo interior do 310 Lapa visto no fim do capítulo 2, agora à noite
+  const rng = srand(31);
+  const near = makeCanvas(W * 2, 120, (c, w, h) => {
+    let x = 0;
+    while (x < w) { const bw = 30 + Math.floor(rng() * 40), bh = 40 + Math.floor(rng() * 50); R(c, x, h - bh, bw - 2, bh, pick(['#10121e', '#141626', '#0e1018'])); for (let yy = h - bh + 4; yy < h - 6; yy += 7) for (let xx = x + 3; xx < x + bw - 6; xx += 6) R(c, xx, yy, 3, 4, rng() < .15 ? '#d8b86a' : '#181a2a'); x += bw; }
+  });
   const sc = {
-    music: null, amb: 'bus', t: 0, holdBlack: true, eyes: 'closed', fog: 0, lights: [],
+    music: null, amb: 'bus', t: 0, sx: 0, holdBlack: true, eyes: 'closed', fog: 0,
     enter() { this.script = new Script(this.run()); },
     *run() {
       G.fadeA = 1; sfx('pum'); G.shake(10);
       yield .8;
       yield fadeTo(0, .5);
-      yield .6;
+      yield 1.2;
       this.eyes = null; sfx('heart');
-      yield caption('A alucinação evapora. As ondas viram o ronco do motor a diesel e o ar-condicionado gelado.', { auto: 4 });
+      yield 1;
       this.fog = 1;
-      yield caption('Mirango acorda com a bochecha colada no vidro frio, deixando uma marca embaçada.', { auto: 3.6 });
-      const m = { x: 196, y: 108, h: 50 };
+      const m = { x: 206, y: 132, h: 6 };
       yield think(m, '...Uma praia?');
+      yield 1;
       yield think(m, 'Foi só... um cochilo.');
-      yield caption('Tudo não passou de uma alucinação de poucos minutos de um cérebro exausto.', { auto: 4 });
+      yield 1.2;
       G.unlock(4);
       yield endCard('FIM DO CAPÍTULO 3', 'Barganha');
       G.go('c4_street', { cut: true, black: true });
     },
-    update(dt) {
-      this.t += dt; if (this.script) this.script.update(dt);
-      if (Math.random() < dt * 1.2) this.lights.push({ x: -40 });
-      for (const l of this.lights) l.x += 220 * dt; this.lights = this.lights.filter(l => l.x < W + 60);
-    },
+    update(dt) { this.t += dt; this.sx += dt * 60; if (this.script) this.script.update(dt); },
     draw(c) {
-      R(c, 0, 0, W, H, '#0e1020');
-      c.save(); c.beginPath(); c.rect(24, 16, 200, 112); c.clip();
-      vgrad(c, 24, 16, 200, 112, ['#05060e', '#141830']);
-      for (let i = 0; i < 12; i++) { const x = ((i * 47 - this.t * 90) % 240 + 240) % 240; R(c, 24 + x, 70 + (i % 3) * 6, 6, 3, i % 4 ? '#3a3a5a' : '#ffd77a'); }
-      for (const l of this.lights) { c.globalAlpha = .35; R(c, Math.round(l.x), 16, 10, 112, '#ffcf7a'); c.globalAlpha = 1; }
+      R(c, 0, 0, W, H, '#2a2a36');
+      const WX = 12, WY = 10, WW = 244, WH = 138;
+      c.save(); c.beginPath(); c.rect(WX, WY, WW, WH); c.clip();
+      vgrad(c, WX, WY, WW, WH, ['#05060e', '#12152a']);
+      const b = (Math.round(this.sx * .8) % (W * 2)) - W * 2;
+      c.drawImage(near, b, 4); c.drawImage(near, b + W * 2, 4);
+      R(c, WX, 118, WW, 6, '#2a2830'); R(c, WX, 124, WW, 24, '#16151c');
+      for (let i = 0; i < 4; i++) { const px = ((i * 90 + this.sx * 1.6) % 360) - 40; R(c, px, 64, 3, 56, '#0a0a10'); R(c, px - 6, 64, 14, 3, '#0a0a10'); R(c, px + 4, 67, 4, 2, '#ffcf7a'); c.globalAlpha = .12; R(c, px - 10, 70, 30, 48, '#ffcf7a'); c.globalAlpha = 1; }
+      c.globalAlpha = .1; R(c, WX, WY, WW, WH, '#6a7ab0'); c.globalAlpha = 1;
       c.restore();
-      R(c, 20, 12, 208, 4, '#3a3a48'); R(c, 20, 128, 208, 6, '#3a3a48'); R(c, 20, 12, 4, 120, '#3a3a48'); R(c, 224, 12, 4, 120, '#3a3a48');
-      R(c, 0, 134, W, 46, '#1a2a4a'); dither(c, 0, 138, W, 42, '#203258', 3);
+      R(c, WX - 4, WY - 4, WW + 8, 4, '#4a4640'); R(c, WX - 4, WY + WH, WW + 8, 6, '#4a4640'); R(c, WX - 4, WY, 4, WH, '#4a4640'); R(c, WX + WW, WY, 4, WH, '#4a4640');
+      R(c, WX + WW / 2 - 1, WY, 3, WH, '#4a4640'); R(c, WX, WY + 28, WW, 2, '#4a4640');
+      R(c, 262, 14, 54, 14, '#111'); pixText(c, '310 LAPA', 289, 16, '#ffb030', 1, 'center'); pixText(c, 'PROX: PERIFERIA', 289, 22, '#ff7a30', 1, 'center');
+      R(c, 0, 154, W, 26, '#4a4438');
+      const sx0 = 168;
+      R(c, sx0 + 58, 104, 14, 62, OUT); R(c, sx0 + 60, 106, 10, 58, '#1e3a70'); R(c, sx0 + 60, 106, 3, 58, '#3a5a9a'); R(c, sx0 + 56, 100, 18, 6, '#8a8a8a');
+      R(c, sx0 + 4, 152, 70, 12, OUT); R(c, sx0 + 6, 154, 66, 8, '#1e3a70'); R(c, sx0 + 6, 154, 66, 2, '#3a5a9a');
+      R(c, sx0 + 20, 164, 4, 16, '#555'); R(c, sx0 + 56, 164, 4, 16, '#555');
       const vib = Math.floor(this.t * 12) % 2;
-      for (const l of this.lights) { c.globalAlpha = .12; R(c, Math.round(l.x) + 60, 0, 14, H, '#ffcf7a'); c.globalAlpha = 1; }
-      drawPersonBig(c, 236, 178 + vib, LOOKS.mirango, { face: -1, sit: true, slump: .7, eyes: this.eyes, rot2: -.22 }, 2);
-      if (this.fog) { c.globalAlpha = .35 + Math.sin(this.t * 2) * .05; R(c, 210, 84, 12, 16, '#d8e8f0'); R(c, 212, 82, 8, 20, '#d8e8f0'); c.globalAlpha = 1; }
+      drawPersonBig(c, sx0 + 46, 174 + vib, LOOKS.mirango, { face: -1, sit: true, slump: .7, eyes: this.eyes, rot2: -.14 }, 2);
+      if (this.fog) { c.globalAlpha = .35 + Math.sin(this.t * 2) * .05; R(c, 186, 120, 10, 14, '#d8e8f0'); R(c, 188, 118, 6, 18, '#d8e8f0'); c.globalAlpha = 1; }
+      c.globalAlpha = .3; R(c, 0, 0, W, H, '#0a0c20'); c.globalAlpha = 1;
     }
   };
   return sc;

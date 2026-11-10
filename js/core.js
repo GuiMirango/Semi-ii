@@ -1,6 +1,6 @@
 'use strict';
 /* =========================================================
-   O INFUNDÍBULO DE MIRANGO — núcleo do motor
+   O CICLO DE MIRANGO — núcleo do motor
    Resolução interna 320x180 (pixel art), texto/HUD em alta resolução.
    ========================================================= */
 const W = 320, H = 180;

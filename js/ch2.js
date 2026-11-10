@@ -21,7 +21,7 @@ SCENES.c2_reject = () => {
       yield shout(m, 'EU ME DEMITO!', { size: 24, maxW: 260, auto: 1.3 });
       m.pose = { eyes: 'wide' };
       yield titleCard('CAPÍTULO 2', 'RAIVA');
-      yield caption('Silêncio absoluto. Os colegas estão paralisados em choque.', { auto: 2.6 });
+      yield 1.0;
       Music.play('rage');
       m.pose = {};
       yield think(m, 'Pela primeira vez em anos... eu tô de pé. De verdade.');
@@ -133,7 +133,7 @@ SCENES.c2_frogger = () => {
     R(c, 0, 36, W, 4, '#c9c4b8'); R(c, 0, 39, W, 1, '#6a665e');
     // ponto de ônibus
     R(c, 234, 8, 68, 20, '#2a2a30'); R(c, 236, 10, 64, 16, '#4a6a8a'); R(c, 236, 10, 64, 2, '#6a8aaa'); pixText(c, 'ONIBUS', 268, 15, '#ffd54a', 1, 'center');
-    R(c, 120, 8, 60, 22, '#2a2a30'); R(c, 122, 10, 56, 18, '#1f4a6a'); pixText(c, 'CORP.AI', 150, 12, '#fff', 1, 'center'); pixText(c, 'SEM TRANSITO', 150, 20, '#7fd4ff', 1, 'center');
+    R(c, 120, 8, 60, 22, '#2a2a30'); R(c, 122, 10, 56, 18, '#1f4a6a'); pixText(c, 'GAUDE AI', 150, 12, '#fff', 1, 'center'); pixText(c, 'SEM TRANSITO', 150, 20, '#7fd4ff', 1, 'center');
     R(c, 222, 6, 3, 30, '#555'); R(c, 218, 4, 11, 7, '#1e5aa8'); pixText(c, 'P', 223, 5, '#fff');
     // asfalto
     R(c, 0, 40, W, 96, '#3a3d44');
@@ -291,7 +291,7 @@ function buildStreet() {
     skyline(c, -5, W + 10, 104, rng, { col: '#c7765a', win: '#d48a6a', hmin: 30, hmax: 70 });
     skyline(c, -5, W + 10, 112, rng, { col: '#8a4a3a', win: '#9a5a48', lit: '#ffd77a', litP: .05, hmin: 20, hmax: 55 });
     // outdoor de IA
-    R(c, 96, 34, 92, 34, '#2a2a30'); R(c, 98, 36, 88, 30, '#1f4a6a'); pixText(c, 'CORP.AI', 142, 40, '#fff', 2, 'center'); pixText(c, 'DEIXA QUE A IA', 142, 53, '#7fd4ff', 1, 'center'); pixText(c, 'TRABALHA POR VOCE', 142, 59, '#7fd4ff', 1, 'center');
+    R(c, 96, 34, 92, 34, '#2a2a30'); R(c, 98, 36, 88, 30, '#1f4a6a'); pixText(c, 'GAUDE AI', 142, 40, '#fff', 2, 'center'); pixText(c, 'DEIXA QUE A IA', 142, 53, '#7fd4ff', 1, 'center'); pixText(c, 'TRABALHA POR VOCE', 142, 59, '#7fd4ff', 1, 'center');
     R(c, 116, 68, 3, 12, '#2a2a30'); R(c, 166, 68, 3, 12, '#2a2a30');
     // lojas
     const shops = [[0, 70, 'PADARIA', '#c43b3b'], [74, 64, 'FARMACIA', '#2e7d32'], [142, 80, 'LOTERIAS', '#1e5aa8'], [226, 94, 'BAR DO ZE', '#e3a32a']];
@@ -320,7 +320,7 @@ function drawBusSide(c, x, y, col = '#1e5aa8', lit) {
   R(c, x + 2, y - 40, 12, 32, '#9ac4e0'); R(c, x + 3, y - 40, 4, 32, '#bcd8ec');
   R(c, x + 114, y - 40, 12, 14, '#9ac4e0');
   R(c, x + 124, y - 14, 4, 3, '#ffe9a0'); R(c, x + 1, y - 14, 3, 3, '#ff3030');
-  pixText(c, '107 - CENTRO', x + 66, y - 44, '#ffd54a', 1, 'center');
+  R(c, x + 40, y - 46, 52, 7, '#111'); pixText(c, '310 LAPA', x + 66, y - 45, '#ffb030', 1, 'center');
   for (const wx of [x + 22, x + 100]) { R(c, wx - 1, y - 9, 16, 10, OUT); R(c, wx, y - 8, 14, 8, '#222'); R(c, wx + 4, y - 6, 6, 4, '#777'); }
 }
 function drawCart(c, x, y) {
@@ -461,7 +461,7 @@ SCENES.c2_fight = () => {
         const oc = r === 1 ? LOSES_TO[mc] : BEATS[mc];
         if (r === 3) {
           this.bullet = 1; Music.muffle(500); this.vig = .7; this.desat = .5;
-          yield caption('Câmera lenta. O coração dispara.', { auto: 1.2, y: 140 });
+          yield 0.5;
         }
         yield* this.jo(r === 3);
         this.reveal = [mc, oc]; sfx('swoosh'); G.shake(2);
@@ -490,7 +490,7 @@ SCENES.c2_fight = () => {
       yield say(zé, 'A paçoca é sua, campeão!', { name: 'SEU ZÉ' });
       A.pose = { arms: 'hold' }; this.pacoca = true; sfx('coin');
       yield think(A, 'O doce sabor da primeira vitória do dia.');
-      yield caption('Lá vem outro ônibus...', { auto: 1.6 });
+      yield caption('Lá vem o 310 Lapa...', { auto: 1.6 });
       G.go('c2_bus');
     },
     update(dt, rdt) {
@@ -582,7 +582,7 @@ SCENES.c2_bus = () => {
     // costado interno (bege) e faixa de anúncios
     vgrad(c, 0, 34, BUS_W, 116, ['#e2dccd', '#c4bba8']);
     R(c, 0, 36, BUS_W, 9, '#3a3f4a');
-    const ads = ['CORP.AI: TRABALHE ENQUANTO DORME', 'CURSO: SEJA SUBSTITUIDO COM DIGNIDADE', 'SEU CHEFE JA USA IA. E VOCE?', 'CORP.AI - ELA NAO PEDE AUMENTO'];
+    const ads = ['GAUDE AI: TRABALHE ENQUANTO DORME', 'CURSO: SEJA SUBSTITUIDO COM DIGNIDADE', 'SEU CHEFE JA USA IA. E VOCE?', 'GAUDE AI - ELA NAO PEDE AUMENTO'];
     for (let i = 0, x = 110; x < BUS_W - 80; x += 170, i++) { R(c, x, 37, 150, 7, i % 2 ? '#d8323c' : '#1f4a6a'); pixText(c, ads[i % ads.length], x + 75, 38, '#fff', 1, 'center'); }
     // janelas com basculante (vazadas para ver a rua)
     for (let x = 100; x < BUS_W - 20; x += 60) {
@@ -598,6 +598,7 @@ SCENES.c2_bus = () => {
     R(c, 0, 100, 34, 50, '#3a3f4a'); R(c, 6, 108, 16, 26, '#2a2f38'); R(c, 24, 104, 3, 14, '#222'); R(c, 18, 102, 14, 3, '#111');
     R(c, 36, 50, 26, 100, '#4a5058'); R(c, 38, 52, 10, 96, '#9ac4e0'); R(c, 50, 52, 10, 96, '#9ac4e0'); R(c, 48, 52, 2, 96, '#333');
     pixText(c, 'EMBARQUE', 49, 44, '#ffd54a', 1, 'center');
+    R(c, 2, 34, 60, 8, '#111'); pixText(c, '310 LAPA', 32, 36, '#ffb030', 1, 'center');
     R(c, 70, 112, 16, 22, '#7a7f88'); R(c, 70, 112, 16, 2, '#a0a5ae'); R(c, 74, 120, 22, 2, '#c9cdd2'); R(c, 74, 126, 22, 2, '#c9cdd2'); pixText(c, 'CATRACA', 80, 104, '#5a5448', 1, 'center');
     R(c, 66, 100, 2, 50, '#e3c34a');
     // porta do meio (desembarque)
@@ -646,8 +647,7 @@ SCENES.c2_bus = () => {
       this.script = new Script((function* () {
         hero.frozen = true;
         yield bigText('TETRIS HUMANO', 1.4, { size: 14, zoom: true, col: '#ffd54a' });
-        yield caption('O ônibus encosta lotado. Horário de pico. Só há um banco livre: lá no fundo.', { auto: 3.2 });
-        Balloons.add(null, 'Segure ' + Input.label('down') + ' nas curvas e freadas  •  ' + Input.label('a') + ' "Com licença!"  •  ' + Input.label('b') + ' empurrar', { type: 'caption', auto: 6, bottom: true });
+        Balloons.add(null, 'Chegue ao banco livre no fundo  •  ' + Input.label('down') + ' segurar nas curvas  •  ' + Input.label('a') + ' "Com licença!"  •  ' + Input.label('b') + ' empurrar', { type: 'caption', auto: 6, bottom: true });
         hero.frozen = false;
       })());
     },
@@ -808,7 +808,7 @@ SCENES.c2_end = () => {
   const near = makeCanvas(W * 2, 120, (c, w, h) => {
     let x = 0;
     while (x < w) { const bw = 30 + Math.floor(rng() * 40), bh = 40 + Math.floor(rng() * 50); R(c, x, h - bh, bw - 2, bh, pick(['#3a2438', '#2e2234', '#40283a'])); for (let yy = h - bh + 4; yy < h - 6; yy += 7) for (let xx = x + 3; xx < x + bw - 6; xx += 6) R(c, xx, yy, 3, 4, rng() < .3 ? '#ffd77a' : '#4a3448'); x += bw; }
-    R(c, 300, 30, 90, 30, '#1a1018'); R(c, 302, 32, 86, 26, '#1f4a6a'); pixText(c, 'CORP.AI', 345, 36, '#fff', 2, 'center'); pixText(c, 'O FUTURO NAO TIRA FERIAS', 345, 50, '#7fd4ff', 1, 'center');
+    R(c, 300, 30, 90, 30, '#1a1018'); R(c, 302, 32, 86, 26, '#1f4a6a'); pixText(c, 'GAUDE AI', 345, 36, '#fff', 2, 'center'); pixText(c, 'O FUTURO NAO TIRA FERIAS', 345, 50, '#7fd4ff', 1, 'center');
   });
   const cars = [];
   const parts = new Parts();
@@ -817,19 +817,19 @@ SCENES.c2_end = () => {
     enter() { this.script = new Script(this.run()); },
     *run() {
       yield 1;
-      yield caption('Mirango senta na janela. O caos diminui, virando um zumbido abafado.', { auto: 3.4 });
-      yield caption('Ele encosta a cabeça no vidro frio, que vibra com o motor.', { auto: 3 });
+      yield 1.2;
+      yield 1.2;
       this.eat = 1; sfx('slurp');
-      yield caption('As mãos ainda tremem. Mas o semblante, enfim, relaxa.', { auto: 3 });
+      yield 1.2;
       this.tower = -60;
-      yield caption('O prédio antigo fica para trás.', { auto: 3.2 });
+      yield 1.2;
       const mA = { x: 206, y: 132, h: 6 };
       yield think(mA, 'Não sei o dia de amanhã...', { auto: 2.4 });
       yield think(mA, '...mas eu não volto.', { auto: 2.6 });
       G.unlock(3);
       this.eyes = 'closed';
       yield 1.2;
-      yield caption('Os olhos pesam. O vidro vibra. O motor vira... ondas?', { auto: 3 });
+      yield 1.2;
       yield endCard('FIM DO CAPÍTULO 2', 'Raiva');
       G.go('c3_beach', { col: '#fff', dur: 1.4 });
     },
@@ -865,6 +865,7 @@ SCENES.c2_end = () => {
       // moldura da janela, basculante e parede
       R(c, WX - 4, WY - 4, WW + 8, 4, '#6a6458'); R(c, WX - 4, WY + WH, WW + 8, 6, '#6a6458'); R(c, WX - 4, WY, 4, WH, '#6a6458'); R(c, WX + WW, WY, 4, WH, '#6a6458');
       R(c, WX + WW / 2 - 1, WY, 3, WH, '#6a6458'); R(c, WX, WY + 28, WW, 2, '#6a6458');
+      R(c, 262, 14, 54, 14, '#111'); pixText(c, '310 LAPA', 289, 16, '#ffb030', 1, 'center'); pixText(c, 'PROX: CENTRO', 289, 22, '#ff7a30', 1, 'center');
       R(c, 0, 154, W, 26, '#b8af9a');
       // assento de ônibus de perfil (encosto atrás, à direita)
       const sx0 = 168;

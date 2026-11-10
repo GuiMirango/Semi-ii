@@ -1,8 +1,8 @@
-# O Infundíbulo de Mirango
+# O Ciclo de Mirango
 
 ![Prévia do jogo](preview.png)
 
-Jogo de plataforma 2D em pixel art para navegador, baseado no GDD *"O Mundo de Mirango"* e no roteiro expandido *"O Infundíbulo de Mirango"*.
+Jogo de plataforma 2D em pixel art para navegador, baseado no GDD *"O Mundo de Mirango"* e no roteiro expandido do projeto.
 Cinco capítulos (Negação → Raiva → Barganha → Depressão → Aceitação), cada um com mudanças de câmera, de gênero e de paleta conforme o estado emocional do protagonista.
 
 ## Como jogar
@@ -45,3 +45,10 @@ Atalho de desenvolvimento: abrir com `#nome_da_cena` (ex.: `index.html#c3_climb`
 
 Nenhum arquivo de imagem ou som externo é usado; as únicas dependências externas são as fontes *Press Start 2P* e *VT323* do Google Fonts (com fallback monoespaçado).
 
+
+## Créditos
+
+- Idealização: **@guimirango**
+- FATEC SEBRAE — Curso de Marketing (3º semestre) — Sociedade e Cultura, 2026
+- Agradecimento especial ao professor Alexander Homenko Neto
+- Dedicado a Isabele Ribeiro

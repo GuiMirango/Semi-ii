@@ -14,15 +14,18 @@ SCENES.c5_wake = () => {
       yield titleCard('CAPÍTULO 5', 'ACEITAÇÃO');
       yield fadeTo(0, .8);
       this.ringing = true;
-      yield caption('O despertador toca sem piedade na manhã seguinte.', { auto: 2.6 });
       this.stage = 1;
       yield Tk.until(() => sc.stage === 2);
       this.ringing = false; this.mode = 'morning'; sfx('click');
       yield 1;
-      yield caption('Mirango abre os olhos na cama simples. Não há praias. Não há fuga.', { auto: 3.2 });
       this.lying = false; hero.x = 80; hero.y = BR_FLOOR - 24;
-      yield think(mA, '...');
-      yield caption('O peso da depressão continua cravado nos ombros. O passado não pode ser apagado.', { auto: 3.4 });
+      yield think(mA, '...Ontem eu me demiti.');
+      yield 1.2;
+      yield think(mA, 'As contas. O aluguel. A geladeira vazia.');
+      yield 1;
+      hero.pose = { arms: 'fist' };
+      yield think(mA, 'Eu vou voltar. Vou pedir meu emprego de volta.');
+      hero.pose = {};
       hero.frozen = false; this.stage = 3;
     },
     update(dt) {
@@ -72,7 +75,7 @@ SCENES.c5_street = () => {
     // banca de jornal e outdoor
     R(c, 180, 104, 44, 40, '#2e5a3a'); R(c, 180, 104, 44, 4, '#1e4a2a'); R(c, 184, 112, 36, 18, '#e8e4d8');
     pixText(c, 'IA SUBSTITUI', 202, 114, '#c43b3b', 1, 'center'); pixText(c, '40% DOS', 202, 120, '#222', 1, 'center'); pixText(c, 'ESCRITORIOS', 202, 126, '#222', 1, 'center');
-    R(c, 380, 30, 110, 50, '#2a2a30'); R(c, 383, 33, 104, 44, '#d8323c'); pixText(c, 'SEJA PROMOVIDO', 435, 42, '#fff', 1, 'center'); pixText(c, 'TRABALHE MAIS', 435, 52, '#ffd54a', 1, 'center'); pixText(c, 'COM CORP.AI', 435, 64, '#fff', 1, 'center');
+    R(c, 380, 30, 110, 50, '#2a2a30'); R(c, 383, 33, 104, 44, '#d8323c'); pixText(c, 'SEJA PROMOVIDO', 435, 42, '#fff', 1, 'center'); pixText(c, 'TRABALHE MAIS', 435, 52, '#ffd54a', 1, 'center'); pixText(c, 'COM GAUDE AI', 435, 64, '#fff', 1, 'center');
     R(c, 400, 80, 3, 34, '#2a2a30'); R(c, 466, 80, 3, 34, '#2a2a30');
     // fachada imponente
     R(c, 790, 0, 170, 140, '#2c3340'); for (let y = 6; y < 120; y += 8) for (let x = 796; x < 954; x += 10) R(c, x, y, 7, 6, (x + y) % 3 ? '#3e4c62' : '#5a6a82');
@@ -90,7 +93,7 @@ SCENES.c5_street = () => {
     hero, botTarget: () => 875, cam: { x: 0, y: 0 }, music: 'street', amb: 'city', t: 0, desat: .55, vig: .25, carT: 0,
     enter() {
       this.script = new Script((function* () {
-        yield caption('Ruas barulhentas. Todos olhando para as próprias telas.', { auto: 3 });
+        yield 1.2;
       })());
     },
     update(dt) {
@@ -135,7 +138,7 @@ SCENES.c5_office = () => {
   const vac = { x: 400, d: 1 };
   const parts = new Parts();
   const sc = {
-    hero, botTarget: () => 256, cam: { x: 0, y: 0 }, music: null, amb: 'office', holdBlack: true, elevOpen: 0, t: 0, desat: .2, vig: .2, eyes: null, term: 0, termLines: [], beepT: 0, beepI: 1.2,
+    hero, botTarget: () => 536, cam: { x: 0, y: 0 }, music: null, amb: 'office', holdBlack: true, elevOpen: 0, t: 0, desat: .2, vig: .2, eyes: null, term: 0, termLines: [], beepT: 0, beepI: 1.2,
     elevInside(c) { if (sc.inElev) hero.draw(c); },
     enter() { this.script = new Script(this.intro()); },
     *intro() {
@@ -146,54 +149,53 @@ SCENES.c5_office = () => {
       AU.amb('office'); sfx('ding');
       yield fadeTo(0, 1.2);
       yield { t: 0, update(dt) { this.t += dt; sc.elevOpen = Math.min(1, this.t / .9); return this.t >= .9; } };
-      yield caption('As portas se abrem. Exatamente o mesmo quadro do primeiro minuto.', { auto: 3 });
       this.inElev = false;
       hero.speed = 30; yield heroTo(hero, 104); hero.speed = 46;
       yield { t: 0, update(dt) { this.t += dt; sc.elevOpen = Math.max(0, 1 - this.t / .9); return this.t >= .9; } };
-      yield caption('O ciclo se fecha geometricamente.', { auto: 2.4 });
       yield think(mA, '...Tem algo diferente.');
+      chefe.active = true; chefe.x = 604; chefe.face = -1;
       hero.frozen = false; this.stage = 1;
     },
     *promo() {
-      hero.frozen = true; hero.face = 1;
-      yield think(mA, 'Cadê a impressora? Os contratos? Os e-mails de 13 segundos?');
-      yield caption('As tarefas manuais sumiram. Sobre a mesa, apenas um terminal digital, automatizado e frio.', { auto: 3.8 });
-      yield caption('O trabalho braçal foi totalmente substituído por inteligências artificiais.', { auto: 3.2 });
-      yield think(mA, 'Eu sou... obsoleto?');
-      chefe.active = true; chefe.x = 584;
-      yield walkTo(chefe, hero.cx + 24, 55);
-      chefe.face = -1; hero.face = 1; chefe.pose = { arms: 'out', mouth: 'smile' };
-      sfx('thud');
-      yield say(chefe, 'Mirango! *tapinha nas costas* Pensamos muito no seu caso...', { name: 'SR. CASTRO' });
+      hero.frozen = true; hero.face = hero.cx < chefe.x ? 1 : -1; chefe.face = -hero.face;
+      yield say(mA, 'Sr. Castro... sobre ontem. Eu me precipitei.');
+      yield say(mA, 'Eu quero meu emprego de volta. Por favor.');
+      yield 1;
+      chefe.pose = { arms: 'out' };
+      yield say(chefe, 'Hm. Olha só quem voltou.', { name: 'SR. CASTRO' });
+      yield say(chefe, 'Muita coisa mudou desde ontem. Impressora, contratos, e-mails... a Gaude AI faz tudo agora.', { name: 'SR. CASTRO' });
+      yield think(mA, 'Então eu sou... obsoleto?');
+      chefe.pose = { arms: 'out', mouth: 'smile' }; sfx('thud');
+      yield say(chefe, 'Mas a gente pensou muito no seu caso... *tapinha nas costas*', { name: 'SR. CASTRO' });
       yield say(chefe, '...e decidimos te dar uma PROMOÇÃO.', { name: 'SR. CASTRO' });
       this.eyes = 'shine'; hero.slump = .2; sfx('sparkle');
-      yield caption('Por um segundo, os olhos de Mirango brilham com esperança.', { auto: 2.6 });
+      yield 1.6;
       chefe.pose = { arms: 'point' };
-      yield say(chefe, 'Vimos que seus velhos métodos foram automatizados. Por isso, agora você vai gerenciar o fluxo das máquinas...', { name: 'SR. CASTRO' });
-      yield say(chefe, '...responder relatórios de conformidade automatizados em tempo real e supervisionar três novos setores ao mesmo tempo.', { name: 'SR. CASTRO' });
+      yield say(chefe, 'Agora você vai gerenciar o fluxo das máquinas, responder relatórios de conformidade em tempo real...', { name: 'SR. CASTRO' });
+      yield say(chefe, '...e supervisionar três novos setores ao mesmo tempo.', { name: 'SR. CASTRO' });
       this.eyes = null; hero.slump = 1; hero.pose = { mouth: 'sad' }; sfx('thud');
-      yield caption('O sorriso desaba. A "promoção" é maquiagem corporativa para uma carga ainda mais complexa e algorítmica.', { auto: 4 });
+      yield 1.4;
       chefe.pose = { arms: 'point', mouth: 'smile' };
       yield say(chefe, 'É assim que o sistema funciona, meu amigo. O antigo ficou para trás, agora você tem uma nova fase. Bom trabalho.', { name: 'SR. CASTRO' });
       chefe.pose = {};
       yield walkTo(chefe, 584, 55); chefe.active = false;
+      yield heroTo(hero, 256);
+      hero.face = 1;
       // o terminal
       this.term = 1;
       const lines = ['BEM-VINDO, MIRANGO', 'CARGO: GESTOR DE FLUXO JR.', '> setores supervisionados: 3', '> relatórios de conformidade: 147', '> fluxo das máquinas: 98,7% ▲', '> reuniões de alinhamento: 6 hoje', '> notificações: ∞'];
       for (const l of lines) { this.termLines.push(l); sfx('type'); yield .5; }
       yield 1;
-      yield caption('Nem a revolta, nem o grito de demissão, nem o sonho com a ilha, nem a depressão quebraram o sistema.', { auto: 4.4 });
-      yield caption('A engrenagem apenas o absorveu, o reajustou e o colocou de volta na roda do hamster, com uma coleira algorítmica mais justa.', { auto: 5 });
+      yield caption('A engrenagem apenas o absorveu, o reajustou e o colocou de volta na roda.', { auto: 4 });
       this.term = 0;
       // senta
       yield heroTo(hero, 262);
       hero.face = -1; sfx('thud');
-      yield caption('Ele puxa a cadeira com um suspiro resignado e senta-se diante da tela.', { auto: 3 });
       this.seated = true; hero.frozen = true;
-      yield caption('Suas mãos trêmulas pousam no teclado. As luzes fluorescentes zumbem alto.', { auto: 3.4 });
+      yield 2;
       if (AU.ctx) AU.humG.gain.setTargetAtTime(.05, AU.ctx.currentTime, 1);
       this.beeping = true;
-      yield caption('O jogo reinicia, sutilmente, o seu ciclo invisível.', { auto: 3 });
+      yield 2;
       yield fadeTo(1, 6);
       yield 1.2;
       this.beeping = false;
@@ -217,7 +219,7 @@ SCENES.c5_office = () => {
           if (this.cur.k === 'plinio') sayAuto({ x: 150, y: 128, h: 10 }, 'PLÍNIO.AI v2 — "Sorriso 100% otimizado :)"', 2.4, { name: 'SERVIDOR' });
           else sayAuto(mA, 'A impressora... foi pra onde?', 2, { type: 'thought' });
         }
-        if (Math.abs(hero.cx - 256) < 10) { this.stage = 2; this.script = new Script(this.promo()); }
+        if (Math.abs(hero.cx - chefe.x) < 26) { this.stage = 2; this.script = new Script(this.promo()); }
       }
       parts.update(dt);
       const tx = clamp(hero.cx - W / 2 + hero.face * 20, 0, OFFICE_W - W);
@@ -249,7 +251,7 @@ SCENES.c5_office = () => {
       c.restore();
     },
     ui(c) {
-      if (this.stage === 1 && !this.cur) objectiveUI(c, this, 'Vá até a sua mesa', 254, FLOOR - 40);
+      if (this.stage === 1 && !this.cur) objectiveUI(c, this, 'Fale com o Sr. Castro', chefe.x, FLOOR - 40);
       if (this.cur) promptAt(c, this.cur.x - this.cam.x, 92, 'a', this.cur.l);
       if (this.term) {
         pxBox(c, 60, 34, 200, 104, '#06121a', '#2a4a5a');
@@ -266,14 +268,18 @@ SCENES.c5_office = () => {
 /* ---------- Créditos ---------- */
 SCENES.credits = () => {
   const lines = [
-    ['O INFUNDÍBULO DE MIRANGO', 10, '#f3efe6'], ['', 6], ['Um jogo em cinco estágios e um ciclo.', 11, '#a9a3b8'], ['', 14],
+    ['O CICLO DE MIRANGO', 10, '#f3efe6'], ['', 6], ['Um jogo em cinco estágios e um ciclo.', 11, '#a9a3b8'], ['', 14],
+    ['IDEALIZAÇÃO', 7, '#ffd54a'], ['', 4], ['@guimirango', 14, '#f3efe6'], ['', 18],
     ['NEGAÇÃO · RAIVA · BARGANHA', 11, '#d8323c'], ['DEPRESSÃO · ACEITAÇÃO', 11, '#d8323c'], ['', 18],
     ['ELENCO', 7, '#ffd54a'], ['', 4],
     ['Mirango ......... ele mesmo', 10, '#f3efe6'], ['Plínio ........... sorriso plastificado', 10, '#f3efe6'], ['Sueli ............ supervisão', 10, '#f3efe6'],
     ['Dr. Moura ........ sempre numa call', 10, '#f3efe6'], ['Sr. Castro ....... alinhamento', 10, '#f3efe6'], ['Seu Zé ........... juiz e paçoqueiro', 10, '#f3efe6'],
     ['O Apressado ...... atrasado', 10, '#f3efe6'], ['O Nativo ......... livre', 10, '#f3efe6'], ['', 18],
-    ['Pixel art, trilha e efeitos 100% procedurais', 9, '#a9a3b8'], ['(nenhum arquivo externo foi ferido)', 9, '#6a6480'], ['', 22],
-    ['CORP.AI agradece a sua dedicação.', 11, '#7fd4ff'], ['', 30]
+    ['FATEC SEBRAE', 12, '#f3efe6'], ['Curso de Marketing — 3º Semestre', 10, '#a9a3b8'], ['Sociedade e Cultura — 2026', 10, '#a9a3b8'], ['', 18],
+    ['AGRADECIMENTOS ESPECIAIS', 7, '#ffd54a'], ['', 4], ['Ao professor Alexander Homenko Neto', 11, '#f3efe6'], ['', 18],
+    ['DEDICATÓRIA', 7, '#ffd54a'], ['', 4], ['À mulher da minha vida,', 11, '#f3efe6'], ['a biomédica Isabele Ribeiro,', 11, '#f3efe6'], ['celebrando 8 anos desde que nos conhecemos.', 10, '#d8323c'], ['', 22],
+    ['Pixel art, trilha e efeitos 100% procedurais', 9, '#a9a3b8'], ['', 22],
+    ['Gaude AI agradece a sua dedicação.', 11, '#7fd4ff'], ['', 30]
   ];
   let total = 0; for (const l of lines) total += l[1] + 4;
   const sc = {

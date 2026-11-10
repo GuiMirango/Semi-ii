@@ -93,9 +93,9 @@ SCENES.c4_street = () => {
       this.busV = 0; sfx('door');
       yield .5;
       this.showHero = true;
-      yield caption('O ônibus freia num ponto mal iluminado da periferia cinzenta.', { auto: 3 });
+      yield 1.2;
       this.busV = 40;
-      yield caption('A ilusão da praia evaporou. Restou a vida real: sufocante.', { auto: 3 });
+      yield 1.2;
       yield think(mA, 'Só... chegar em casa.');
       Balloons.add(null, 'Pular: ' + Input.label('jump') + '  •  Agachar: ' + Input.label('down') + '  •  Esquivar: ' + Input.label('dash'), { type: 'caption', auto: 6, bottom: true });
       hero.frozen = false;
@@ -112,7 +112,7 @@ SCENES.c4_street = () => {
       this.collapsing = true; hero.frozen = true; hero.vx = 0; hero.pose = { crouch: true, arms: 'face' };
       Music.muffle(400); sfx('heart');
       yield 1;
-      yield caption('Mirango desaba de joelhos no meio da calçada.', { auto: 2.4 });
+      yield 1.0;
       yield think(mA, '...Levanta. Só mais um pouco.');
       yield fadeTo(1, .6);
       hero.x = this.cp - 4; hero.y = NIGHT_FLOOR - 24; hero.pose = {}; this.san = 60; this.heavy = .1; proj.length = 0; resetHZ(this.cp);
@@ -192,7 +192,7 @@ SCENES.c4_street = () => {
       c.globalCompositeOperation = 'source-over';
       for (const lx of LAMPS) { R(c, lx + 12, 74, 8, 2, this.lit[lx] ? '#e8f0ff' : '#a8b8d8'); if (!this.lit[lx] && lx > 100) { const b = Math.round(Math.sin(G.t * 4) * 2); pixText(c, '+', lx + 8, 140 + b, '#ffe9a0'); } }
       // outdoor iluminado de IA (único ponto vivo da rua)
-      R(c, 1180, 34, 104, 40, '#141620'); R(c, 1182, 36, 100, 36, '#1f4a6a'); pixText(c, 'CORP.AI', 1232, 40, '#fff', 2, 'center'); pixText(c, 'ELA NAO CANSA.', 1232, 54, '#7fd4ff', 1, 'center'); pixText(c, 'ELA NAO DORME.', 1232, 61, '#7fd4ff', 1, 'center');
+      R(c, 1180, 34, 104, 40, '#141620'); R(c, 1182, 36, 100, 36, '#1f4a6a'); pixText(c, 'GAUDE AI', 1232, 40, '#fff', 2, 'center'); pixText(c, 'ELA NAO CANSA.', 1232, 54, '#7fd4ff', 1, 'center'); pixText(c, 'ELA NAO DORME.', 1232, 61, '#7fd4ff', 1, 'center');
       R(c, 1200, 74, 3, 30, '#141620'); R(c, 1262, 74, 3, 30, '#141620');
       if (this.busX > -140 && this.busX < NIGHT_W) drawBusSide(c, this.busX, NIGHT_FLOOR - 2, '#2a3a5a', true);
       // perigos
@@ -319,15 +319,15 @@ SCENES.c4_house = () => {
     enter() {
       this.script = new Script((function* () {
         sfx('door'); yield .4; sfx('click');
-        yield caption('Mirango entra na casa escura e tranca a porta.', { auto: 2.4 });
-        yield caption('O silêncio do lar amplifica o barulho interno da angústia.', { auto: 3 });
+        yield 1.0;
+        yield 1.2;
         Balloons.add(null, 'Aproxime-se das lembranças pulsantes e pressione ' + Input.label('a') + ' para afastá-las antes que estourem.', { type: 'caption', auto: 5.5, bottom: true });
         hero.frozen = false;
       })());
     },
     *crush() {
       hero.frozen = true; hero.pose = { crouch: true, arms: 'face' }; sfx('boom'); G.shake(8);
-      yield caption('As paredes imaginárias do escritório cercam a sala. O teto desce.', { auto: 2.6 });
+      yield 1.0;
       yield fadeTo(1, .6);
       this.orbs = []; this.press = 0; this.count = Math.max(0, this.count - 3); hero.x = 34; hero.pose = {}; this.spawnT = 2.5;
       yield fadeTo(0, .6);
@@ -337,10 +337,10 @@ SCENES.c4_house = () => {
       this.done = true; hero.frozen = true; this.orbs.forEach(o => o.fade = true);
       yield heroTo(hero, 500);
       hero.face = 1;
-      yield caption('Mirango desaba de bruços na cama, sem tirar os sapatos.', { auto: 2.6 });
+      yield 1.0;
       this.lying = true; sfx('thud');
       yield 1;
-      yield caption('Puxa o travesseiro contra a cabeça para abafar a dor.', { auto: 2.6 });
+      yield 1.0;
       G.go('c4_end', { dur: 1.2 });
     },
     update(dt) {
@@ -494,10 +494,10 @@ SCENES.c4_end = () => {
     enter() { this.script = new Script(this.run()); },
     *run() {
       yield 1;
-      yield caption('Mirango jaz imóvel na escuridão.', { auto: 2.4 });
+      yield 1.0;
       yield caption('A depressão o envolve como um cobertor de chumbo.', { auto: 2.8 });
-      yield caption('Sem raiva. Sem ilusões. Restou apenas o peso de saber que a realidade o aguarda logo cedo.', { auto: 4.2 });
-      yield caption('As luzes amareladas da rua cortam o quarto em sombras frias.', { auto: 3 });
+      yield 1.2;
+      yield 1.2;
       G.unlock(5);
       yield endCard('FIM DO CAPÍTULO 4', 'Depressão');
       G.go('c5_wake', { cut: true, black: true });
