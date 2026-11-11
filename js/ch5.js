@@ -174,24 +174,24 @@ SCENES.c5_office = () => {
       this.eyes = 'shine'; hero.slump = .2; sfx('sparkle');
       yield 1.6;
       chefe.pose = { arms: 'point' };
-      yield say(chefe, 'Parabéns! Você agora é o ASSISTENTE PESSOAL da Gaude AI. Isso mesmo: você vai trabalhar PRA ELA.', { name: 'SR. CASTRO' });
-      yield say(chefe, 'Vai supervisionar três setores, responder 147 relatórios por hora e treinar a IA que vai te substituir de vez. Ela aprende rápido, viu?', { name: 'SR. CASTRO' });
-      this.eyes = null; hero.slump = .6; hero.pose = { mouth: 'open', eyes: 'wide' }; sfx('thud');
-      yield say(chefe, 'Salário? O mesmo. Mas agora você recebe em EXPERIÊNCIA. E em visibilidade. Muita visibilidade.', { name: 'SR. CASTRO' });
-      yield say(chefe, 'Plantão 24 horas, claro. Se a IA travar de madrugada, você reinicia. Se ela ficar triste, você conversa com ela.', { name: 'SR. CASTRO' });
+      yield say(chefe, 'Parabéns! Sabe todo aquele trabalho chato? Imprimir, responder e-mail... ACABOU! A Gaude AI faz tudo isso agora!', { name: 'SR. CASTRO' });
+      yield say(chefe, 'Então agora você é GESTOR DE FLUXO INTELIGENTE! Vai supervisionar três setores ao mesmo tempo. Coisa simples!', { name: 'SR. CASTRO' });
+      this.eyes = null; hero.slump = .5; hero.pose = { eyes: 'wide' }; sfx('thud');
+      yield say(chefe, 'E como a IA não para nunca, você acompanha ela em tempo real. Uns 147 relatórios por hora. Ela é rapidinha, você pega o jeito!', { name: 'SR. CASTRO' });
+      yield say(chefe, 'Ah, e de noite e no fim de semana você fica de olho nela pelo celular. Mas olha a responsabilidade! Isso é crescimento!', { name: 'SR. CASTRO' });
       chefe.pose = { arms: 'out', mouth: 'smile' };
-      yield say(chefe, 'Ah, e o cargo novo não tem cadeira. A gente vendeu todas pra comprar mais servidor. Mas fica em pé que é bom pra postura!', { name: 'SR. CASTRO' });
-      yield say(mA, 'Isso... não é uma promoção.');
+      yield say(chefe, 'Salário, por enquanto, o mesmo. Mas olha o título novo no crachá! E tiramos sua cadeira: gestor de verdade trabalha em pé, é mais dinâmico!', { name: 'SR. CASTRO' });
       hero.slump = 1; hero.pose = { mouth: 'sad' };
+      yield think(mA, '...Obrigado?');
       chefe.pose = { arms: 'point', mouth: 'smile' };
-      yield say(chefe, 'É assim que o sistema funciona, meu amigo. Você não foi promovido a cargo nenhum: foi promovido a ACESSÓRIO da máquina. Bom trabalho!', { name: 'SR. CASTRO' });
+      yield say(chefe, 'É assim que o sistema funciona, meu amigo. O antigo ficou pra trás, agora você tem uma nova fase. Merecido! Bom trabalho!', { name: 'SR. CASTRO' });
       chefe.pose = {};
       yield walkTo(chefe, 584, 55); chefe.active = false;
       yield heroTo(hero, 256);
       hero.face = 1;
       // o terminal
       this.term = 1;
-      const lines = ['BEM-VINDO, MIRANGO', 'CARGO: ASSISTENTE DA GAUDE AI', '> setores supervisionados: 3', '> relatórios por hora: 147', '> plantão: 24h / 7 dias', '> cadeira: não incluída', '> notificações: ∞'];
+      const lines = ['BEM-VINDO, MIRANGO', 'GESTOR DE FLUXO INTELIGENTE', '> setores supervisionados: 3', '> relatórios por hora: 147', '> disponibilidade: 24h / 7 dias', '> cadeira: não incluída', '> notificações: ∞'];
       for (const l of lines) { this.termLines.push(l); sfx('type'); yield .5; }
       yield 1;
       yield caption('A engrenagem apenas o absorveu, o reajustou e o colocou de volta na roda.', { auto: 4 });
