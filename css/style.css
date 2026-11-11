@@ -4,18 +4,21 @@ html,body{margin:0;padding:0;height:100%;background:#0b0a10;overflow:hidden;touc
 #touch{display:none;position:fixed;inset:0;pointer-events:none;font-family:"Press Start 2P",monospace}
 body.touch #touch{display:block}
 .tb{pointer-events:auto;position:absolute;border:2px solid rgba(255,255,255,.55);background:rgba(20,18,30,.38);color:rgba(255,255,255,.9);font-family:inherit;font-size:12px;border-radius:10px;padding:0;touch-action:none;-webkit-user-select:none;user-select:none;box-shadow:0 3px 0 rgba(0,0,0,.35)}
-.pad{position:absolute;left:calc(14px + env(safe-area-inset-left));bottom:calc(14px + env(safe-area-inset-bottom));width:156px;height:156px}
-.pad .tb{width:52px;height:52px;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(30,28,44,.55);border-color:rgba(255,255,255,.7)}
-.pad .up{left:52px;top:0}.pad .down{left:52px;bottom:0}.pad .left{left:0;top:52px}.pad .right{right:0;top:52px}
-.btns{position:absolute;right:calc(14px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));width:168px;height:168px}
-.xb{width:56px;height:56px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:3px solid rgba(255,255,255,.85);color:#fff}
-.xb b{font-size:16px;line-height:1}.xb small{font-size:5px;line-height:1;opacity:.95;letter-spacing:-.5px}
-.ba{left:56px;bottom:0;background:rgba(63,174,73,.75)}
-.bb{right:0;top:56px;background:rgba(224,64,58,.75)}
-.bx{left:0;top:56px;background:rgba(58,120,224,.75)}
-.by{left:56px;top:0;background:rgba(232,183,42,.8)}
-.tb.on{filter:brightness(1.35);transform:translateY(2px);box-shadow:none}
-.pause{right:calc(12px + env(safe-area-inset-right));top:calc(12px + env(safe-area-inset-top));width:44px;height:36px;font-size:10px}
+.pad{position:absolute;left:calc(12px + env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom));width:174px;height:174px}
+.pad .tb{width:58px;height:58px;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(30,28,44,.55);border-color:rgba(255,255,255,.75)}
+.pad .tb::after,.xb::after{content:"";position:absolute;inset:-8px;border-radius:inherit}
+.pad .up{left:58px;top:0}.pad .down{left:58px;bottom:0}.pad .left{left:0;top:58px}.pad .right{right:0;top:58px}
+.pad .up,.pad .down{opacity:.6}
+.btns{position:absolute;right:calc(12px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));width:186px;height:186px}
+.xb{width:62px;height:62px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:3px solid rgba(255,255,255,.85);color:#fff}
+.xb b{font-size:17px;line-height:1}.xb small{font-size:5px;line-height:1;opacity:.95;letter-spacing:-.5px}
+.ba{left:62px;bottom:0;background:rgba(63,174,73,.8)}
+.bb{right:0;top:62px;background:rgba(224,64,58,.8)}
+.bx{left:0;top:62px;background:rgba(58,120,224,.8)}
+.by{left:62px;top:0;background:rgba(232,183,42,.8);opacity:.6}
+.tb.on{filter:brightness(1.35);transform:translateY(2px);box-shadow:none;opacity:1}
+.pause{right:calc(12px + env(safe-area-inset-right));top:calc(12px + env(safe-area-inset-top));width:auto;height:40px;padding:0 12px;font-size:10px;background:#d8323c;border:3px solid #fff;color:#fff;border-radius:10px;display:flex;align-items:center;gap:6px;box-shadow:0 3px 0 rgba(0,0,0,.45)}
+.pause b{font-size:12px}
 #rotate{display:none;position:fixed;left:0;right:0;top:calc(56.25vw + 4vh + 14px);text-align:center;color:#ffd54a;font:10px "Press Start 2P",monospace;pointer-events:none;padding:0 16px;line-height:1.8}
 @media (orientation:portrait){body.touch #rotate{display:block}body.touch #wrap{align-items:flex-start;padding-top:4vh}body.touch .pause{top:calc(56.25vw + 4vh + 64px)}}
-@media (max-height:460px){.pad{width:126px;height:126px}.pad .tb{width:42px;height:42px}.pad .up,.pad .down{left:42px}.pad .left,.pad .right{top:42px}.btns{width:138px;height:138px}.xb{width:46px;height:46px}.ba,.by{left:46px}.bb,.bx{top:46px}.xb b{font-size:13px}.xb small{font-size:4px}}
+@media (max-height:460px){.pad{width:138px;height:138px}.pad .tb{width:46px;height:46px}.pad .up,.pad .down{left:46px}.pad .left,.pad .right{top:46px}.btns{width:150px;height:150px}.xb{width:50px;height:50px}.ba,.by{left:50px}.bb,.bx{top:50px}.xb b{font-size:14px}.xb small{font-size:4px}}

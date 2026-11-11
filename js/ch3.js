@@ -190,9 +190,9 @@ SCENES.c3_climb = () => {
     if (x + dx < 10 || x + dx > 262) dx = -dx;
     x = clamp(x + dx, 10, 262);
     const type = i % 3 === 1 ? 'branch' : 'rock';
-    pw = type === 'branch' ? 30 : Math.floor(38 + rng() * 14);
+    pw = type === 'branch' ? 36 : Math.floor(38 + rng() * 14) + 6;
     plats.push({ x, y, w: pw, h: 6, type, oneway: true, t: 0, fall: 0 });
-    if (type === 'rock' && i % 5 === 3) monkeys.push({ x: x + pw / 2, y, t: rnd(1, 2.5), arm: 0 });
+    if (type === 'rock' && i % 5 === 3) monkeys.push({ x: x + pw / 2, y, t: rnd(3, 5), arm: 0 });
   }
   const topY = y - 34;
   plats.push({ x: 100, y: topY, w: 120, h: 6, type: 'leaf', oneway: true });
@@ -212,7 +212,7 @@ SCENES.c3_climb = () => {
     R(c, 0, 980, W, 20, '#e8d8a8');
     palmP(c, 160, topY + 14, 2, 0, rng, { big: 46, coco: false });
   });
-  const hero = new Hero(150, 950, LOOKS.mirangoBeach); hero.jumpV = 232; hero.speed = 74;
+  const hero = new Hero(150, 950, LOOKS.mirangoBeach); hero.jumpV = 248; hero.speed = 80;
   const mA = heroActor(hero);
   const parts = new Parts(), peels = [];
   const sc = {
@@ -249,7 +249,7 @@ SCENES.c3_climb = () => {
           const hx = hero.cx, hy = hero.y + 8, dx = vx - v.ax, dy = vy - v.ay, l2 = dx * dx + dy * dy;
           const tt = clamp(((hx - v.ax) * dx + (hy - v.ay) * dy) / l2, .3, 1);
           const px = v.ax + dx * tt, py = v.ay + dy * tt;
-          if (Math.hypot(hx - px, hy - py) < 8 && !hero.onGround) {
+          if (Math.hypot(hx - px, hy - py) < 13 && !hero.onGround) {
             this.vine = v; v.r = Math.max(18, tt * v.len); v.th = Math.atan2(hx - v.ax, hy - v.ay); v.w = (hero.vx * Math.cos(v.th)) / v.r; sfx('zip');
             break;
           }
@@ -260,17 +260,17 @@ SCENES.c3_climb = () => {
       for (const p of plats) {
         if (p.type !== 'branch') continue;
         if (p.off) { p.fall += dt; if (p.fall > 3) { p.off = false; p.fall = 0; p.t = 0; } continue; }
-        if (hero.ground === p && hero.onGround) { p.t += dt; if (p.t > .45 && !p.cracked) { p.cracked = true; sfx('crack'); } if (p.t > .85) { p.off = true; p.cracked = false; sfx('crack'); parts.burst(p.x + p.w / 2, p.y, 8, { col: ['#6a4a28', '#2f8a3f'], min: 10, max: 50, g: 200 }); } }
+        if (hero.ground === p && hero.onGround) { p.t += dt; if (p.t > 1.1 && !p.cracked) { p.cracked = true; sfx('crack'); } if (p.t > 1.9) { p.off = true; p.cracked = false; sfx('crack'); parts.burst(p.x + p.w / 2, p.y, 8, { col: ['#6a4a28', '#2f8a3f'], min: 10, max: 50, g: 200 }); } }
         else p.t = Math.max(0, p.t - dt * .5);
       }
       // macacos
       for (const mk of monkeys) {
         mk.arm = Math.max(0, mk.arm - dt);
-        if (Math.abs(hero.cy() - mk.y) < 130 && !this.done) {
+        if (Math.abs(hero.cy() - mk.y) < 85 && !this.done) {
           mk.t -= dt;
           if (mk.t <= 0) {
-            mk.t = rnd(2.2, 3.4); mk.arm = .4; sfx('monkey');
-            const T = .9, tx = hero.cx, ty = hero.y + 8, g = 300;
+            mk.t = rnd(5.5, 7.5); mk.arm = .4; sfx('monkey');
+            const T = 1.35, tx = hero.cx, ty = hero.y + 8, g = 220;
             peels.push({ x: mk.x, y: mk.y - 12, vx: (tx - mk.x) / T, vy: (ty - (mk.y - 12)) / T - .5 * g * T, g, t: 0 });
             if (Math.random() < .5) sayAuto({ x: mk.x, y: mk.y, h: 14 }, pick(['Uh uh!', 'Ah ah ah!', 'Uuuh!']), .9, {});
           }
@@ -279,8 +279,7 @@ SCENES.c3_climb = () => {
       for (const p of peels) {
         p.t += dt; p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt;
         if (hero.inv <= 0 && overlap(hero, { x: p.x - 3, y: p.y - 3, w: 6, h: 6 })) {
-          p.t = 9; hero.inv = 1; hero.stun = .45; hero.vx = Math.sign(p.vx || 1) * 110; hero.vy = -80; sfx('hurt'); G.shake(2);
-          if (this.vine) { this.vine = null; this.grabCD = .6; }
+          p.t = 9; hero.inv = 1.4; hero.stun = .12; if (!this.vine) { hero.vx = Math.sign(p.vx || 1) * 45; } sfx('hurt'); G.shake(1);
           sayAuto(mA, pick(['Ei!', 'Casca de banana?!', 'Sério isso?']), 1, {});
         }
       }
@@ -542,13 +541,15 @@ SCENES.c3_dream = () => {
       drawBeach(c, cx, 1.3, { redSun: this.redSun, noProps: true });
       c.save(); c.translate(-cx, 0);
       // estações na areia
-      R(c, 104, 168, 34, 1, '#9a8aa8'); pixText(c, 'LINHA', 120, 172, '#7a6a8a', 1, 'center');
+      const allShells = shells.every(s2 => s2.got) && !this.shellsDone;
+      if (allShells) { c.globalAlpha = .35 + Math.sin(G.t * 6) * .25; R(c, 100, 160, 42, 12, '#ffe98a'); c.globalAlpha = 1; }
+      R(c, 104, 168, 34, 1, allShells ? '#ffd54a' : '#9a8aa8'); pixText(c, 'LINHA', 120, 172, allShells ? '#ffd54a' : '#7a6a8a', 1, 'center');
       shells.forEach((s, i) => {
         let x = s.x, y = BEACH_FLOOR + 2;
         if (this.shellsDone) { const tx = 106 + i * 6; x = lerp(s.x, tx, ease(this.aligned)); y = 162; }
         else if (s.got) return;
         R(c, Math.round(x), y, 4, 3, '#f6c8c8'); R(c, Math.round(x) + 1, y, 2, 1, '#fff');
-        if (!s.got && Math.floor(G.t * 3 + i) % 3 === 0) R(c, Math.round(x) + 1, y - 3, 1, 1, '#fff');
+        if (!s.got) { const k = .4 + Math.sin(G.t * 5 + i) * .3; c.globalAlpha = k; R(c, Math.round(x) - 2, y - 2, 8, 7, '#ffe98a'); c.globalAlpha = 1; R(c, Math.round(x), y, 4, 3, '#f6c8c8'); R(c, Math.round(x) + 1, y, 2, 1, '#fff'); R(c, Math.round(x) + 1, y - 4 - Math.round(k * 3), 1, 2, '#fff'); }
       });
       // planilha
       const sp = this.sheetDone ? 1 : this.sheet;
@@ -595,6 +596,16 @@ SCENES.c3_dream = () => {
       row(6, this.shellsDone, 'Conchas ' + (this.shellsDone ? 5 : got) + '/5 + alinhar');
       row(16, this.sheetDone, 'Planilha na areia');
       row(26, this.waveDone, 'Ondas cronometradas ' + this.waveHits + '/3');
+      // próximo passo sempre indicado com seta + brilho no chão
+      if (!this.climax && !this.waveGame && !this.melt) {
+        let t = null, x = null;
+        const left = shells.filter(s => !s.got);
+        if (left.length && !this.shellsDone) { t = 'Pegue as conchas brilhando (' + (5 - left.length) + '/5)'; let b = left[0]; for (const s2 of left) if (Math.abs(s2.x - hero.cx) < Math.abs(b.x - hero.cx)) b = s2; x = b.x; }
+        else if (!this.shellsDone) { t = 'Leve as conchas até a LINHA e aperte ' + Input.label('a'); x = 120; }
+        else if (!this.sheetDone) { t = 'Desenhe a planilha na areia (XLS)'; x = 330; }
+        else if (!this.waveDone) { t = 'Cronometre as ondas na bandeira'; x = 545; }
+        if (t && !this.cur) objectiveUI(c, this, t, x, BEACH_FLOOR - 40, H - HINT_H - 13);
+      }
       if (this.cur && !this.waveGame) promptAt(c, this.cur.x - this.cam.x, 104, 'a', this.cur.l);
       if (this.cur && this.cur.k === 'sheet' && this.sheet > 0 && !this.sheetDone) { R(c, this.cur.x - this.cam.x - 15, 120, 30, 3, '#2a2438'); R(c, this.cur.x - this.cam.x - 15, 120, 30 * this.sheet, 3, '#ffd54a'); }
       if (this.waveGame) {

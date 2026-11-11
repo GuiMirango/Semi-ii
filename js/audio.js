@@ -5,11 +5,34 @@
    ========================================================= */
 const AU = {
   ctx: null, master: null, mus: null, musF: null, sfxG: null, muted: false, pendingAmb: null, noiseBuf: null,
+  LEVELS: [1, .75, .5, .25, 0], vol: 2,
+  gainNow() { return this.LEVELS[this.vol] * .8; },
+  setVol(i) { this.vol = (i + this.LEVELS.length) % this.LEVELS.length; this.muted = this.vol === this.LEVELS.length - 1; try { localStorage.setItem('mirango_vol', this.vol); } catch (e) { } if (this.master) this.master.gain.value = this.gainNow(); },
+  _silentEl: null,
+  iosPlayback() {
+    // iPhone no modo silencioso corta o WebAudio: um <audio> mudo em loop muda a sessão para "reprodução"
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { }
+    try {
+      if (!this._silentEl) {
+        const a = this._silentEl = document.createElement('audio');
+        a.setAttribute('playsinline', ''); a.loop = true; a.volume = .01;
+        const n = 4000, buf = new Uint8Array(44 + n), dv = new DataView(buf.buffer), w = (o, t) => { for (let i = 0; i < t.length; i++) buf[o + i] = t.charCodeAt(i); };
+        w(0, 'RIFF'); dv.setUint32(4, 36 + n, true); w(8, 'WAVEfmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+        dv.setUint32(24, 8000, true); dv.setUint32(28, 8000, true); dv.setUint16(32, 1, true); dv.setUint16(34, 8, true); w(36, 'data'); dv.setUint32(40, n, true); buf.fill(128, 44);
+        a.src = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+      }
+      const pr = this._silentEl.play(); if (pr && pr.catch) pr.catch(() => { });
+    } catch (e) { }
+  },
   unlock() {
-    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; }
+    this.iosPlayback();
+    if (this.ctx) { if (this.ctx.state !== 'running') { const pr = this.ctx.resume(); if (pr && pr.catch) pr.catch(() => { }); } return; }
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
     const c = this.ctx = new AC();
-    this.master = c.createGain(); this.master.gain.value = this.muted ? 0 : .9; this.master.connect(c.destination);
+    if (c.state !== 'running') { const pr = c.resume(); if (pr && pr.catch) pr.catch(() => { }); }
+    // um "clique" inaudível dentro do gesto destrava o áudio em navegadores antigos do iOS
+    try { const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); } catch (e) { }
+    this.master = c.createGain(); this.master.gain.value = this.gainNow(); this.master.connect(c.destination);
     this.musF = c.createBiquadFilter(); this.musF.type = 'lowpass'; this.musF.frequency.value = 18000; this.musF.connect(this.master);
     this.mus = c.createGain(); this.mus.gain.value = .55; this.mus.connect(this.musF);
     this.sfxG = c.createGain(); this.sfxG.gain.value = .8; this.sfxG.connect(this.master);
@@ -27,7 +50,7 @@ const AU = {
     Music.next = c.currentTime + .05;
     this.amb(this.pendingAmb);
   },
-  toggleMute() { this.muted = !this.muted; if (this.master) this.master.gain.value = this.muted ? 0 : .9; },
+  toggleMute() { this.setVol(this.muted ? 2 : this.LEVELS.length - 1); },
   amb(name) {
     this.pendingAmb = name; if (!this.ctx) return;
     const P = {
@@ -210,3 +233,8 @@ const Music = {
     o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + .7);
   }
 };
+
+// volume salvo + destrava o áudio no primeiro gesto de qualquer tipo (toque, clique, tecla), inclusive dentro de iframe
+try { const v = localStorage.getItem('mirango_vol'); if (v != null) AU.setVol(+v); } catch (e) { }
+['touchstart', 'touchend', 'pointerdown', 'mousedown', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, () => AU.unlock(), { capture: true, passive: true }));
+document.addEventListener('visibilitychange', () => { if (!document.hidden && AU.ctx && AU.ctx.state !== 'running') AU.ctx.resume().catch(() => { }); });

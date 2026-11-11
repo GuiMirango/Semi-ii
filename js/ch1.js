@@ -237,7 +237,7 @@ function makeOffice() {
     *sueliTalk() {
       hero.frozen = true;
       yield say(sueli, 'Preciso de 3 assinaturas do Dr. Moura nesses documentos. PRA ONTEM.', { name: 'SUELI — SUPERVISORA' });
-      yield say(sueli, 'Ele tá andando pelo andar. Boa sorte pegando ele parado.', { name: 'SUELI — SUPERVISORA' });
+      yield say(sueli, 'Ele tá andando pelo andar. Quando ele estiver LIVRE, peça a assinatura. Se estiver em ligação, insista!', { name: 'SUELI — SUPERVISORA' });
       this.hasDocs = true; diretor.active = true; diretor.x = 1060; diretor.tx = 820;
       sueli.pose = { sit: true, arms: 'type' };
       hero.frozen = false;
@@ -352,12 +352,12 @@ function makeOffice() {
       // fase 3: pedidos de impressão extras no meio das assinaturas
       if (this.phase === 3 && !this.script) {
         this.p3t += dt;
-        if (this.p3jobs === 0 && this.p3t > 6) { this.p3jobs = 1; this.jobs.push({ for: plinio, st: 'queued', t: 0 }); sayAuto(plinio, 'Mirangão! Imprime a pauta da próxima reunião? :)', 2.6, { name: 'PLÍNIO' }); }
-        if (this.p3jobs === 1 && this.p3t > 22) { this.p3jobs = 2; this.jobs.push({ for: sueli, st: 'queued', t: 0 }); sayAuto(sueli, 'E a ata da reunião! Impressa!', 2.6, { name: 'SUELI' }); }
+        if (this.p3jobs === 0 && this.p3t > 6) { this.p3jobs = 1; this.jobs.push({ for: plinio, st: 'queued', t: 0, ph: 3 }); sayAuto(plinio, 'Mirangão! Imprime a pauta da próxima reunião? :)', 2.6, { name: 'PLÍNIO' }); }
+        if (this.p3jobs === 1 && this.p3t > 22) { this.p3jobs = 2; this.jobs.push({ for: sueli, st: 'queued', t: 0, ph: 3 }); sayAuto(sueli, 'E a ata da reunião! Impressa!', 2.6, { name: 'SUELI' }); }
       }
       // diretor andarilho
       if (diretor.active) {
-        diretor.bt -= dt; if (diretor.bt <= 0) { diretor.busy = !diretor.busy; diretor.bt = diretor.busy ? rnd(2.5, 3.5) : rnd(2.5, 3.2); }
+        diretor.bt -= dt; if (diretor.bt <= 0) { diretor.busy = !diretor.busy; diretor.bt = diretor.busy ? rnd(1.6, 2.4) : rnd(3, 4); }
         diretor.pose = diretor.busy ? { arms: 'phone' } : {};
         if (diretor.wait > 0) { diretor.wait -= dt; diretor.moving = false; }
         else {
@@ -443,7 +443,12 @@ function makeOffice() {
       if (ready) { R(c, 969, 136, 26, 4, '#f4f4ee'); R(c, 969, 136, 26, 1, '#fff'); }
       // NPCs
       plinio.draw(c); sueli.draw(c);
-      if (diretor.active) { diretor.draw(c); if (diretor.busy) pixText(c, '...', diretor.x, FLOOR - 36, '#ffd54a', 1, 'center'); }
+      if (diretor.active) {
+        diretor.draw(c);
+        const lab = diretor.busy ? 'EM LIGACAO' : 'LIVRE!', w2 = lab.length * 4 + 5, by2 = FLOOR - 44 + (diretor.busy ? 0 : Math.round(Math.sin(G.t * 6)));
+        R(c, Math.round(diretor.x - w2 / 2) - 1, by2 - 1, w2 + 2, 9, OUT); R(c, Math.round(diretor.x - w2 / 2), by2, w2, 7, diretor.busy ? '#b02a2a' : '#2f9a4a');
+        pixText(c, lab, diretor.x, by2 + 1, '#fff', 1, 'center');
+      }
       if (chefe.active) chefe.draw(c);
       if (cart.active) {
         intern.draw(c);
@@ -480,6 +485,15 @@ function makeOffice() {
       }
       if (this.obj && !Balloons.l.some(b => b.type === 'caption')) objectiveUI(c, this, this.obj, this.objX, FLOOR - 40, this.showHUD ? H - HINT_H - 13 : 15);
       if (this.cur) promptAt(c, this.cur.x - cam.x, (this.cur.py || 96) - cam.y, 'a', this.cur.label());
+      if (this.showHUD && (this.phase === 2 || this.phase === 3) && !this.panel) {
+        const J3 = this.phase === 3 ? this.jobs.filter(j => j.ph === 3) : this.jobs;
+        const done = J3.filter(j => j.st === 'done').length, tot = Math.max(J3.length, this.phase === 3 ? 2 : 3);
+        const rows = this.phase === 2
+          ? [['E-mails respondidos', Math.min(this.answered, 4) + '/4', this.answered >= 4], ['Impressões entregues', done + '/3', done >= 3 && this.p2jobs === 2]]
+          : [['Pegar os documentos', this.hasDocs || this.signs ? 'ok' : '', this.hasDocs || this.signs > 0], ['Assinaturas do Diretor', this.signs + '/3', this.signs >= 3], ['Impressões extras', done + '/' + tot, done >= tot]];
+        pxBox(c, 4, 40, 124, 6 + rows.length * 10, 'rgba(14,12,20,.82)', '#5a5470');
+        rows.forEach(([k, v, ok], i) => { T(c, (ok ? '☑ ' : '☐ ') + k, 8, 42 + i * 10, { f: FONT2, size: 9, col: ok ? '#9aff9a' : '#e8e4f0', sh: false }); T(c, v, 124, 42 + i * 10, { f: FONT2, size: 9, align: 'right', col: ok ? '#9aff9a' : '#ffd54a', sh: false }); });
+      }
       if (this.panel) {
         const pn = this.panel;
         pxBox(c, 70, 30, 180, 110, 'rgba(10,8,16,.94)', '#d8323c');
@@ -511,14 +525,20 @@ function makeOffice() {
     { get x() { return sueli.x; }, y: FLOOR, r: 18, py: 100, cond: () => sc.jobs.some(j => j.st === 'carry' && j.for === sueli), label: () => 'Entregar à Sueli', act: () => { for (const j of sc.jobs) if (j.st === 'carry' && j.for === sueli) j.st = 'done'; sfx('paper'); sayAuto(sueli, 'Já não era sem tempo.', 1.6, { name: 'SUELI' }); } },
     { get x() { return sueli.x; }, y: FLOOR, r: 18, py: 100, cond: () => sc.phase === 3 && !sc.hasDocs && sc.signs === 0, label: () => 'Falar com a Sueli', act: () => { sc.script = new Script(sc.sueliTalk()); } },
     { get x() { return sueli.x; }, y: FLOOR, r: 18, py: 100, cond: () => sc.phase === 3 && sc.signs >= 3, label: () => 'Entregar documentos', act: () => { sc.script = new Script(sc.sueliDeliver()); } },
-    { get x() { return diretor.x; }, y: FLOOR, r: 16, py: 100, cond: () => sc.phase === 3 && diretor.active && sc.hasDocs && sc.signs < 3, label: () => 'Pedir assinatura',
+    { get x() { return diretor.x; }, y: FLOOR, r: 16, py: 100, cond: () => sc.phase === 3 && diretor.active && sc.hasDocs && sc.signs < 3, label: () => diretor.busy ? 'Pedir assinatura (ele está numa ligação)' : 'Pedir assinatura',
       act: () => {
-        if (diretor.busy) { sayAuto(diretor, pick(['Agora não! Tô numa call!', 'Depois, depois!', 'Manda por e-mail!']), 1.6, { name: 'DR. MOURA' }); diretor.tx = hero.cx < 690 ? rnd(820, 1000) : rnd(380, 520); diretor.wait = 0; diretor.spd = 70; setTimeout(() => diretor.spd = 56, 1400); sfx('hurt'); }
-        else {
+        const sign = (line) => {
           sc.signs++; sfx('paper'); sc.floatTx.push({ x: diretor.x, y: 110, t: 0, s: 'ASSINATURA ' + sc.signs + '/3', col: '#ffd54a' });
-          sayAuto(diretor, ['Rabisca aqui... pronto. Próximo!', 'Assinado. Não me interrompa de novo.', 'Isso é urgente mesmo? Tá, tá.'][sc.signs - 1], 1.8, { name: 'DR. MOURA' });
-          diretor.busy = true; diretor.bt = 3.5; diretor.tx = hero.cx < 690 ? rnd(800, 1000) : rnd(380, 520); diretor.wait = 0;
-        }
+          sayAuto(diretor, line, 1.8, { name: 'DR. MOURA' });
+          diretor.refused = 0; diretor.busy = true; diretor.bt = 2.2; diretor.wait = 0;
+        };
+        if (diretor.busy && (diretor.refused || 0) < 1) {
+          // recusa só uma vez: na insistência seguinte ele assina para se livrar do Mirango
+          diretor.refused = (diretor.refused || 0) + 1; sfx('hurt');
+          sayAuto(diretor, pick(['Agora não! Tô numa call!', 'Depois, depois!', 'Manda por e-mail!']), 1.6, { name: 'DR. MOURA' });
+          sc.floatTx.push({ x: diretor.x, y: 104, t: 0, s: 'INSISTA OU ESPERE', col: '#ff8a8a' });
+        } else if (diretor.busy) sign('Tá bom, tá bom! Dá aqui... pronto. Satisfeito?');
+        else sign(['Rabisca aqui... pronto. Próximo!', 'Assinado. Não me interrompa de novo.', 'Isso é urgente mesmo? Tá, tá.'][sc.signs]);
       } },
     { x: 396, y: FLOOR, r: 14, py: 92, cond: () => sc.showHUD && sc.coffeeCD <= 0 && sc.phase < 6, label: () => 'Tomar café', act: () => { sc.coffeeCD = 14; sc.energy = Math.min(100, sc.energy + 28); sfx('slurp'); sc.floatTx.push({ x: 396, y: 100, t: 0, s: '+28 ENERGIA', col: '#ffd54a' }); hero.pose = { arms: 'drink' }; hero.frozen = true; setTimeout(() => { hero.pose = {}; hero.frozen = false; }, 350); } },
     { x: 582, y: FLOOR, r: 14, py: 70, cond: () => sc.phase === 4 && !sc.script, label: () => 'Entrar na reunião', act: () => { sfx('door'); G.go('c1_meeting', { n: sc.meetN || 1 }); } }

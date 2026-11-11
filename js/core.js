@@ -109,7 +109,7 @@ window.addEventListener('blur', () => { Input.k = {}; Input.t = {}; });
     btn.addEventListener('pointerdown', on); btn.addEventListener('pointerup', off);
     btn.addEventListener('pointercancel', off); btn.addEventListener('pointerleave', off);
   });
-  cv.addEventListener('pointerdown', () => { AU.unlock(); Input.hit.tap = 1; });
+  cv.addEventListener('pointerdown', (e) => { AU.unlock(); Input.hit.tap = 1; const r = cv.getBoundingClientRect(); Input.tapX = (e.clientX - r.left) / r.width * W; Input.tapY = (e.clientY - r.top) / r.height * H; });
 })();
 
 /* ---------- roteiros (geradores) e tarefas ---------- */

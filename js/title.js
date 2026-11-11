@@ -16,7 +16,7 @@ SCENES.title = () => {
     R(c, 0, 115, W, 65, '#151722'); dither(c, 0, 115, W, 65, '#1b1e2b', 3);
     deskP(c, 214, 160, 60, '#3a3238', '#2a2328');
     chairP(c, 266, 160, '#1d2028');
-    cabinetP(c, 20, 160, 16, 26, '#3b404c'); cabinetP(c, 190, 160, 16, 20, '#3b404c');
+    cabinetP(c, 20, 160, 16, 26, '#3b404c');
     plantP(c, 300, 160, 1, rng);
   });
   const rain = Array.from({ length: 60 }, () => ({ x: rnd(W), y: rnd(20, 112), v: rnd(80, 140) }));
@@ -74,8 +74,8 @@ SCENES.title = () => {
       c.globalAlpha = 1;
       T(c, '@guimirango', 5, 170, { f: FONT2, size: 9, col: '#a9a3b8' });
       if (this.state === 'press') {
-        if (Math.floor(this.t * 2) % 2 === 0) T(c, 'PRESSIONE QUALQUER TECLA', W / 2, 150, { size: 6, align: 'center', col: '#ffd54a' });
-        T(c, 'teclado • toque • gamepad', W / 2, 162, { f: FONT2, size: 9, align: 'center', col: '#8a84a0' });
+        if (Math.floor(this.t * 2) % 2 === 0) T(c, Input.dev === 'kb' ? 'PRESSIONE QUALQUER TECLA' : 'TOQUE PARA COMEÇAR', W / 2, 150, { size: 6, align: 'center', col: '#ffd54a' });
+        T(c, 'o som liga no primeiro toque ou tecla', W / 2, 162, { f: FONT2, size: 9, align: 'center', col: '#8a84a0' });
         return;
       }
       if (this.sub === 'chap') {

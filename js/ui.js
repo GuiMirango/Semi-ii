@@ -262,12 +262,15 @@ function objectiveUI(c, sc, text, tx, ty, by = 15) {
   if (tx == null) return;
   const cam = camOf(sc); const sx = tx - cam.x, sy = (ty != null ? ty : 100) - cam.y;
   if (sx < 6 || sx > W - 6) {
-    const dir = sx < 6 ? -1 : 1, ax = dir < 0 ? 6 : W - 6, ay = clamp(sy, 40, H - 20);
+    const dir = sx < 6 ? -1 : 1, ax = dir < 0 ? 8 : W - 8, ay = 52 + Math.sin(G.t * 3) * 2;
     const b = Math.sin(G.t * 8) * 1.5 * dir;
-    c.fillStyle = '#d8323c'; c.beginPath(); c.moveTo(ax + b + dir * 4, ay); c.lineTo(ax + b - dir * 2, ay - 5); c.lineTo(ax + b - dir * 2, ay + 5); c.fill();
+    c.fillStyle = OUT; c.beginPath(); c.moveTo(ax + b + dir * 7, ay); c.lineTo(ax + b - dir * 4, ay - 8); c.lineTo(ax + b - dir * 4, ay + 8); c.fill();
+    c.fillStyle = '#ffd54a'; c.beginPath(); c.moveTo(ax + b + dir * 5, ay); c.lineTo(ax + b - dir * 3, ay - 6); c.lineTo(ax + b - dir * 3, ay + 6); c.fill();
   } else {
-    const b = Math.sin(G.t * 6) * 2;
-    c.fillStyle = '#d8323c'; c.beginPath(); c.moveTo(sx, sy + b); c.lineTo(sx - 4, sy - 6 + b); c.lineTo(sx + 4, sy - 6 + b); c.fill();
+    const b = Math.sin(G.t * 6) * 2, gy = sy + 38, k = .5 + Math.sin(G.t * 5) * .5;
+    c.globalAlpha = .25 + k * .35; c.strokeStyle = '#ffd54a'; c.lineWidth = 1.2; c.beginPath(); c.ellipse(sx, gy, 12 + k * 3, 3 + k, 0, 0, 7); c.stroke(); c.globalAlpha = 1;
+    c.fillStyle = OUT; c.beginPath(); c.moveTo(sx, sy + 2 + b); c.lineTo(sx - 7, sy - 8 + b); c.lineTo(sx + 7, sy - 8 + b); c.fill();
+    c.fillStyle = '#ffd54a'; c.beginPath(); c.moveTo(sx, sy + b); c.lineTo(sx - 5, sy - 7 + b); c.lineTo(sx + 5, sy - 7 + b); c.fill();
   }
 }
 
@@ -284,17 +287,21 @@ function nearInter(list, hero) {
 
 /* ---------- menu de pausa ---------- */
 const Pause = {
-  sel: 0, opts: ['Continuar', 'Reiniciar cena', 'Som: ', 'Tela cheia', 'Menu principal'],
+  sel: 0, opts: ['Continuar', 'Reiniciar cena', 'Volume: ', 'Tela cheia', 'Menu principal'],
   update() {
     if (Input.pressed('up')) { this.sel = (this.sel + this.opts.length - 1) % this.opts.length; sfx('sel'); }
     if (Input.pressed('down')) { this.sel = (this.sel + 1) % this.opts.length; sfx('sel'); }
     if (Input.pressed('start')) { G.paused = false; return; }
-    if (Input.confirm()) {
+    if (this.sel === 2 && Input.pressed('left')) { AU.setVol(AU.vol + 1); sfx('sel'); }
+    if (this.sel === 2 && Input.pressed('right')) { AU.setVol(AU.vol - 1); sfx('sel'); }
+    let tapped = false;
+    if (Input.pressed('tap') && Input.tapX > 100 && Input.tapX < 220) { const i = Math.floor((Input.tapY - 64) / 14); if (i >= 0 && i < this.opts.length) { this.sel = i; tapped = true; } }
+    if (Input.confirm() || tapped) {
       sfx('ok');
       switch (this.sel) {
         case 0: G.paused = false; break;
         case 1: G.paused = false; G.go(G.sceneName, Object.assign({}, G.scene.restartOpts || {}, { restart: true })); break;
-        case 2: AU.toggleMute(); break;
+        case 2: AU.setVol(AU.vol + 1); break;
         case 3: toggleFull(); break;
         case 4: G.paused = false; G.go('title'); break;
       }
@@ -302,10 +309,11 @@ const Pause = {
   },
   draw(c) {
     R(c, 0, 0, W, H, 'rgba(8,6,12,.72)');
-    pxBox(c, 100, 38, 120, 104, '#16121c', '#d8323c');
+    pxBox(c, 96, 36, 128, 114, '#16121c', '#d8323c');
     T(c, 'PAUSA', W / 2, 48, { size: 8, align: 'center', col: '#f3efe6' });
+    T(c, 'toque numa opção ou use ↑ ↓', W / 2, 139, { f: FONT2, size: 8, align: 'center', col: '#8a84a0' });
     this.opts.forEach((o, i) => {
-      const s = i === 2 ? o + (AU.muted ? 'desligado' : 'ligado') : o;
+      const s = i === 2 ? o + (AU.vol === AU.LEVELS.length - 1 ? 'mudo' : Math.round(AU.LEVELS[AU.vol] * 100) + '%') + ' ◂▸' : o;
       T(c, (i === this.sel ? '▶ ' : '  ') + s, 112, 68 + i * 14, { f: FONT2, size: 11, col: i === this.sel ? '#ffd54a' : '#cfc8dc' });
     });
   }
