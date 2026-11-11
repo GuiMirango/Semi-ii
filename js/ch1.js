@@ -81,7 +81,7 @@ function buildOffice(auto) {
     }
     plantP(c, 206, FLOOR, 1, rng); plantP(c, 622, FLOOR, 1.1, rng); plantP(c, 1028, FLOOR, 1.2, rng); plantP(c, 864, FLOOR, .8, rng);
     R(c, 300, 140, 8, 10, '#3a3f48'); R(c, 299, 139, 10, 2, '#4a4f58');
-    chairP(c, 162, FLOOR, '#2f3440'); chairP(c, 262, FLOOR, '#7a2a30'); chairP(c, 700, FLOOR, '#2f3440');
+    chairP(c, 162, FLOOR, '#2f3440'); if (!auto) chairP(c, 262, FLOOR, '#7a2a30'); else { R(c, 258, 147, 10, 1, '#555'); pixText(c, 'SEM CADEIRA', 263, 140, '#8a96a6', 1, 'center'); } chairP(c, 700, FLOOR, '#2f3440');
   });
   return (_offCache[key] = { far, bg });
 }

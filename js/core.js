@@ -146,7 +146,15 @@ function walkTo(a, x, speed = 40) {
   } };
 }
 
-function heroTo(h, x) { let s = false; return { update() { if (!s) { h.auto = x; s = true; } return h.auto == null; } }; }
+function heroTo(h, x) {
+  let s = false, t = 0, lastX = 0, still = 0;
+  return { update(dt) {
+    if (!s) { h.auto = x; s = true; lastX = h.x; }
+    t += dt; still = Math.abs(h.x - lastX) < .05 ? still + dt : 0; lastX = h.x;
+    if (h.auto != null && (still > 1.2 || t > 12)) { h.x = x - h.w / 2; h.vx = 0; h.auto = null; }
+    return h.auto == null;
+  } };
+}
 function heroActor(h) { return { get x() { return h.cx; }, get y() { return h.fy; }, h: 30 }; }
 function npc(look, x, y, o = {}) {
   return Object.assign({
@@ -225,7 +233,9 @@ class Hero {
     if (opt.canJump !== false && this.jbuf > 0 && this.coyote > 0 && this.stun <= 0 && !this.duck) {
       this.vy = -this.jumpV * (opt.jumpMul || 1); this.coyote = 0; this.jbuf = 0; this.onGround = false; sfx('jump');
     }
-    if (this.vy < -90 && !Input.down('jump') && !(opt.upJump && Input.down('up'))) this.vy = -90;
+    if (this.auto != null && this.autoBlocked && this.onGround) { this.vy = -this.jumpV; this.onGround = false; this.autoJumping = true; sfx('jump'); }
+    if (this.onGround) this.autoJumping = false;
+    if (this.vy < -90 && !this.autoJumping && !Input.down('jump') && !(opt.upJump && Input.down('up'))) this.vy = -90;
     if (opt.canDash && !this.frozen && Input.pressed('dash') && this.dashCD <= 0 && this.stun <= 0) {
       this.dashT = .2; this.dashCD = .9; this.inv = Math.max(this.inv, .3); sfx('dash');
       if (opt.parts) opt.parts.burst(this.cx, this.fy - 4, 6, { col: '#8899aa', min: 10, max: 30, ang: this.face > 0 ? Math.PI : 0, spread: .6 });
@@ -236,6 +246,7 @@ class Hero {
     const wasG = this.onGround;
     this.hitWall = false;
     moveBody(this, solids, dt, !this.frozen && opt.canDrop && Input.down('down') && Input.pressed('jump'));
+    this.autoBlocked = this.auto != null && this.hitWall;
     if (!wasG && this.onGround) { sfx('land'); if (opt.parts) opt.parts.burst(this.cx, this.fy, 4, { col: opt.dust || '#9a9aa8', min: 8, max: 25, ang: -Math.PI / 2, spread: 1.2, lmax: .4 }); }
     if (opt.minX != null && this.x < opt.minX) { this.x = opt.minX; this.vx = Math.max(0, this.vx); }
     if (opt.maxX != null && this.x + this.w > opt.maxX) { this.x = opt.maxX - this.w; this.vx = Math.min(0, this.vx); }

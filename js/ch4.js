@@ -46,15 +46,16 @@ function buildNight() {
     for (let px = 0; px < NIGHT_W; px += 22) R(c, px, NIGHT_FLOOR + 2, 1, 22, '#181a20');
     for (let i = 0; i < 80; i++) { const cx = Math.floor(rng() * NIGHT_W); R(c, cx, NIGHT_FLOOR + 3 + Math.floor(rng() * 15), 4 + Math.floor(rng() * 6), 1, '#16181e'); }
     for (let i = 0; i < 10; i++) { const px = Math.floor(rng() * NIGHT_W); R(c, px, NIGHT_FLOOR + 10, 24, 3, '#2a3048'); R(c, px + 4, NIGHT_FLOOR + 11, 10, 1, '#4a5478'); }
-    // postes de luz (checkpoints)
-    for (const lx of LAMPS) { R(c, lx, 70, 3, 86, '#2a2c36'); R(c, lx, 70, 16, 3, '#2a2c36'); R(c, lx + 12, 72, 8, 3, '#3a3c46'); }
-    // portão de casa
+  });
+  // primeiro plano: postes e portão ficam na calçada, NA FRENTE do ônibus
+  const front = makeCanvas(NIGHT_W, H, (c) => {
+    for (const lx of LAMPS) { R(c, lx, 70, 3, 88, '#2a2c36'); R(c, lx - 1, 156, 5, 2, '#1a1c24'); R(c, lx, 70, 16, 3, '#2a2c36'); R(c, lx + 12, 72, 8, 3, '#3a3c46'); }
     R(c, 1930, 96, 70, 60, '#2a2834'); R(c, 1946, 112, 30, 44, '#3a2a22');
     for (let k = 0; k < 8; k++) R(c, 1948 + k * 4, 112, 1, 44, '#5a3a2a');
     R(c, 1946, 112, 30, 2, '#6a4a32'); R(c, 1946, 132, 30, 1, '#6a4a32'); R(c, 1970, 132, 2, 3, '#8a6a4a');
     pixText(c, 'N 13', 1988, 104, '#5a5a6a', 1, 'center');
   });
-  return (_night = { sky, far, main });
+  return (_night = { sky, far, main, front });
 }
 // linguagem visual de AMEAÇA: aura vermelha pulsante + contorno vermelho (nada inofensivo usa essas cores)
 function threat(c, x, y, w, h) {
@@ -195,6 +196,8 @@ SCENES.c4_street = () => {
       R(c, 1180, 34, 104, 40, '#141620'); R(c, 1182, 36, 100, 36, '#1f4a6a'); pixText(c, 'GAUDE AI', 1232, 40, '#fff', 2, 'center'); pixText(c, 'ELA NAO CANSA.', 1232, 54, '#7fd4ff', 1, 'center'); pixText(c, 'ELA NAO DORME.', 1232, 61, '#7fd4ff', 1, 'center');
       R(c, 1200, 74, 3, 30, '#141620'); R(c, 1262, 74, 3, 30, '#141620');
       if (this.busX > -140 && this.busX < NIGHT_W) drawBusSide(c, this.busX, NIGHT_FLOOR - 2, '#2a3a5a', true);
+      c.drawImage(B.front, 0, 0);
+      for (const lx of LAMPS) R(c, lx + 12, 74, 8, 2, this.lit[lx] ? '#e8f0ff' : '#a8b8d8');
       // perigos
       for (const h of HZ) {
         if (h.used && h.t !== 'shadow') continue;

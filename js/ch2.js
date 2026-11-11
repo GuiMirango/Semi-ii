@@ -306,10 +306,14 @@ function buildStreet() {
     R(c, 0, 140, W, 4, '#b8b0a0'); R(c, 0, 143, W, 1, '#6a665e');
     R(c, 0, 144, W, 36, '#a39a8c'); for (let x = 0; x < W; x += 16) R(c, x, 144, 1, 36, '#8f877a'); R(c, 0, 160, W, 1, '#8f877a');
     // poste e lixeira
-    R(c, 2, 60, 3, 98, '#3a3a40'); R(c, 2, 60, 14, 3, '#3a3a40'); R(c, 12, 62, 6, 3, '#ffe9a0');
-    R(c, 300, 140, 10, 18, '#2e7d32'); R(c, 299, 139, 12, 2, '#1f5a22');
+
   });
   return _streetBG;
+}
+function streetFront(c) {
+  // poste e lixeira ficam na calçada: na frente de qualquer veículo
+  R(c, 2, 60, 3, 98, '#3a3a40'); R(c, 2, 60, 14, 3, '#3a3a40'); R(c, 12, 62, 6, 3, '#ffe9a0');
+  R(c, 300, 140, 10, 18, '#2e7d32'); R(c, 299, 139, 12, 2, '#1f5a22');
 }
 function drawBusSide(c, x, y, col = '#1e5aa8', lit) {
   // y = base (rodas no chão)
@@ -377,6 +381,7 @@ SCENES.c2_stop = () => {
     draw(c) {
       c.drawImage(bg, 0, 0);
       drawBusSide(c, this.busX, 142);
+      streetFront(c);
       // abrigo do ponto
       R(c, 150, 102, 70, 4, '#2a2a30'); R(c, 152, 106, 2, 50, '#555'); R(c, 216, 106, 2, 50, '#555'); R(c, 160, 136, 50, 3, '#6a4a3a');
       c.globalAlpha = .3; R(c, 154, 106, 62, 30, '#9ac4e0'); c.globalAlpha = 1;
@@ -515,6 +520,7 @@ SCENES.c2_fight = () => {
     },
     draw(c) {
       c.drawImage(bg, 0, 0);
+      streetFront(c);
       c.globalAlpha = .45; R(c, 0, 0, W, H, '#2a0a14'); c.globalAlpha = 1;
       drawCart(c, 176, 128);
       zé.pose = { arms: this.count ? 'up' : undefined }; zé.draw(c);

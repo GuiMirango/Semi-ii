@@ -72,16 +72,18 @@ SCENES.c5_street = () => {
   const main = makeCanvas(DAY_W, H, (c) => {
     R(c, 0, 114, DAY_W, 26, '#4a4c52'); for (let x = 0; x < DAY_W; x += 20) R(c, x, 126, 10, 1, '#c8c8c8');
     R(c, 0, 140, DAY_W, 4, '#9a968e'); R(c, 0, 144, DAY_W, 36, '#86827a'); for (let x = 0; x < DAY_W; x += 16) R(c, x, 144, 1, 36, '#76726a');
-    // banca de jornal e outdoor
-    R(c, 172, 104, 60, 40, '#2e5a3a'); R(c, 172, 104, 60, 4, '#1e4a2a'); R(c, 175, 111, 54, 21, '#e8e4d8');
-    pixText(c, 'IA SUBSTITUI', 202, 114, '#c43b3b', 1, 'center'); pixText(c, '40% DOS', 202, 120, '#222', 1, 'center'); pixText(c, 'ESCRITORIOS', 202, 126, '#222', 1, 'center');
+    // outdoor (fica atrás da pista: as pernas terminam na calçada do outro lado)
     R(c, 380, 30, 110, 50, '#2a2a30'); R(c, 383, 33, 104, 44, '#d8323c'); pixText(c, 'SEJA PROMOVIDO', 435, 42, '#fff', 1, 'center'); pixText(c, 'TRABALHE MAIS', 435, 52, '#ffd54a', 1, 'center'); pixText(c, 'COM GAUDE AI', 435, 64, '#fff', 1, 'center');
-    R(c, 400, 80, 3, 34, '#2a2a30'); R(c, 466, 80, 3, 34, '#2a2a30');
-    // fachada imponente
-    R(c, 790, 0, 170, 140, '#2c3340'); for (let y = 6; y < 120; y += 8) for (let x = 796; x < 954; x += 10) R(c, x, y, 7, 6, (x + y) % 3 ? '#3e4c62' : '#5a6a82');
+    R(c, 400, 80, 3, 30, '#2a2a30'); R(c, 466, 80, 3, 30, '#2a2a30'); R(c, 380, 110, 110, 4, '#7a7a74');
+  });
+  // primeiro plano: tudo que fica na calçada do Mirango, na FRENTE dos carros
+  const front = makeCanvas(DAY_W, H, (c) => {
+    R(c, 172, 106, 60, 38, '#2e5a3a'); R(c, 172, 106, 60, 4, '#1e4a2a'); R(c, 175, 112, 54, 21, '#e8e4d8'); R(c, 170, 142, 64, 3, '#1e3a2a');
+    pixText(c, 'IA SUBSTITUI', 202, 115, '#c43b3b', 1, 'center'); pixText(c, '40% DOS', 202, 121, '#222', 1, 'center'); pixText(c, 'ESCRITORIOS', 202, 127, '#222', 1, 'center');
+    R(c, 790, 0, 170, 144, '#2c3340'); R(c, 788, 0, 2, 144, '#1a1e26'); for (let y = 6; y < 120; y += 8) for (let x = 796; x < 954; x += 10) R(c, x, y, 7, 6, (x + y) % 3 ? '#3e4c62' : '#5a6a82');
     R(c, 800, 74, 150, 14, '#d8323c'); pixText(c, 'CORP S.A.', 875, 76, '#fff', 2, 'center');
-    R(c, 852, 100, 46, 40, '#14181e'); R(c, 856, 104, 18, 36, '#3a4a5a'); R(c, 876, 104, 18, 36, '#3a4a5a'); R(c, 874, 100, 2, 40, '#888');
-    R(c, 840, 138, 70, 3, '#b8b2a6');
+    R(c, 852, 100, 46, 44, '#14181e'); R(c, 856, 104, 18, 40, '#3a4a5a'); R(c, 876, 104, 18, 40, '#3a4a5a'); R(c, 874, 100, 2, 44, '#888');
+    R(c, 784, 140, 176, 4, '#b8b2a6');
   });
   const hero = new Hero(10, DAY_FLOOR - 24, LOOKS.mirangoGray); hero.speed = 46; hero.slump = 1;
   const mA = heroActor(hero);
@@ -115,6 +117,7 @@ SCENES.c5_street = () => {
       c.drawImage(main, -cx, 0);
       c.save(); c.translate(-cx, 0);
       for (const v of cars) { const x = Math.round(v.x); R(c, x, v.lane - 8, 30, 8, OUT); R(c, x + 1, v.lane - 7, 28, 6, v.col); R(c, x + 6, v.lane - 12, 16, 5, OUT); R(c, x + 7, v.lane - 11, 14, 4, '#9ac4e0'); R(c, x + 4, v.lane - 2, 5, 4, '#111'); R(c, x + 21, v.lane - 2, 5, 4, '#111'); }
+      c.drawImage(front, 0, 0);
       for (const p of peds) if (p.back) drawPerson(c, p.x, DAY_FLOOR - 6, p.look, { face: p.d, walk: p.walk, arms: p.phone ? 'phone' : undefined, slump: .6, alpha: .7 });
       hero.draw(c);
       for (const p of peds) if (!p.back) drawPerson(c, p.x, DAY_FLOOR + 14, p.look, { face: p.d, walk: p.walk, arms: p.phone ? 'phone' : undefined, slump: .6 });
@@ -138,7 +141,7 @@ SCENES.c5_office = () => {
   const vac = { x: 400, d: 1 };
   const parts = new Parts();
   const sc = {
-    hero, botTarget: () => 536, cam: { x: 0, y: 0 }, music: null, amb: 'office', holdBlack: true, elevOpen: 0, t: 0, desat: .2, vig: .2, eyes: null, term: 0, termLines: [], beepT: 0, beepI: 1.2,
+    hero, botTarget: () => 604, cam: { x: 0, y: 0 }, music: null, amb: 'office', holdBlack: true, elevOpen: 0, t: 0, desat: .2, vig: .2, eyes: null, term: 0, termLines: [], beepT: 0, beepI: 1.2,
     elevInside(c) { if (sc.inElev) hero.draw(c); },
     enter() { this.script = new Script(this.intro()); },
     *intro() {
@@ -171,27 +174,32 @@ SCENES.c5_office = () => {
       this.eyes = 'shine'; hero.slump = .2; sfx('sparkle');
       yield 1.6;
       chefe.pose = { arms: 'point' };
-      yield say(chefe, 'Agora você vai gerenciar o fluxo das máquinas, responder relatórios de conformidade em tempo real...', { name: 'SR. CASTRO' });
-      yield say(chefe, '...e supervisionar três novos setores ao mesmo tempo.', { name: 'SR. CASTRO' });
-      this.eyes = null; hero.slump = 1; hero.pose = { mouth: 'sad' }; sfx('thud');
-      yield 1.4;
+      yield say(chefe, 'Parabéns! Você agora é o ASSISTENTE PESSOAL da Gaude AI. Isso mesmo: você vai trabalhar PRA ELA.', { name: 'SR. CASTRO' });
+      yield say(chefe, 'Vai supervisionar três setores, responder 147 relatórios por hora e treinar a IA que vai te substituir de vez. Ela aprende rápido, viu?', { name: 'SR. CASTRO' });
+      this.eyes = null; hero.slump = .6; hero.pose = { mouth: 'open', eyes: 'wide' }; sfx('thud');
+      yield say(chefe, 'Salário? O mesmo. Mas agora você recebe em EXPERIÊNCIA. E em visibilidade. Muita visibilidade.', { name: 'SR. CASTRO' });
+      yield say(chefe, 'Plantão 24 horas, claro. Se a IA travar de madrugada, você reinicia. Se ela ficar triste, você conversa com ela.', { name: 'SR. CASTRO' });
+      chefe.pose = { arms: 'out', mouth: 'smile' };
+      yield say(chefe, 'Ah, e o cargo novo não tem cadeira. A gente vendeu todas pra comprar mais servidor. Mas fica em pé que é bom pra postura!', { name: 'SR. CASTRO' });
+      yield say(mA, 'Isso... não é uma promoção.');
+      hero.slump = 1; hero.pose = { mouth: 'sad' };
       chefe.pose = { arms: 'point', mouth: 'smile' };
-      yield say(chefe, 'É assim que o sistema funciona, meu amigo. O antigo ficou para trás, agora você tem uma nova fase. Bom trabalho.', { name: 'SR. CASTRO' });
+      yield say(chefe, 'É assim que o sistema funciona, meu amigo. Você não foi promovido a cargo nenhum: foi promovido a ACESSÓRIO da máquina. Bom trabalho!', { name: 'SR. CASTRO' });
       chefe.pose = {};
       yield walkTo(chefe, 584, 55); chefe.active = false;
       yield heroTo(hero, 256);
       hero.face = 1;
       // o terminal
       this.term = 1;
-      const lines = ['BEM-VINDO, MIRANGO', 'CARGO: GESTOR DE FLUXO JR.', '> setores supervisionados: 3', '> relatórios de conformidade: 147', '> fluxo das máquinas: 98,7% ▲', '> reuniões de alinhamento: 6 hoje', '> notificações: ∞'];
+      const lines = ['BEM-VINDO, MIRANGO', 'CARGO: ASSISTENTE DA GAUDE AI', '> setores supervisionados: 3', '> relatórios por hora: 147', '> plantão: 24h / 7 dias', '> cadeira: não incluída', '> notificações: ∞'];
       for (const l of lines) { this.termLines.push(l); sfx('type'); yield .5; }
       yield 1;
       yield caption('A engrenagem apenas o absorveu, o reajustou e o colocou de volta na roda.', { auto: 4 });
       this.term = 0;
       // senta
-      yield heroTo(hero, 262);
-      hero.face = -1; sfx('thud');
-      this.seated = true; hero.frozen = true;
+      hero.face = 1; hero.frozen = true;
+      yield think(mA, '...Não tem cadeira mesmo.');
+      this.standType = true;
       yield 2;
       if (AU.ctx) AU.humG.gain.setTargetAtTime(.05, AU.ctx.currentTime, 1);
       this.beeping = true;
@@ -208,6 +216,7 @@ SCENES.c5_office = () => {
       if (this.script) { this.script.update(dt); if (this.script.done) this.script = null; }
       hero.update(dt, solids, { minX: 4, maxX: OFFICE_W - 4, upJump: true, stride: 11 });
       if (this.seated) hero.pose = { sit: true, arms: 'type', tremble: Math.random() < .3 };
+      else if (this.standType) hero.pose = { arms: 'type', slump: 1, tremble: Math.random() < .3 };
       else if (this.eyes) hero.pose = { eyes: this.eyes };
       vac.x += vac.d * 22 * dt; if (vac.x > 640 || vac.x < 380) vac.d *= -1;
       if (this.beeping) { this.beepT -= dt; if (this.beepT <= 0) { sfx('notif'); this.beepI = Math.max(.08, this.beepI * .86); this.beepT = this.beepI; } }
