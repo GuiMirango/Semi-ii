@@ -79,22 +79,27 @@ SCENES.title = () => {
         return;
       }
       if (this.sub === 'chap') {
-        pxBox(c, 34, 66, 252, 108, 'rgba(14,12,20,.94)', '#d8323c');
-        T(c, 'CAPÍTULOS', W / 2, 72, { size: 6, align: 'center', col: '#f3efe6' });
+        // caixa compacta, do tamanho do conteúdo
+        c.font = '10px ' + FONT2; const cw = Math.max(...this.chapters.map(ch => c.measureText(ch[1]).width)) + 34;
+        const bw = Math.max(cw, 92), bh = 18 + this.chapters.length * 11, bx = (W - bw) / 2, by = 62;
+        pxBox(c, bx, by, bw, bh, 'rgba(14,12,20,.94)', '#d8323c');
+        T(c, 'CAPÍTULOS', W / 2, by + 5, { size: 4.5, align: 'center', col: '#f3efe6' });
         this.chapters.forEach((ch, i) => {
-          const on = i === this.csel, y = 86 + i * 16;
-          if (on) R(c, 38, y - 2, 244, 15, 'rgba(216,50,60,.25)');
-          T(c, ch[0], 46, y + 2, { size: 6, col: on ? '#ffd54a' : '#8a84a0' });
-          T(c, ch[1], 60, y + 1, { f: FONT2, size: 12, col: on ? '#fff' : '#cfc8dc' });
+          const on = i === this.csel, y = by + 14 + i * 11;
+          if (on) R(c, bx + 3, y - 1, bw - 6, 10, 'rgba(216,50,60,.3)');
+          T(c, ch[0], bx + 8, y + 1.5, { size: 4.5, col: on ? '#ffd54a' : '#8a84a0' });
+          T(c, ch[1], bx + 18, y, { f: FONT2, size: 10, col: on ? '#fff' : '#cfc8dc' });
         });
         return;
       }
       if (this.sub === 'ctrl') {
-        pxBox(c, 30, 58, 260, 118, 'rgba(14,12,20,.94)', '#d8323c');
-        T(c, 'CONTROLES', W / 2, 63, { size: 6, align: 'center', col: '#f3efe6' });
-        const rows = [['← → / A D', 'Andar'], ['↑ ↓ / W S', 'Subir · descer · agachar · segurar'], ['ESPAÇO', 'Pular (A)'], ['E', 'Interagir · confirmar (X)'], ['X', 'Gritar · rejeitar · empurrar (B)'], ['Q', 'Esquivar (Y)'], ['ESC', 'Pausa (START)'], ['M · F', 'Som · Tela cheia']];
-        rows.forEach((r, i) => { T(c, r[0], 44, 75 + i * 10.5, { f: FONT2, size: 10, col: '#ffd54a' }); T(c, r[1], 112, 75 + i * 10.5, { f: FONT2, size: 10, col: '#e8e4f0' }); });
-        T(c, 'Controle Xbox: A pular · X interagir · B gritar · Y esquivar', W / 2, 162, { f: FONT2, size: 8, align: 'center', col: '#8a84a0' });
+        const rows = [['← → / A D', 'Andar'], ['↑ ↓ / W S', 'Subir · agachar · segurar'], ['ESPAÇO', 'Pular (A)'], ['E', 'Interagir (X)'], ['X', 'Gritar · empurrar (B)'], ['Q', 'Esquivar (Y)'], ['ESC', 'Pausa (START)'], ['M · F', 'Som · Tela cheia']];
+        c.font = '9px ' + FONT2;
+        const w1 = Math.max(...rows.map(r => c.measureText(r[0]).width)), w2 = Math.max(...rows.map(r => c.measureText(r[1]).width));
+        const bw = w1 + w2 + 26, bh = 20 + rows.length * 9, bx = (W - bw) / 2, by = 60;
+        pxBox(c, bx, by, bw, bh, 'rgba(14,12,20,.94)', '#d8323c');
+        T(c, 'CONTROLES', W / 2, by + 5, { size: 4.5, align: 'center', col: '#f3efe6' });
+        rows.forEach((r, i) => { T(c, r[0], bx + 9, by + 14 + i * 9, { f: FONT2, size: 9, col: '#ffd54a' }); T(c, r[1], bx + 17 + w1, by + 14 + i * 9, { f: FONT2, size: 9, col: '#e8e4f0' }); });
         return;
       }
       this.items.forEach((it, i) => {

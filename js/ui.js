@@ -254,11 +254,6 @@ function controlsHint(c, items) {
 }
 function objectiveUI(c, sc, text, tx, ty, by = 15) {
   if (!text) return;
-  c.font = '10px ' + FONT2; const w = c.measureText(text).width + 14;
-  const x = (W - w) / 2, y = by;
-  pxBox(c, x, y, w, 11, 'rgba(22,18,28,.82)', '#d8323c');
-  T(c, '◆', x + 4, y + 3.3, { size: 4, col: '#d8323c', sh: false });
-  T(c, text, x + 10, y + 1.2, { f: FONT2, size: 10, col: '#f3efe6', sh: false });
   if (tx == null) return;
   const cam = camOf(sc); const sx = tx - cam.x, sy = (ty != null ? ty : 100) - cam.y;
   if (sx < 6 || sx > W - 6) {
@@ -295,7 +290,7 @@ const Pause = {
     if (this.sel === 2 && Input.pressed('left')) { AU.setVol(AU.vol + 1); sfx('sel'); }
     if (this.sel === 2 && Input.pressed('right')) { AU.setVol(AU.vol - 1); sfx('sel'); }
     let tapped = false;
-    if (Input.pressed('tap') && Input.tapX > 100 && Input.tapX < 220) { const i = Math.floor((Input.tapY - 64) / 14); if (i >= 0 && i < this.opts.length) { this.sel = i; tapped = true; } }
+    const bb = this.box; if (bb && Input.pressed('tap') && Input.tapX > bb.x && Input.tapX < bb.x + bb.w) { const i = Math.floor((Input.tapY - bb.y) / bb.rh); if (i >= 0 && i < this.opts.length) { this.sel = i; tapped = true; } }
     if (Input.confirm() || tapped) {
       sfx('ok');
       switch (this.sel) {
@@ -309,12 +304,14 @@ const Pause = {
   },
   draw(c) {
     R(c, 0, 0, W, H, 'rgba(8,6,12,.72)');
-    pxBox(c, 96, 36, 128, 114, '#16121c', '#d8323c');
-    T(c, 'PAUSA', W / 2, 48, { size: 8, align: 'center', col: '#f3efe6' });
-    T(c, 'toque numa opção ou use ↑ ↓', W / 2, 139, { f: FONT2, size: 8, align: 'center', col: '#8a84a0' });
+    const lab = (o, i) => i === 2 ? o + (AU.vol === AU.LEVELS.length - 1 ? 'mudo' : Math.round(AU.LEVELS[AU.vol] * 100) + '%') + ' ◂▸' : o;
+    c.font = '10px ' + FONT2; const bw = Math.max(...this.opts.map((o, i) => c.measureText('▶ ' + lab(o, i)).width)) + 20;
+    const bx = (W - bw) / 2, by = 52;
+    this.box = { x: bx, y: by + 14, w: bw, rh: 11 };
+    pxBox(c, bx, by, bw, 18 + this.opts.length * 11, '#16121c', '#d8323c');
+    T(c, 'PAUSA', W / 2, by + 5, { size: 5, align: 'center', col: '#f3efe6' });
     this.opts.forEach((o, i) => {
-      const s = i === 2 ? o + (AU.vol === AU.LEVELS.length - 1 ? 'mudo' : Math.round(AU.LEVELS[AU.vol] * 100) + '%') + ' ◂▸' : o;
-      T(c, (i === this.sel ? '▶ ' : '  ') + s, 112, 68 + i * 14, { f: FONT2, size: 11, col: i === this.sel ? '#ffd54a' : '#cfc8dc' });
+      T(c, (i === this.sel ? '▶ ' : '  ') + lab(o, i), bx + 9, by + 15 + i * 11, { f: FONT2, size: 10, col: i === this.sel ? '#ffd54a' : '#cfc8dc' });
     });
   }
 };

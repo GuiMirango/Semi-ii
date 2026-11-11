@@ -489,9 +489,9 @@ function makeOffice() {
         const J3 = this.phase === 3 ? this.jobs.filter(j => j.ph === 3) : this.jobs;
         const done = J3.filter(j => j.st === 'done').length, tot = Math.max(J3.length, this.phase === 3 ? 2 : 3);
         const rows = this.phase === 2
-          ? [['E-mails respondidos', Math.min(this.answered, 4) + '/4', this.answered >= 4], ['Impressões entregues', done + '/3', done >= 3 && this.p2jobs === 2]]
-          : [['Pegar os documentos', this.hasDocs || this.signs ? 'ok' : '', this.hasDocs || this.signs > 0], ['Assinaturas do Diretor', this.signs + '/3', this.signs >= 3], ['Impressões extras', done + '/' + tot, done >= tot]];
-        pxBox(c, 4, 40, 124, 6 + rows.length * 10, 'rgba(14,12,20,.82)', '#5a5470');
+          ? [['Responder os e-mails', '', this.answered >= 4], ['Entregar as impressões', '', done >= 3 && this.p2jobs === 2]]
+          : [['Pegar os documentos', '', this.hasDocs || this.signs > 0], ['Assinaturas do Diretor', '', this.signs >= 3], ['Impressões extras', '', done >= tot && tot > 0]];
+        pxBox(c, 4, 40, 102, 6 + rows.length * 10, 'rgba(14,12,20,.82)', '#5a5470');
         rows.forEach(([k, v, ok], i) => { T(c, (ok ? '☑ ' : '☐ ') + k, 8, 42 + i * 10, { f: FONT2, size: 9, col: ok ? '#9aff9a' : '#e8e4f0', sh: false }); T(c, v, 124, 42 + i * 10, { f: FONT2, size: 9, align: 'right', col: ok ? '#9aff9a' : '#ffd54a', sh: false }); });
       }
       if (this.panel) {
@@ -569,14 +569,13 @@ SCENES.c1_meeting = (o) => {
     'Mais interconectividade! E-mail a cada 13 segundos é POUCO.', 'Quem não se alinha... se desalinha.'
   ];
   const sc = {
-    hints: [['a', 'Concordar quando ele olhar pra você']],
     restartOpts: { n: N }, music: 'office', amb: 'office', capY: 44, t: 0, slide: 0, st: 0, qte: null, nextQ: 2.5, minute: 0, vig: .35, eng: 0,
     pops: [], script: null, moveWarn: 0,
     enter() {
       Music.tempo = 1.15;
       this.script = new Script((function* () {
         if (N === 2) return;
-        Balloons.add(null, 'Quando o gerente olhar pra você (ícone de olho), concorde com a cabeça!', { type: 'caption', auto: 4.5, bottom: true });
+
       })());
     },
     update(dt) {
@@ -657,7 +656,7 @@ SCENES.c1_meeting = (o) => {
     ui(c) {
       hudBar(c, 6, 10, 70, 'ENERGIA', off.energy / 100, '#ffd54a', '#c49a1a');
       hudBar(c, 6, 27, 70, 'SANIDADE', off.sanity / 100, '#b07aff', '#7a4ad0');
-      T(c, 'Engajamento: ' + this.eng, W - 6, 156, { f: FONT2, size: 9, align: 'right', col: '#8f9bc0' });
+      T(c, 'Engajamento: ' + this.eng, 163, 40, { f: FONT2, size: 9, align: 'center', col: '#8f9bc0' });
       if (this.qte) { promptAt(c, mir.x, 76, 'a', 'Concordar'); R(c, mir.x - 15, 90, 30 * (this.qte.t / 1.35), 2, '#ffd54a'); }
       this.pops.forEach(p => T(c, p.s, mir.x, 82 - p.t * 16, { size: 5, align: 'center', col: p.col }));
     }
