@@ -186,7 +186,8 @@ function overlayTask(dur, drawFn, skippable = true) {
   return { update(dt) { if (!o.added) { G.overlays.push(o); o.added = true; } o.t += dt; const done = o.t >= dur || (skippable && o.t > .8 && Input.confirm()); if (done) G.overlays = G.overlays.filter(v => v !== o); return done; } };
 }
 function titleCard(num, name, sub) {
-  return overlayTask(4.2, (c, o) => {
+  // o cartão de capítulo fica acima do fade, para aparecer mesmo com a tela preta de transição
+  const tk = overlayTask(4.2, (c, o) => {
     const k = o.t < .6 ? o.t / .6 : o.t > o.dur - .6 ? (o.dur - o.t) / .6 : 1;
     c.globalAlpha = 1; R(c, 0, 0, W, H, '#07060a');
     c.globalAlpha = Math.max(0, k);
@@ -195,6 +196,9 @@ function titleCard(num, name, sub) {
     R(c, W / 2 - 60 * k, 96, 120 * k, 1, '#d8323c');
     c.globalAlpha = 1;
   });
+  const up = tk.update; let first = true;
+  tk.update = function (dt) { const r = up.call(this, dt); if (first) { first = false; const o = G.overlays[G.overlays.length - 1]; if (o) o.top = true; } return r; };
+  return tk;
 }
 function bigText(txt, dur = 1.2, o = {}) {
   return overlayTask(dur, (c, ov) => {

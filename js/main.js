@@ -65,10 +65,11 @@ function frame(ts) {
     if (sc.ui) { ctx.save(); sc.ui(ctx); ctx.restore(); }
     if (sc.hints && !G.paused) { const hs = typeof sc.hints === 'function' ? sc.hints() : sc.hints; if (hs) { ctx.save(); controlsHint(ctx, hs); ctx.restore(); } }
     Balloons.draw(ctx);
-    for (const o of G.overlays) { ctx.save(); o.draw(ctx, o); ctx.restore(); }
+    for (const o of G.overlays) if (!o.top) { ctx.save(); o.draw(ctx, o); ctx.restore(); }
   }
   if (G.flashA > 0) { ctx.globalAlpha = Math.min(1, G.flashA); R(ctx, 0, 0, W, H, G.flashCol); ctx.globalAlpha = 1; }
   if (G.fadeA > 0) { ctx.globalAlpha = Math.min(1, G.fadeA); R(ctx, 0, 0, W, H, G.fadeCol); ctx.globalAlpha = 1; }
+  if (sc) for (const o of G.overlays) if (o.top) { ctx.save(); o.draw(ctx, o); ctx.restore(); }
   if (sc && sc.uiTop) { ctx.save(); sc.uiTop(ctx); ctx.restore(); }
   if (G.paused) Pause.draw(ctx);
   requestAnimationFrame(frame);

@@ -215,16 +215,18 @@ SCENES.c5_office = () => {
       yield 3;
       this.flick = 1; this.zoomT = 2.6;
       yield 2.5;
-      // o surto
-      this.surto = true; this.zoomT = 3.2; sfx('glitch'); G.shake(8);
-      if (AU.ctx) AU.humG.gain.setTargetAtTime(.12, AU.ctx.currentTime, .3);
-      yield shout(mA, 'CHEGA!!!', { auto: 1.4 });
-      yield shout(mA, 'EU NÃO AGUENTO MAIS!!!', { auto: 1.6 });
-      yield { t: 0, update(dt) { this.t += dt; G.glitch = Math.min(1, this.t / 1.6); G.shake(3); return this.t >= 2; } };
-      // corte seco: o caos volta ao começo
-      this.beeping = false; this.notifOn = false; G.glitch = 0; G.fadeA = 1; sfx('pum');
+      // o surto: em silêncio, só tremendo, enquanto as notificações não param de chegar
+      this.surto = true; this.zoomT = 3.4;
+      if (AU.ctx) AU.humG.gain.setTargetAtTime(.1, AU.ctx.currentTime, 2);
+      yield 6;
+      yield fadeTo(1, 5);
+      yield 1.5;
+      // as notificações continuam no escuro... até um corte seco
+      this.beeping = false; this.notifOn = false;
       if (AU.ctx) AU.humG.gain.setTargetAtTime(0, AU.ctx.currentTime, .05);
-      yield 1.4;
+      this.pops = []; sfx('click');
+      yield 1.6;
+      G.fadeA = 0; this.blackout = true;
       yield overlayTask(4, (c, o) => { R(c, 0, 0, W, H, '#000'); c.globalAlpha = Math.min(1, o.t / 1.2); T(c, 'FIM DO JOGO', W / 2, 82, { size: 14, align: 'center', col: '#f3efe6' }); c.globalAlpha = 1; });
       G.go('credits', { cut: true, black: true });
     },
@@ -232,7 +234,7 @@ SCENES.c5_office = () => {
       this.t += dt;
       if (this.script) { this.script.update(dt); if (this.script.done) this.script = null; }
       hero.update(dt, solids, { minX: 4, maxX: OFFICE_W - 4, upJump: true, stride: 11 });
-      if (this.surto) hero.pose = { arms: Math.floor(this.t * 8) % 2 ? 'up2' : 'shrug', mouth: 'shout', eyes: 'wide', slump: 0, tremble: true, sweat: true };
+      if (this.surto) hero.pose = { arms: 'type', eyes: 'wide', slump: 1, tremble: true, sweat: Math.floor(this.t * 2) % 2 === 0 };
       else if (this.seated) hero.pose = { sit: true, arms: 'type', tremble: Math.random() < .3 };
       else if (this.standType) hero.pose = { arms: 'type', slump: 1, tremble: Math.random() < .3 };
       else if (this.eyes) hero.pose = { eyes: this.eyes };
@@ -301,13 +303,11 @@ SCENES.c5_office = () => {
       parts.draw(c);
       drawLights(c, this, cx, this.flick ? Math.min(1, .5 + this.flick * .5) : this.beeping ? .3 : 0);
       c.restore();
+      if (this.blackout) { R(c, 0, 0, W, H, '#000'); return; }
       if (this.dark) { c.globalAlpha = .55 + (this.flick || 0) * .3; R(c, 0, 0, W, H, '#05060c'); c.globalAlpha = 1; }
-      if (this.surto && Math.random() < .25) { c.globalAlpha = .18; R(c, 0, 0, W, H, '#d8323c'); c.globalAlpha = 1; }
     },
-    ui(c) {
-      if (this.stage === 1 && !this.cur) objectiveUI(c, this, 'Fale com o Sr. Castro', chefe.x, FLOOR - 40);
-      if (this.cur) promptAt(c, this.cur.x - this.cam.x, 92, 'a', this.cur.l);
-      // notificações (por cima de tudo, cada vez mais caóticas)
+    // notificações acima de tudo, inclusive do escurecimento final: continuam chegando no escuro
+    uiTop(c) {
       for (const p of this.pops) {
         c.font = '8px ' + FONT2; const tw = Math.ceil(c.measureText(p.s).width);
         const bw = tw + 18, x = p.side < 0 ? p.off : W - bw - p.off, y = p.y + (p.t < .15 ? (1 - p.t / .15) * -6 : 0);
@@ -315,6 +315,10 @@ SCENES.c5_office = () => {
         R(c, x + 3, y + 3, 8, 8, p.red ? '#ff5252' : '#7fd4ff'); T(c, '!', x + 7, y + 4.5, { size: 4.5, align: 'center', col: '#000', sh: false });
         T(c, p.s, x + 14, y + 2.5, { f: FONT2, size: 8, col: '#f3efe6', sh: false });
       }
+    },
+    ui(c) {
+      if (this.stage === 1 && !this.cur) objectiveUI(c, this, 'Fale com o Sr. Castro', chefe.x, FLOOR - 40);
+      if (this.cur) promptAt(c, this.cur.x - this.cam.x, 92, 'a', this.cur.l);
       if (this.term) {
         pxBox(c, 60, 34, 200, 104, '#06121a', '#2a4a5a');
         R(c, 64, 38, 192, 96, '#0a1e2a');
