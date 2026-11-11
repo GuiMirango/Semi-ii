@@ -568,6 +568,7 @@ SCENES.c1_meeting = (o) => {
     'Precisamos sinergizar as sinergias. KPI do KPI.', 'Aqui todo mundo é dono. Menos do lucro, claro.',
     'Mais interconectividade! E-mail a cada 13 segundos é POUCO.', 'Quem não se alinha... se desalinha.'
   ];
+  const QTE_T = 3.2; // tempo para concordar com o chefe (mais folgado)
   const sc = {
     restartOpts: { n: N }, capSafe: [86, 180], music: 'office', amb: 'office', t: 0, slide: 0, st: 0, qte: null, nextQ: 2.5, minute: 0, vig: .35, eng: 0,
     pops: [], script: null, moveWarn: 0,
@@ -593,7 +594,7 @@ SCENES.c1_meeting = (o) => {
       if (this.lastSaid !== this.slide) { this.lastSaid = this.slide; sayAuto(chefe, lines[this.slide], 3.2, { name: 'SR. CASTRO' }); sfx('click'); }
       // QTE: concordar
       this.nextQ -= dt;
-      if (!this.qte && this.nextQ <= 0) { this.qte = { t: 1.35 }; chefe.face = -1; sfx('sel'); }
+      if (!this.qte && this.nextQ <= 0) { this.qte = { t: QTE_T, T: QTE_T }; chefe.face = -1; sfx('sel'); }
       if (this.qte) {
         this.qte.t -= dt;
         if (Input.pressed('a')) { this.qte = null; this.eng++; this.nod = .5; sfx('ok'); this.pops.push({ s: '+1 ENGAJAMENTO', t: 0, col: '#7aff9a' }); this.nextQ = rnd(2.4, 3.6); }
@@ -657,7 +658,7 @@ SCENES.c1_meeting = (o) => {
       hudBar(c, 6, 10, 70, 'ENERGIA', off.energy / 100, '#ffd54a', '#c49a1a');
       hudBar(c, 6, 27, 70, 'SANIDADE', off.sanity / 100, '#b07aff', '#7a4ad0');
       T(c, 'Engajamento: ' + this.eng, 163, 40, { f: FONT2, size: 9, align: 'center', col: '#8f9bc0' });
-      if (this.qte) { promptAt(c, mir.x, 76, 'a', 'Concordar'); R(c, mir.x - 15, 90, 30 * (this.qte.t / 1.35), 2, '#ffd54a'); }
+      if (this.qte) { promptAt(c, mir.x, 76, 'a', 'Concordar'); R(c, mir.x - 15, 90, 30, 3, '#2c2638'); R(c, mir.x - 15, 90, 30 * (this.qte.t / this.qte.T), 3, this.qte.t < 1 ? '#ff5252' : '#ffd54a'); }
       this.pops.forEach(p => T(c, p.s, mir.x, 82 - p.t * 16, { size: 5, align: 'center', col: p.col }));
     }
   };

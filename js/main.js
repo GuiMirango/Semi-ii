@@ -57,7 +57,9 @@ function frame(ts) {
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = 1;
   ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cv.width, cv.height);
   const sx = Math.round(rnd(-1, 1) * G.shakeA) * S, sy = Math.round(rnd(-1, 1) * G.shakeA) * S;
-  ctx.drawImage(buf, 0, 0, W, H, sx, sy, cv.width, cv.height);
+  const zr = zoomOf(sc);
+  if (zr) ctx.drawImage(buf, zr.sx, zr.sy, zr.sw, zr.sh, sx, sy, cv.width, cv.height);
+  else ctx.drawImage(buf, 0, 0, W, H, sx, sy, cv.width, cv.height);
   ctx.setTransform(S, 0, 0, S, 0, 0);
   if (sc) {
     if (sc.ui) { ctx.save(); sc.ui(ctx); ctx.restore(); }

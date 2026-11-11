@@ -431,6 +431,29 @@ SCENES.c4_house = () => {
         c.globalAlpha = 1; c.beginPath(); c.arc(x, y, Math.max(1, r), 0, 7); c.fill();
         c.fillStyle = '#fff'; c.globalAlpha = .6; c.fillRect(x - 1, y - Math.round(r / 2), 2, 2); c.globalAlpha = 1;
         if (k > .25) pixText(c, o.label, x, y - r - 9, k > .7 ? '#ff8a8a' : '#a8b0d0', 1, 'center');
+        // sinal de nascimento: ondas que se expandem e um "!" que pisca sobre o ponto de origem
+        if (!o.fade && o.t < 1.6) {
+          for (let w = 0; w < 2; w++) {
+            const tt = o.t * 1.4 - w * .35; if (tt < 0 || tt > 1) continue;
+            c.globalAlpha = 1 - tt; c.strokeStyle = '#e8f0ff'; c.lineWidth = 1;
+            c.beginPath(); c.arc(x, y, 4 + tt * 26, 0, 7); c.stroke();
+          }
+          c.globalAlpha = 1;
+          if (Math.floor(o.t * 6) % 2 === 0) { R(c, x - 3, y - 30, 7, 12, OUT); R(c, x - 2, y - 29, 5, 7, '#ffd54a'); R(c, x - 2, y - 21, 5, 2, '#ffd54a'); }
+        }
+      }
+      // pensamentos fora da tela: seta na borda apontando para a origem, mais vermelha quanto mais urgente
+      for (const o of this.orbs) {
+        if (o.fade) continue;
+        const x = o.x - cx;
+        if (x >= 6 && x <= W - 6) continue;
+        const k = clamp(o.t / o.life, 0, 1), side = x < 6 ? -1 : 1;
+        const ex = side < 0 ? 4 + Math.round(this.pressV * 26) : W - 5 - Math.round(this.pressV * 26), ey = Math.round(o.y), bob = Math.round(Math.sin(G.t * 8) * 1.5) * side;
+        const col = mix('#a8c0ff', '#ff3040', k);
+        c.globalAlpha = .35 + .25 * Math.sin(G.t * 6); c.fillStyle = col; c.beginPath(); c.arc(ex, ey, 9 + k * 3, 0, 7); c.fill(); c.globalAlpha = 1;
+        c.fillStyle = OUT; c.beginPath(); c.moveTo(ex + side * 6 + bob, ey); c.lineTo(ex - side * 3 + bob, ey - 6); c.lineTo(ex - side * 3 + bob, ey + 6); c.fill();
+        c.fillStyle = col; c.beginPath(); c.moveTo(ex + side * 4 + bob, ey); c.lineTo(ex - side * 2 + bob, ey - 4); c.lineTo(ex - side * 2 + bob, ey + 4); c.fill();
+        pixText(c, Math.round(Math.abs(o.x - hero.cx) / 10) + 'M', ex - side * 4, ey + 9, '#fff', 1, side < 0 ? 'left' : 'right');
       }
       // paredes do escritório se fechando
       const p = this.pressV;

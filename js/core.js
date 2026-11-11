@@ -81,10 +81,16 @@ const Input = {
       const b = i => p.buttons[i] && p.buttons[i].pressed;
       const ax = p.axes[0] || 0, ay = p.axes[1] || 0;
       const m = { left: ax < -.4 || b(14), right: ax > .4 || b(15), up: ay < -.5 || b(12), down: ay > .5 || b(13), jump: b(0), b: b(1), a: b(2), dash: b(3) || b(4) || b(5), start: b(9) };
-      for (const k in m) if (m[k]) { c[k] = 1; this.dev = 'pad'; }
+      for (const k in m) if (m[k]) { c[k] = 1; this.setDev('pad'); }
     }
     this.any = Object.keys(c).some(k => !this.prev[k]);
     this.cur = c;
+  },
+  // o HUD de toque só aparece em tela de toque; some quando teclado ou controle são usados
+  setDev(d) {
+    if (this.dev === d) return;
+    this.dev = d;
+    document.body.classList.toggle('touch', d === 'touch');
   },
   label(a) {
     const kb = { a: 'E', b: 'X', jump: 'ESPAÇO', dash: 'Q', down: '↓', up: '↑', left: '←', right: '→', start: 'ESC', move: '← →', vert: '↑ ↓' };
@@ -94,22 +100,23 @@ const Input = {
 };
 window.addEventListener('keydown', e => {
   const a = KEYMAP[e.code];
-  if (a) { if (!e.repeat) Input.hit[a] = 1; Input.k[a] = 1; Input.dev = 'kb'; e.preventDefault(); }
+  if (a) { if (!e.repeat) Input.hit[a] = 1; Input.k[a] = 1; Input.setDev('kb'); e.preventDefault(); }
   AU.unlock();
 });
 window.addEventListener('keyup', e => { const a = KEYMAP[e.code]; if (a) { Input.k[a] = 0; e.preventDefault(); } });
 window.addEventListener('blur', () => { Input.k = {}; Input.t = {}; });
 (function setupTouch() {
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0 && matchMedia('(pointer: coarse)').matches);
-  if (isTouch) { document.body.classList.add('touch'); Input.dev = 'touch'; }
+  if (isTouch) { Input.dev = null; Input.setDev('touch'); }
   document.querySelectorAll('#touch .tb').forEach(btn => {
     const act = btn.dataset.act;
-    const on = e => { e.preventDefault(); Input.t[act] = 1; Input.hit[act] = 1; btn.classList.add('on'); Input.dev = 'touch'; AU.unlock(); };
+    const on = e => { e.preventDefault(); Input.t[act] = 1; Input.hit[act] = 1; btn.classList.add('on'); Input.setDev('touch'); AU.unlock(); };
     const off = e => { e.preventDefault(); Input.t[act] = 0; btn.classList.remove('on'); };
     btn.addEventListener('pointerdown', on); btn.addEventListener('pointerup', off);
     btn.addEventListener('pointercancel', off); btn.addEventListener('pointerleave', off);
   });
-  cv.addEventListener('pointerdown', (e) => { AU.unlock(); Input.hit.tap = 1; const r = cv.getBoundingClientRect(); Input.tapX = (e.clientX - r.left) / r.width * W; Input.tapY = (e.clientY - r.top) / r.height * H; });
+  window.addEventListener('touchstart', () => Input.setDev('touch'), { passive: true, capture: true });
+  cv.addEventListener('pointerdown', (e) => { AU.unlock(); if (e.pointerType === 'touch') Input.setDev('touch'); Input.hit.tap = 1; const r = cv.getBoundingClientRect(); Input.tapX = (e.clientX - r.left) / r.width * W; Input.tapY = (e.clientY - r.top) / r.height * H; });
 })();
 
 /* ---------- roteiros (geradores) e tarefas ---------- */
@@ -296,4 +303,10 @@ const G = {
   flash(col = '#fff', a = 1) { this.flashCol = col; this.flashA = a; },
   unlock(ch) { try { const u = +localStorage.getItem('mirango_ch') || 1; if (ch > u) localStorage.setItem('mirango_ch', ch); } catch (e) { } }
 };
+// zoom de câmera (recorte do buffer): retorna origem e escala do recorte visível
+function zoomOf(sc) {
+  const z = sc && sc.zoom; if (!z || z.k <= 1.001) return null;
+  const sw = W / z.k, sh = H / z.k;
+  return { k: z.k, sx: clamp(z.x - sw / 2, 0, W - sw), sy: clamp(z.y - sh / 2, 0, H - sh), sw, sh };
+}
 function camOf(sc) { return (sc && sc.cam) || { x: 0, y: 0 }; }

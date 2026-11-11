@@ -99,6 +99,8 @@ function drawBalloon(c, b, cam) {
   let ay = (a.y != null ? a.y : 120) - (a.h || 28) - 4 - (b.o.world === false ? 0 : cam.y);
   if (a.headY != null) ay = a.headY - (b.o.world === false ? 0 : cam.y);
   if (b.o.dy) ay += b.o.dy;
+  const zr = b.o.world === false ? null : zoomOf(G.scene);
+  if (zr) { ax = (ax - zr.sx) * zr.k; ay = (ay + (a.h || 28) + 4 - zr.sy) * zr.k - ((a.h || 28) + 4) * zr.k; }
   let x = Math.round(ax - bw / 2 + (b.o.dx || 0)), y = Math.round(ay - bh - 8);
   const below = y < 2;
   if (below) y = Math.round(ay + (a.h || 28) + 10);

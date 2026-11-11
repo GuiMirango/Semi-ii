@@ -651,24 +651,18 @@ SCENES.c3_wake = () => {
     },
     update(dt) { this.t += dt; this.sx += dt * 60; if (this.script) this.script.update(dt); },
     draw(c) {
-      R(c, 0, 0, W, H, '#2a2a36');
-      const WX = 12, WY = 10, WW = 244, WH = 138;
-      c.save(); c.beginPath(); c.rect(WX, WY, WW, WH); c.clip();
-      vgrad(c, WX, WY, WW, WH, ['#05060e', '#12152a']);
-      const b = (Math.round(this.sx * .8) % (W * 2)) - W * 2;
-      c.drawImage(near, b, 4); c.drawImage(near, b + W * 2, 4);
-      R(c, WX, 118, WW, 6, '#2a2830'); R(c, WX, 124, WW, 24, '#16151c');
-      for (let i = 0; i < 4; i++) { const px = ((i * 90 + this.sx * 1.6) % 360) - 40; R(c, px, 64, 3, 56, '#0a0a10'); R(c, px - 6, 64, 14, 3, '#0a0a10'); R(c, px + 4, 67, 4, 2, '#ffcf7a'); c.globalAlpha = .12; R(c, px - 10, 70, 30, 48, '#ffcf7a'); c.globalAlpha = 1; }
-      c.globalAlpha = .1; R(c, WX, WY, WW, WH, '#6a7ab0'); c.globalAlpha = 1;
-      c.restore();
-      R(c, WX - 4, WY - 4, WW + 8, 4, '#4a4640'); R(c, WX - 4, WY + WH, WW + 8, 6, '#4a4640'); R(c, WX - 4, WY, 4, WH, '#4a4640'); R(c, WX + WW, WY, 4, WH, '#4a4640');
-      R(c, WX + WW / 2 - 1, WY, 3, WH, '#4a4640'); R(c, WX, WY + 28, WW, 2, '#4a4640');
-      R(c, 256, 14, 64, 14, '#111'); pixText(c, '310 LAPA', 288, 16, '#ffb030', 1, 'center'); pixText(c, 'PROX: PERIFERIA', 288, 22, '#ff7a30', 1, 'center');
-      R(c, 0, 154, W, 26, '#4a4438');
+      busWindowView(c, true, (c) => {
+        const WX = 0, WW = W;
+        vgrad(c, 0, 0, W, 160, ['#05060e', '#12152a']);
+        const b = (Math.round(this.sx * .8) % (W * 2)) - W * 2;
+        c.drawImage(near, b, 4); c.drawImage(near, b + W * 2, 4);
+        R(c, WX, 118, WW, 6, '#2a2830'); R(c, WX, 124, WW, 24, '#16151c');
+        for (let i = 0; i < 4; i++) { const px = ((i * 90 + this.sx * 1.6) % 360) - 40; R(c, px, 64, 3, 56, '#0a0a10'); R(c, px - 6, 64, 14, 3, '#0a0a10'); R(c, px + 4, 67, 4, 2, '#ffcf7a'); c.globalAlpha = .12; R(c, px - 10, 70, 30, 48, '#ffcf7a'); c.globalAlpha = 1; }
+      });
+      R(c, 250, 26, 66, 16, '#111'); pixText(c, '310 LAPA', 283, 29, '#ffb030', 1, 'center'); pixText(c, 'PROX: PERIFERIA', 283, 35, '#ff7a30', 1, 'center');
       const sx0 = 168;
-      R(c, sx0 + 58, 104, 14, 62, OUT); R(c, sx0 + 60, 106, 10, 58, '#1e3a70'); R(c, sx0 + 60, 106, 3, 58, '#3a5a9a'); R(c, sx0 + 56, 100, 18, 6, '#8a8a8a');
-      R(c, sx0 + 4, 152, 70, 12, OUT); R(c, sx0 + 6, 154, 66, 8, '#1e3a70'); R(c, sx0 + 6, 154, 66, 2, '#3a5a9a');
-      R(c, sx0 + 20, 164, 4, 16, '#555'); R(c, sx0 + 56, 164, 4, 16, '#555');
+      c.save(); c.translate(sx0 - 6, 178); c.scale(2, 2); drawBusSeat(c, 0, 0, '#1e4680'); c.restore();
+      c.save(); c.translate(sx0 + 46, 178); c.scale(2, 2); drawBusSeat(c, 0, 0, '#1e4680'); c.restore();
       const vib = Math.floor(this.t * 12) % 2;
       drawPersonBig(c, sx0 + 46, 174 + vib, LOOKS.mirango, { face: -1, sit: true, slump: .7, eyes: this.eyes, rot2: -.14 }, 2);
       if (this.fog) { c.globalAlpha = .35 + Math.sin(this.t * 2) * .05; R(c, 186, 120, 10, 14, '#d8e8f0'); R(c, 188, 118, 6, 18, '#d8e8f0'); c.globalAlpha = 1; }

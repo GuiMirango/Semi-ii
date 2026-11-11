@@ -316,17 +316,38 @@ function streetFront(c) {
   R(c, 2, 60, 3, 98, '#3a3a40'); R(c, 2, 60, 14, 3, '#3a3a40'); R(c, 12, 62, 6, 3, '#ffe9a0');
   R(c, 300, 140, 10, 18, '#2e7d32'); R(c, 299, 139, 12, 2, '#1f5a22');
 }
-function drawBusSide(c, x, y, col = '#1e5aa8', lit) {
-  // y = base (rodas no chão)
+function drawBusSide(c, x, y, col, lit) {
+  // ônibus metropolitano (pintura no padrão da referência: azul, frente prateada com faixa vermelha,
+  // listras diagonais vermelho/branco/azul na traseira). Frente à direita. y = chão.
   x = Math.round(x);
-  R(c, x, y - 46, 130, 40, OUT); R(c, x + 1, y - 45, 128, 38, col); R(c, x + 1, y - 45, 128, 3, '#7ab0e8');
-  R(c, x + 1, y - 20, 128, 6, '#f3efe6'); R(c, x + 1, y - 18, 128, 2, '#d8323c');
-  for (let i = 0; i < 7; i++) R(c, x + 18 + i * 15, y - 40, 12, 14, lit ? '#ffe9a0' : '#9ac4e0');
-  R(c, x + 2, y - 40, 12, 32, '#9ac4e0'); R(c, x + 3, y - 40, 4, 32, '#bcd8ec');
-  R(c, x + 114, y - 40, 12, 14, '#9ac4e0');
-  R(c, x + 124, y - 14, 4, 3, '#ffe9a0'); R(c, x + 1, y - 14, 3, 3, '#ff3030');
-  R(c, x + 40, y - 46, 52, 7, '#111'); pixText(c, '310 LAPA', x + 66, y - 45, '#ffb030', 1, 'center');
-  for (const wx of [x + 22, x + 100]) { R(c, wx - 1, y - 9, 16, 10, OUT); R(c, wx, y - 8, 14, 8, '#222'); R(c, wx + 4, y - 6, 6, 4, '#777'); }
+  const L = 132, top = y - 48;
+  R(c, x - 1, top - 1, L + 2, 44, OUT);
+  R(c, x, top, L, 4, '#d2d7de');                                   // teto
+  R(c, x, top + 4, L, 30, '#1f3fa0'); R(c, x, top + 4, L, 1, '#3a5cc4'); // corpo azul
+  R(c, x, top + 30, L, 4, '#162e7a');
+  R(c, x, top + 34, L, 8, '#b9c0ca'); R(c, x, top + 34, L, 1, '#e6e9ee'); R(c, x, top + 41, L, 1, '#6a7280'); // saia prateada
+  // listras diagonais da traseira
+  const st = [['#d8323c', 0], ['#f3efe6', 4], ['#4a8ae0', 8], ['#f3efe6', 12], ['#d8323c', 16]];
+  for (const [cc, o] of st) for (let k = 0; k < 26; k++) R(c, x + 4 + o + Math.round(k * .5), top + 33 - k, 3, 1, cc);
+  // frente prateada com para-brisa e faixa vermelha
+  R(c, x + L - 16, top + 4, 16, 38, '#e3e6eb'); R(c, x + L - 14, top + 6, 12, 22, '#16202e'); R(c, x + L - 12, top + 7, 3, 18, '#3a4a60');
+  R(c, x + L - 16, top + 30, 16, 3, '#d8323c'); R(c, x + L - 5, top + 35, 4, 3, '#fff3b0'); R(c, x + 1, top + 35, 3, 3, '#ff3030');
+  // letreiro
+  R(c, x + L - 46, top, 44, 6, '#0c0c0c'); pixText(c, '310 LAPA', x + L - 24, top + 1, '#ffb030', 1, 'center');
+  // janelas escuras
+  for (let wx = x + 30; wx < x + L - 30; wx += 14) {
+    if (wx > x + 60 && wx < x + 76) continue; // porta do meio
+    R(c, wx, top + 7, 12, 15, lit ? '#e8d48a' : '#1a2433'); R(c, wx + 1, top + 8, 3, 13, lit ? '#f8e8b0' : '#3a4a60');
+  }
+  R(c, x + 6, top + 7, 20, 15, lit ? '#e8d48a' : '#1a2433');
+  // portas
+  for (const dx of [62, L - 30]) { R(c, x + dx, top + 6, 12, 28, '#1a2433'); R(c, x + dx + 5, top + 6, 1, 28, '#b9c0ca'); R(c, x + dx, top + 6, 12, 1, '#b9c0ca'); }
+  // logotipo e número
+  R(c, x + 40, top + 25, 4, 4, '#f3efe6'); R(c, x + 41, top + 26, 2, 2, '#d8323c');
+  pixText(c, '20954', x + 72, top + 25, '#f3efe6');
+  // rodas
+  for (const wx of [x + 20, x + L - 34]) { R(c, wx - 2, y - 11, 20, 3, '#0e1018'); R(c, wx, y - 10, 16, 10, OUT); R(c, wx + 1, y - 9, 14, 8, '#222'); R(c, wx + 5, y - 7, 6, 4, '#9aa2ae'); }
+  if (lit) { c.globalAlpha = .35; R(c, x, top, L, 42, '#0a1030'); c.globalAlpha = 1; }
 }
 function drawCart(c, x, y) {
   R(c, x - 2, y - 26, 44, 20, OUT); R(c, x - 1, y - 25, 42, 18, '#e8c46a'); R(c, x - 1, y - 25, 42, 3, '#f8dc8a');
@@ -573,78 +594,126 @@ SCENES.c2_fight = () => {
 
 /* ---------- Minigame 3: Tetris Humano — a conquista do banco ---------- */
 const BUS_W = 780, BUS_FLOOR = 150;
+const BAR = '#3a9a4a', BARL = '#8ad89a';
+// banco de ônibus de perfil (passageiro virado para a esquerda; s = âncora do passageiro, y = piso)
+function drawBusSeat(c, s, y, col = '#2b5f9e', dy = 0) {
+  y += dy;
+  const cd = '#1b3d6a', cl = '#5a8ad0';
+  // pé / pedestal
+  R(c, s + 1, y - 6, 2, 6 - dy, '#5a5f68'); R(c, s - 3, y - 1 - dy, 9, 1, '#3a3f48');
+  // assento (almofada)
+  R(c, s - 6, y - 11, 15, 6, OUT); R(c, s - 5, y - 10, 13, 4, col); R(c, s - 5, y - 10, 13, 1, cl); R(c, s - 5, y - 7, 13, 1, cd);
+  // encosto alto com apoio de cabeça
+  R(c, s + 4, y - 36, 7, 30, OUT); R(c, s + 5, y - 35, 5, 28, col); R(c, s + 5, y - 35, 1, 28, cl); R(c, s + 9, y - 35, 1, 28, cd);
+  for (let k = y - 32; k < y - 10; k += 4) R(c, s + 6, k, 3, 1, cd);
+  R(c, s + 4, y - 40, 7, 5, OUT); R(c, s + 5, y - 39, 5, 3, '#d8dce2');
+  // pegador verde no topo do encosto
+  R(c, s + 2, y - 42, 2, 4, BAR); R(c, s + 2, y - 42, 9, 2, BAR); R(c, s + 2, y - 42, 9, 1, BARL);
+}
+
+// mochila caída no corredor (x = esquerda, y = chão)
+function drawMochila(c, x, y, w, h, col, edge) {
+  x = Math.round(x); y = Math.round(y);
+  const t = y - h;
+  if (edge) R(c, x - 2, t - 1, w + 4, h + 1, edge);
+  R(c, x - 1, t, w + 2, h, OUT); R(c, x, t + 1, w, h - 1, col);
+  R(c, x, t + 1, w, 2, 'rgba(255,255,255,.25)'); R(c, x + 1, t + 2, 1, h - 3, 'rgba(0,0,0,.25)');
+  R(c, x + 2, t + Math.floor(h / 2), w - 4, Math.ceil(h / 2) - 2, OUT); R(c, x + 3, t + Math.floor(h / 2) + 1, w - 6, Math.ceil(h / 2) - 4, 'rgba(0,0,0,.28)');
+  R(c, x + 3, t + Math.floor(h / 2), w - 6, 1, '#d8d8d8');
+  R(c, x + Math.floor(w / 2) - 2, t - 3, 5, 1, OUT); R(c, x + Math.floor(w / 2) - 2, t - 3, 1, 3, OUT); R(c, x + Math.floor(w / 2) + 2, t - 3, 1, 3, OUT);
+  R(c, x + w - 2, t + 3, 2, h - 5, '#222');
+}
+// sacolas de compras de mercado
+function drawSacolas(c, x, y, w, h, edge) {
+  x = Math.round(x); y = Math.round(y);
+  const bag = (bx, bw, bh, col, colD) => {
+    const t = y - bh;
+    if (edge) R(c, bx - 2, t - 1, bw + 4, bh + 1, edge);
+    R(c, bx - 1, t, bw + 2, bh, OUT); R(c, bx, t + 1, bw, bh - 1, col); R(c, bx + bw - 2, t + 1, 2, bh - 1, colD);
+    for (let k = t + 3; k < y - 1; k += 3) R(c, bx + 1, k, bw - 3, 1, colD);
+    R(c, bx + 1, t - 4, 1, 4, colD); R(c, bx + bw - 2, t - 4, 1, 4, colD); R(c, bx + 1, t - 5, bw - 2, 1, colD);
+  };
+  const w1 = Math.round(w * .55), w2 = w - w1;
+  R(c, x + 2, y - h - 5, 2, 6, '#5aa040'); R(c, x + 4, y - h - 7, 2, 7, '#7ac850'); // verduras
+  R(c, x + w1 + 2, y - h + 2, 3, 6, '#e8c46a');                                   // pão
+  bag(x, w1, h, '#f2f2ee', '#c8c8c0');
+  bag(x + w1 + 1, w2, h - 3, '#f39a3a', '#c8742a');
+  pixText(c, 'MERC', x + 1, y - h + 4, '#d8323c');
+}
 SCENES.c2_bus = () => {
   const rng = srand(31);
-  // assento de ônibus de perfil (frente para a esquerda, onde fica o motorista)
-  const seatP = (c, x, y, col = '#2a5aa8', dark) => {
-    const cd = dark ? '#1e3a70' : '#1e4688';
-    R(c, x - 1, y - 28, 6, 22, OUT); R(c, x, y - 27, 4, 20, col); R(c, x, y - 27, 1, 20, '#5a8ad8'); R(c, x - 1, y - 30, 6, 3, '#c9c9c9');
-    R(c, x - 14, y - 10, 18, 5, OUT); R(c, x - 13, y - 9, 17, 3, col); R(c, x - 13, y - 9, 17, 1, '#5a8ad8'); R(c, x - 13, y - 6, 17, 1, cd);
-    R(c, x - 8, y - 5, 2, 5, '#777'); R(c, x - 1, y - 5, 2, 5, '#777'); R(c, x - 10, y - 1, 12, 1, '#555');
-  };
+  // assento de ônibus de perfil (passageiro virado para a esquerda; s = âncora do passageiro)
+  const seatP = drawBusSeat;
+  const SEATS = [];
+  for (let x = 110; x <= 374; x += 24) SEATS.push(x);
+  for (let x = 492; x <= 540; x += 24) SEATS.push(x);
+  for (let x = 640; x <= 688; x += 24) SEATS.push(x);
   const inner = makeCanvas(BUS_W, H, (c) => {
     // teto com luminárias
-    R(c, 0, 0, BUS_W, 30, '#20252f'); R(c, 0, 30, BUS_W, 4, '#c9cdd2');
-    for (let x = 60; x < BUS_W; x += 90) { R(c, x, 31, 40, 3, '#f4f8ff'); }
-    // costado interno (bege) e faixa de anúncios
-    vgrad(c, 0, 34, BUS_W, 116, ['#e2dccd', '#c4bba8']);
+    R(c, 0, 0, BUS_W, 30, '#2a2e36'); R(c, 0, 30, BUS_W, 4, '#d5d8dc');
+    for (let x = 40; x < BUS_W; x += 70) { R(c, x, 30, 46, 4, '#fbfdff'); R(c, x, 34, 46, 1, '#e8eef6'); }
+    // costado interno (painel cinza-claro de ônibus) e faixa de anúncios
+    vgrad(c, 0, 34, BUS_W, 116, ['#c8ccd2', '#a9aeb6']);
     R(c, 0, 36, BUS_W, 9, '#3a3f4a');
     const ads = ['GAUDE AI: TRABALHE ENQUANTO DORME', 'CURSO: SEJA SUBSTITUIDO COM DIGNIDADE', 'SEU CHEFE JA USA IA. E VOCE?', 'GAUDE AI - ELA NAO PEDE AUMENTO'];
     for (let i = 0, x = 110; x < BUS_W - 80; x += 170, i++) { R(c, x, 37, 150, 7, i % 2 ? '#d8323c' : '#1f4a6a'); pixText(c, ads[i % ads.length], x + 75, 38, '#fff', 1, 'center'); }
-    // janelas com basculante (vazadas para ver a rua)
-    for (let x = 100; x < BUS_W - 20; x += 60) {
-      if (x > 380 && x < 470) continue; // porta do meio
-      c.clearRect(x, 48, 54, 44);
-      R(c, x - 2, 46, 58, 2, '#6a6458'); R(c, x - 2, 92, 58, 3, '#6a6458'); R(c, x + 26, 48, 2, 44, '#6a6458'); R(c, x - 2, 48, 2, 44, '#6a6458');
-      R(c, x, 48, 54, 12, 'rgba(160,200,230,.35)'); R(c, x, 60, 54, 1, '#6a6458');
-      if ((x / 60) % 3 === 1) { R(c, x + 30, 82, 22, 7, '#d8323c'); pixText(c, 'SAIDA', x + 41, 83, '#fff', 1, 'center'); }
+    // janelas padrão de ônibus: módulos de vidro com colunas e basculante
+    for (let x = 96; x < BUS_W - 30; x += 48) {
+      if (x > 370 && x < 470) continue; // porta do meio
+      c.clearRect(x, 50, 42, 40);
+      R(c, x - 3, 47, 48, 3, '#2a2e36'); R(c, x - 3, 90, 48, 4, '#2a2e36'); R(c, x - 3, 50, 3, 40, '#2a2e36'); R(c, x + 42, 50, 3, 40, '#2a2e36');
+      R(c, x, 50, 42, 11, 'rgba(160,200,230,.35)'); R(c, x, 61, 42, 2, '#2a2e36'); R(c, x + 20, 50, 2, 11, '#2a2e36');
+      if (((x - 96) / 48) % 4 === 1) { R(c, x + 2, 82, 22, 7, '#d8323c'); pixText(c, 'SAIDA', x + 13, 83, '#fff', 1, 'center'); }
     }
-    R(c, 0, 95, BUS_W, 2, '#8a8478');
+    R(c, 0, 94, BUS_W, 2, '#8a9098');
     // frente: para-brisa, motorista, porta dianteira e catraca
     c.clearRect(0, 40, 22, 60); R(c, 0, 40, 22, 2, '#555'); R(c, 20, 40, 3, 60, '#555');
     R(c, 0, 100, 34, 50, '#3a3f4a'); R(c, 6, 108, 16, 26, '#2a2f38'); R(c, 24, 104, 3, 14, '#222'); R(c, 18, 102, 14, 3, '#111');
     R(c, 36, 50, 26, 100, '#4a5058'); R(c, 38, 52, 10, 96, '#9ac4e0'); R(c, 50, 52, 10, 96, '#9ac4e0'); R(c, 48, 52, 2, 96, '#333');
     pixText(c, 'EMBARQUE', 49, 44, '#ffd54a', 1, 'center');
     R(c, 2, 34, 60, 8, '#111'); pixText(c, '310 LAPA', 32, 36, '#ffb030', 1, 'center');
-    R(c, 70, 112, 16, 22, '#7a7f88'); R(c, 70, 112, 16, 2, '#a0a5ae'); R(c, 74, 120, 22, 2, '#c9cdd2'); R(c, 74, 126, 22, 2, '#c9cdd2'); pixText(c, 'CATRACA', 80, 104, '#5a5448', 1, 'center');
-    R(c, 66, 100, 2, 50, '#e3c34a');
+    R(c, 70, 112, 16, 22, '#7a7f88'); R(c, 70, 112, 16, 2, '#a0a5ae'); R(c, 74, 120, 22, 2, '#c9cdd2'); R(c, 74, 126, 22, 2, '#c9cdd2'); pixText(c, 'CATRACA', 80, 104, '#4a4f58', 1, 'center');
     // porta do meio (desembarque)
     R(c, 386, 50, 82, 100, '#4a5058'); R(c, 390, 54, 36, 92, '#9ac4e0'); R(c, 428, 54, 36, 92, '#9ac4e0'); R(c, 426, 54, 2, 92, '#333');
     R(c, 386, 146, 82, 4, '#ffd54a'); pixText(c, 'DESEMBARQUE', 427, 44, '#ffd54a', 1, 'center');
     R(c, 382, 80, 3, 5, '#d8323c'); R(c, 470, 80, 3, 5, '#d8323c');
     // caixa da roda traseira
-    R(c, 560, 136, 60, 14, '#3a3a40'); R(c, 560, 136, 60, 2, '#5a5a62');
-    // bancos ao fundo (de perfil, todos virados para a frente)
-    for (let x = 118; x < 380; x += 28) seatP(c, x, 150);
-    for (let x = 498; x < 560; x += 28) seatP(c, x, 150);
-    for (let x = 640; x < 690; x += 28) seatP(c, x, 150);
-    // banco do fundo (destino)
-    R(c, 704, 112, 74, 38, '#6a6458'); seatP(c, 744, 150, '#2a5aa8'); seatP(c, 770, 150, '#2a5aa8');
-    R(c, 712, 126, 8, 6, '#2a5aa8');
+    R(c, 566, 134, 64, 16, '#3a3a40'); R(c, 566, 134, 64, 2, '#5a5a62');
+    // fileiras de bancos (todos virados para a frente)
+    for (const s of SEATS) seatP(c, s, 150);
+    // banco do fundo (destino), sobre o degrau
+    R(c, 704, 140, 76, 10, '#3a3f48'); R(c, 704, 140, 76, 1, '#6a7078');
+    seatP(c, 735, 150, '#2b5f9e', -4); seatP(c, 759, 150, '#2b5f9e', -4);
+    // barra horizontal baixa (corrimão sobre os encostos) e barra do teto
+    R(c, 100, 106, 280, 2, BAR); R(c, 100, 106, 280, 1, BARL);
+    R(c, 488, 106, 214, 2, BAR); R(c, 488, 106, 214, 1, BARL);
+    R(c, 0, 50, BUS_W, 2, BAR); R(c, 0, 50, BUS_W, 1, BARL);
+    // corrimão da porta do meio e da catraca
+    R(c, 66, 100, 2, 50, BAR); R(c, 66, 118, 30, 2, BAR);
     // piso emborrachado
     R(c, 0, 150, BUS_W, 30, '#2f3034'); for (let x = 0; x < BUS_W; x += 4) R(c, x, 151, 2, 29, '#37383d');
     R(c, 0, 150, BUS_W, 1, '#55565c');
-    // barra de apoio horizontal
-    R(c, 0, 50, BUS_W, 2, '#d0d4d8');
-    pixText(c, 'NAO FALE COM O MOTORISTA', 160, 98, '#6a6458');
+    pixText(c, 'NAO FALE COM O MOTORISTA', 112, 98, '#4a4f58');
   });
   const city = makeCanvas(W * 2, 60, (c, w, h) => { vgrad(c, 0, 0, w, h, ['#e88a5a', '#f2b47a']); skyline(c, 0, w, h, rng, { col: '#9a5a48', win: '#b07a62', lit: '#ffe0a0', litP: .1, hmin: 20, hmax: 55 }); });
   const hero = new Hero(96, BUS_FLOOR - 24, LOOKS.mirango); hero.speed = 58;
   const mA = heroActor(hero);
   const parts = new Parts();
+  // obstáculos do corredor: passageiros em pé, pernas esticadas, mochilas e sacolas de compras
   const obs = [
-    { t: 'stand', x: 108, look: LOOKS.passA }, { t: 'bag', x: 172, w: 22, h: 14 }, { t: 'legs', x: 246, look: LOOKS.passC },
-    { t: 'stand', x: 318, look: LOOKS.passB, grumpy: true }, { t: 'bag', x: 380, w: 16, h: 22 }, { t: 'stand', x: 446, look: LOOKS.passD, backpack: true },
-    { t: 'legs', x: 520, look: LOOKS.colegaA }, { t: 'stand', x: 594, look: LOOKS.passC, grumpy: true }, { t: 'bag', x: 640, w: 20, h: 12 }
+    { t: 'stand', x: 108, look: LOOKS.passA }, { t: 'bag', kind: 'mochila', x: 170, w: 14, h: 16, col: '#3b6fb0' }, { t: 'legs', x: 254, look: LOOKS.passC },
+    { t: 'stand', x: 318, look: LOOKS.passB, grumpy: true }, { t: 'bag', kind: 'sacola', x: 372, w: 22, h: 14 }, { t: 'stand', x: 446, look: LOOKS.passD, backpack: true },
+    { t: 'legs', x: 540, look: LOOKS.colegaA }, { t: 'stand', x: 594, look: LOOKS.passC, grumpy: true }, { t: 'bag', kind: 'mochila', x: 624, w: 13, h: 14, col: '#6a4a8a' }
   ];
-  const seated = [[118, LOOKS.passB], [174, LOOKS.passD], [258, LOOKS.colegaB], [342, LOOKS.passA], [498, LOOKS.passC], [526, LOOKS.passB], [668, LOOKS.passD]];
+  const SEAT_LOOKS = [LOOKS.passB, LOOKS.passD, LOOKS.colegaB, LOOKS.passA, LOOKS.passC, LOOKS.rival, LOOKS.passD, LOOKS.passB];
+  const seated = SEATS.filter((s) => !obs.some((o) => o.t === 'legs' && o.x === s)).map((s, i) => ({ x: s, L: SEAT_LOOKS[i % SEAT_LOOKS.length], v: i % 4 }));
   const floor = { x: -20, y: BUS_FLOOR, w: BUS_W + 40, h: 30 };
   function solids() {
     const s = [floor];
     for (const o of obs) {
       if (o.t === 'stand' && !o.cleared) s.push({ x: o.x - 4, y: 40, w: 8, h: BUS_FLOOR - 40 });
       if (o.t === 'bag') s.push({ x: o.x, y: BUS_FLOOR - o.h, w: o.w, h: o.h });
-      if (o.t === 'legs') s.push({ x: o.x, y: BUS_FLOOR - 5, w: 14, h: 5 });
+      if (o.t === 'legs') s.push({ x: o.x - 18, y: BUS_FLOOR - 5, w: 14, h: 5 });
     }
     return s;
   }
@@ -749,37 +818,44 @@ SCENES.c2_bus = () => {
       c.save(); c.translate(-cx, 0);
       c.drawImage(inner, 0, 0);
       const lean = Math.round(this.sway * 2);
-      // alças balançando e balaústres
-      for (let x = 96; x < BUS_W; x += 22) { const dx = Math.round(this.sway * 4); c.fillStyle = '#9a9a9a'; for (let k = 0; k < 8; k++) c.fillRect(x + Math.round(dx * k / 8), 52 + k, 1, 1); R(c, x + dx - 2, 60, 5, 5, '#e8e8e8'); R(c, x + dx - 1, 61, 3, 3, '#bdb5a4'); }
-      for (const x of [150, 300, 480, 620]) { R(c, x, 52, 3, 98, '#e3c34a'); R(c, x, 52, 1, 98, '#f8e08a'); R(c, x - 2, 112, 7, 4, '#d8323c'); }
-      // passageiros sentados (fundo, mais apagados)
-      for (const [x, L] of seated) drawPerson(c, x - 5 + lean, BUS_FLOOR, L, { face: -1, sit: true, eyes: Math.random() < .005 ? 'closed' : null, noOutline: true });
-      c.globalAlpha = .28; R(c, cx, 96, W, 54, '#3a3a50'); c.globalAlpha = 1;
+      // alças balançando e balaústres verticais (do piso à barra do teto)
+      for (let x = 96; x < BUS_W; x += 24) { const dx = Math.round(this.sway * 4); c.fillStyle = '#7a7f88'; for (let k = 0; k < 8; k++) c.fillRect(x + Math.round(dx * k / 8), 52 + k, 1, 1); R(c, x + dx - 2, 60, 5, 5, BAR); R(c, x + dx - 1, 61, 3, 3, '#bfc4ca'); }
+      for (const x of [140, 236, 332, 484, 560, 634]) { R(c, x, 52, 3, 98, BAR); R(c, x, 52, 1, 98, BARL); R(c, x - 2, 112, 7, 4, '#d8323c'); R(c, x - 1, 148, 5, 2, '#2a2e36'); }
+      // passageiros sentados: cada um no seu banco, encostado, virado para a frente
+      for (const p of seated) {
+        const P = { face: -1, sit: true, noOutline: true, eyes: p.v === 2 ? 'closed' : (Math.floor(this.t * .7 + p.x) % 9 === 0 ? 'closed' : null), slump: p.v === 2 ? .6 : 0 };
+        if (p.v === 1) P.arms = 'drink';
+        drawPerson(c, p.x + lean, BUS_FLOOR - 2, p.L, P);
+        if (p.v === 1) { R(c, p.x + lean - 6, BUS_FLOOR - 24, 3, 5, '#111'); R(c, p.x + lean - 6, BUS_FLOOR - 23, 2, 3, '#7fd4ff'); }
+        if (p.v === 3) { R(c, p.x + lean - 6, BUS_FLOOR - 16, 8, 6, '#c9a05a'); R(c, p.x + lean - 6, BUS_FLOOR - 16, 8, 1, '#e3c88a'); }
+      }
+      c.globalAlpha = .16; R(c, cx, 96, W, 54, '#3a3a50'); c.globalAlpha = 1;
       // obstáculos: primeiro plano, contorno amarelo pulsante e alerta
       const pulse = Math.floor(G.t * 4) % 2 ? '#ffd54a' : '#ff9a2a';
       const mark = (x, y) => { R(c, x - 2, y - 9, 5, 8, OUT); R(c, x - 1, y - 8, 3, 6, pulse); R(c, x - 1, y - 8, 3, 1, OUT); R(c, x, y - 3, 1, 1, OUT); R(c, x - 1, y - 7, 3, 3, pulse); R(c, x, y - 7, 1, 3, OUT); R(c, x, y - 3, 1, 1, OUT); };
       for (const o of obs) {
         if (o.t === 'bag') {
           const y = BUS_FLOOR - o.h;
-          R(c, o.x - 2, y - 2, o.w + 4, o.h + 2, pulse); R(c, o.x - 1, y - 1, o.w + 2, o.h + 1, OUT);
-          R(c, o.x, y, o.w, o.h, '#e0503a'); R(c, o.x, y, o.w, 3, '#ff8a6a'); R(c, o.x + 3, y + 6, o.w - 6, 4, '#a82a1a'); R(c, o.x + o.w / 2 - 3, y - 3, 6, 2, '#333');
-          mark(o.x + o.w / 2, y - 4);
+          if (o.kind === 'mochila') drawMochila(c, o.x, BUS_FLOOR, o.w, o.h, o.col, pulse);
+          else drawSacolas(c, o.x, BUS_FLOOR, o.w, o.h, pulse);
+          mark(o.x + o.w / 2, y - 6);
         } else if (o.t === 'legs') {
-          seatP(c, o.x - 2, BUS_FLOOR, '#2a5aa8');
-          drawPerson(c, o.x - 7, BUS_FLOOR, o.look, { face: 1, sit: true, eyes: 'closed', slump: 1, outline: pulse });
-          R(c, o.x - 2, BUS_FLOOR - 6, 18, 5, OUT); R(c, o.x - 1, BUS_FLOOR - 5, 16, 3, o.look.pants); R(c, o.x + 13, BUS_FLOOR - 7, 4, 7, '#222');
-          for (let i = 0; i < 16; i += 4) R(c, o.x - 1 + i, BUS_FLOOR - 1, 2, 1, pulse);
-          if (Math.floor(this.t * 1.5) % 2) pixText(c, 'ZZZ', o.x - 6, BUS_FLOOR - 44 - (this.t % 1) * 4, '#5a5448');
-          mark(o.x + 7, BUS_FLOOR - 8);
+          // dorminhoco no banco do corredor com as pernas esticadas
+          drawPerson(c, o.x, BUS_FLOOR - 2, o.look, { face: -1, sit: true, eyes: 'closed', slump: 1, outline: pulse });
+          R(c, o.x - 19, BUS_FLOOR - 6, 18, 5, OUT); R(c, o.x - 18, BUS_FLOOR - 5, 16, 3, o.look.pants); R(c, o.x - 22, BUS_FLOOR - 7, 4, 7, '#222');
+          for (let i = 0; i < 16; i += 4) R(c, o.x - 18 + i, BUS_FLOOR - 1, 2, 1, pulse);
+          if (Math.floor(this.t * 1.5) % 2) pixText(c, 'ZZZ', o.x - 2, BUS_FLOOR - 44 - (this.t % 1) * 4, '#3a3f48');
+          mark(o.x - 10, BUS_FLOOR - 8);
         } else {
           const off = o.cleared ? (o.shoved ? 14 : 10) : o.moving ? 5 : 0;
-          drawPerson(c, o.x + lean + (o.cleared ? -6 : 0), BUS_FLOOR - off * .4, o.look, { face: hero.cx < o.x ? -1 : 1, arms: 'up', alpha: o.cleared ? .6 : 1, eyes: o.shoved ? 'wide' : null, mouth: o.shoved ? 'open' : null, outline: o.cleared ? OUT : pulse });
-          if (o.backpack) { const bx2 = o.x + lean + (hero.cx < o.x ? 4 : -12); R(c, bx2 - 1, BUS_FLOOR - 25, 10, 14, OUT); R(c, bx2, BUS_FLOOR - 24, 8, 12, '#e0503a'); }
+          const fc = hero.cx < o.x ? -1 : 1;
+          drawPerson(c, o.x + lean + (o.cleared ? -6 : 0), BUS_FLOOR - off * .4, o.look, { face: fc, arms: 'up', alpha: o.cleared ? .6 : 1, eyes: o.shoved ? 'wide' : null, mouth: o.shoved ? 'open' : null, outline: o.cleared ? OUT : pulse });
+          if (o.backpack) drawMochila(c, o.x + lean + (o.cleared ? -6 : 0) + (fc < 0 ? 4 : -13), BUS_FLOOR - 11, 9, 12, '#d8603a');
           if (!o.cleared && !o.moving) mark(o.x + lean, BUS_FLOOR - 34);
         }
       }
       if (this.qte) drawPerson(c, this.qte.rx, BUS_FLOOR, LOOKS.rival, { face: -1, walk: this.t * 3, arms: 'out' });
-      if (this.seated) drawPerson(c, 735, BUS_FLOOR, LOOKS.mirango, { face: -1, sit: true, eyes: 'closed', mouth: 'smile' });
+      if (this.seated) drawPerson(c, 735, BUS_FLOOR - 6, LOOKS.mirango, { face: -1, sit: true, eyes: 'closed', mouth: 'smile' });
       else hero.draw(c);
       parts.draw(c);
       c.restore();
@@ -808,6 +884,35 @@ SCENES.c2_bus = () => {
   sc.parts = parts; sc.hero = hero; sc.botTarget = () => BUS_W;
   return sc;
 };
+
+
+/* janela padrão de ônibus vista do banco (usada no fim do cap. 2 e no despertar do cap. 3) */
+const BWIN = { x: 80, y: 30, w: 148, h: 100, dy: -16 };
+function busWindowView(c, night, outside) {
+  const fr = night ? '#1c1e26' : '#2a2e36', wall = night ? ['#3a3c48', '#2c2e38'] : ['#c8ccd2', '#a9aeb6'];
+  vgrad(c, 0, 0, W, H, wall);
+  R(c, 0, 0, W, 16, night ? '#15161c' : '#2a2e36'); R(c, 0, 16, W, 3, night ? '#4a4c58' : '#d5d8dc');
+  // vidros: janela principal e o canto da janela vizinha
+  const glass = [[BWIN.x, BWIN.y, BWIN.w, BWIN.h], [0, BWIN.y, BWIN.x - 12, BWIN.h]];
+  for (const [x, y, w, h] of glass) {
+    c.save(); c.beginPath(); c.rect(x, y, w, h); c.clip(); c.translate(0, BWIN.dy);
+    outside(c);
+    c.restore();
+    c.globalAlpha = .1; R(c, x, y, w, h, night ? '#6a7ab0' : '#9ac4e0'); c.globalAlpha = 1;
+  }
+  // borrachas e coluna entre janelas
+  const X = BWIN.x, Y = BWIN.y, Wd = BWIN.w, Ht = BWIN.h;
+  R(c, 0, Y - 4, X + Wd + 4, 4, fr); R(c, 0, Y + Ht, X + Wd + 4, 5, fr); R(c, X + Wd, Y, 4, Ht, fr);
+  R(c, X - 12, Y, 12, Ht, fr); R(c, X - 10, Y, 8, Ht, night ? '#2c2e38' : '#b5bac2');
+  // basculante superior com trinco
+  R(c, X, Y + 26, Wd, 3, fr); R(c, X + Wd / 2 - 1, Y, 3, 26, fr); R(c, X + Wd / 2 - 4, Y + 29, 9, 3, '#8a8f98');
+  R(c, 0, Y + 26, X - 12, 3, fr);
+  c.globalAlpha = .07; for (let i = 0; i < 3; i++) R(c, X + 20 + i * 44, Y + 4, 2, Ht - 8, '#fff'); c.globalAlpha = 1;
+  // parapeito e barra de apoio verde abaixo da janela
+  R(c, 0, Y + Ht + 5, X + Wd + 4, 4, night ? '#2a2c36' : '#8a9098');
+  R(c, 0, Y + Ht + 12, W, 2, night ? '#2a6a34' : '#3a9a4a'); R(c, 0, Y + Ht + 12, W, 1, night ? '#4a8a54' : '#8ad89a');
+  R(c, 0, 154, W, 26, night ? '#24252c' : '#2f3034');
+}
 
 /* ---------- Encerramento do capítulo 2: a janela ---------- */
 SCENES.c2_end = () => {
@@ -851,35 +956,26 @@ SCENES.c2_end = () => {
       parts.update(dt);
     },
     draw(c) {
-      R(c, 0, 0, W, H, '#cfc6b2');
-      // janela grande: a rua em movimento (o ônibus segue para a esquerda)
-      const WX = 12, WY = 10, WW = 244, WH = 138;
-      c.save(); c.beginPath(); c.rect(WX, WY, WW, WH); c.clip();
-      const a = (Math.round(this.sx * .25) % (W * 2)) - W * 2, b = (Math.round(this.sx * .8) % (W * 2)) - W * 2;
-      c.drawImage(far, a, WY); c.drawImage(far, a + W * 2, WY);
-      if (this.tower > -200) {
-        const tx = Math.round(this.tower);
-        R(c, tx, 14, 60, 104, '#1a1424'); for (let y = 22; y < 116; y += 6) for (let x = tx + 4; x < tx + 56; x += 6) R(c, x, y, 3, 3, (x + y) % 5 ? '#2a2a3a' : '#ffe9a0');
-        R(c, tx + 6, 18, 48, 9, '#d8323c'); pixText(c, 'CORP S.A.', tx + 30, 20, '#fff', 1, 'center');
-      }
-      c.drawImage(near, b, 4); c.drawImage(near, b + W * 2, 4);
-      // calçada, postes e rua
-      R(c, WX, 118, WW, 6, '#8a7e78'); R(c, WX, 124, WW, 24, '#3a3640'); for (let i = 0; i < 8; i++) R(c, ((i * 40 + this.sx * 2.4) % 320) - 30, 135, 16, 2, '#e8e0c8');
-      for (let i = 0; i < 4; i++) { const px = ((i * 90 + this.sx * 1.6) % 360) - 40; R(c, px, 64, 3, 56, '#241a24'); R(c, px - 6, 64, 14, 3, '#241a24'); R(c, px + 4, 67, 4, 2, '#ffe9a0'); }
-      for (const v of cars) { const x = Math.round(v.x); R(c, x, 128, 34, 10, OUT); R(c, x + 1, 129, 32, 8, v.col); R(c, x + 6, 124, 18, 5, OUT); R(c, x + 7, 125, 16, 4, '#9ac4e0'); R(c, x + 4, 136, 6, 4, '#111'); R(c, x + 24, 136, 6, 4, '#111'); }
-      c.globalAlpha = .1; R(c, WX, WY, WW, WH, '#9ac4e0'); c.globalAlpha = 1;
-      for (let i = 0; i < 5; i++) { c.globalAlpha = .08; R(c, 30 + i * 46 + Math.sin(this.t + i) * 2, WY + 4, 2, WH - 8, '#fff'); c.globalAlpha = 1; }
-      c.restore();
-      // moldura da janela, basculante e parede
-      R(c, WX - 4, WY - 4, WW + 8, 4, '#6a6458'); R(c, WX - 4, WY + WH, WW + 8, 6, '#6a6458'); R(c, WX - 4, WY, 4, WH, '#6a6458'); R(c, WX + WW, WY, 4, WH, '#6a6458');
-      R(c, WX + WW / 2 - 1, WY, 3, WH, '#6a6458'); R(c, WX, WY + 28, WW, 2, '#6a6458');
-      R(c, 256, 14, 64, 14, '#111'); pixText(c, '310 LAPA', 288, 16, '#ffb030', 1, 'center'); pixText(c, 'PROX: CENTRO', 288, 22, '#ff7a30', 1, 'center');
-      R(c, 0, 154, W, 26, '#b8af9a');
-      // assento de ônibus de perfil (encosto atrás, à direita)
+      // janela padrão de ônibus: a rua em movimento (o ônibus segue para a esquerda)
+      busWindowView(c, false, (c) => {
+        const WX = 0, WW = W;
+        const a = (Math.round(this.sx * .25) % (W * 2)) - W * 2, b = (Math.round(this.sx * .8) % (W * 2)) - W * 2;
+        c.drawImage(far, a, 10); c.drawImage(far, a + W * 2, 10);
+        if (this.tower > -200) {
+          const tx = Math.round(this.tower);
+          R(c, tx, 14, 60, 104, '#1a1424'); for (let y = 22; y < 116; y += 6) for (let x = tx + 4; x < tx + 56; x += 6) R(c, x, y, 3, 3, (x + y) % 5 ? '#2a2a3a' : '#ffe9a0');
+          R(c, tx + 6, 18, 48, 9, '#d8323c'); pixText(c, 'CORP S.A.', tx + 30, 20, '#fff', 1, 'center');
+        }
+        c.drawImage(near, b, 4); c.drawImage(near, b + W * 2, 4);
+        R(c, WX, 118, WW, 6, '#8a7e78'); R(c, WX, 124, WW, 24, '#3a3640'); for (let i = 0; i < 8; i++) R(c, ((i * 40 + this.sx * 2.4) % 320) - 30, 135, 16, 2, '#e8e0c8');
+        for (let i = 0; i < 4; i++) { const px = ((i * 90 + this.sx * 1.6) % 360) - 40; R(c, px, 64, 3, 56, '#241a24'); R(c, px - 6, 64, 14, 3, '#241a24'); R(c, px + 4, 67, 4, 2, '#ffe9a0'); }
+        for (const v of cars) { const x = Math.round(v.x); R(c, x, 128, 34, 10, OUT); R(c, x + 1, 129, 32, 8, v.col); R(c, x + 6, 124, 18, 5, OUT); R(c, x + 7, 125, 16, 4, '#9ac4e0'); R(c, x + 4, 136, 6, 4, '#111'); R(c, x + 24, 136, 6, 4, '#111'); }
+      });
+      R(c, 250, 26, 66, 16, '#111'); pixText(c, '310 LAPA', 283, 29, '#ffb030', 1, 'center'); pixText(c, 'PROX: CENTRO', 283, 35, '#ff7a30', 1, 'center');
+      // o mesmo banco do interior do ônibus, em escala próxima
       const sx0 = 168;
-      R(c, sx0 + 58, 104, 14, 62, OUT); R(c, sx0 + 60, 106, 10, 58, '#2a5aa8'); R(c, sx0 + 60, 106, 3, 58, '#5a8ad8'); R(c, sx0 + 56, 100, 18, 6, '#c9c9c9');
-      R(c, sx0 + 4, 152, 70, 12, OUT); R(c, sx0 + 6, 154, 66, 8, '#2a5aa8'); R(c, sx0 + 6, 154, 66, 2, '#5a8ad8');
-      R(c, sx0 + 20, 164, 4, 16, '#777'); R(c, sx0 + 56, 164, 4, 16, '#777');
+      c.save(); c.translate(sx0 - 6, 178); c.scale(2, 2); drawBusSeat(c, 0, 0); c.restore();
+      c.save(); c.translate(sx0 + 46, 178); c.scale(2, 2); drawBusSeat(c, 0, 0); c.restore();
       // Mirango sentado, cabeça encostada no vidro
       const vib = Math.floor(this.t * 12) % 2;
       drawPersonBig(c, sx0 + 46, 174 + vib, LOOKS.mirango, { face: -1, sit: true, slump: .4, eyes: this.eyes || (Math.floor(this.t * 1.3) % 6 === 0 ? 'closed' : null), mouth: this.eat && Math.floor(this.t * 2) % 3 === 0 ? 'eat' : null, arms: this.eat ? 'drink' : undefined, rot2: -.1, tremble: !this.eyes && Math.random() < .2 }, 2);

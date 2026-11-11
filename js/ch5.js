@@ -134,6 +134,7 @@ SCENES.c5_street = () => {
 };
 
 /* ---------- O escritório automatizado e a "promoção" ---------- */
+const NOTIFS = ['Reunião de alinhamento — 08:00', 'Nova função: Supervisor de Prompts', 'Convite: alinhamento do alinhamento', 'Nova função: treinar a IA', 'Gaude AI: 148/147 relatórios', 'URGENTE: daily às 23h', 'Nova função: Embaixador da Cultura', 'Reunião de realinhamento', '+3 setores atribuídos a você', 'Nova função: plantão de domingo', 'URGENTE: responda AGORA', 'Alinhamento estratégico (obrig.)', 'Nova função: Gestor de Gestores', 'Feedback 360º em 5 min', 'Gaude AI precisa de você ∞', 'Reunião sobre a reunião'];
 SCENES.c5_office = () => {
   const L = buildOffice(true);
   const hero = new Hero(33, FLOOR - 24, LOOKS.mirangoGray); hero.slump = 1; hero.frozen = true; hero.speed = 46;
@@ -144,7 +145,7 @@ SCENES.c5_office = () => {
   const parts = new Parts();
   const sc = {
     hints() { return this.stage === 1 ? [['move', 'Andar'], ['jump', 'Pular'], ['a', 'Interagir']] : null; },
-    hero, botTarget: () => 604, cam: { x: 0, y: 0 }, music: null, amb: 'office', holdBlack: true, elevOpen: 0, t: 0, desat: .2, vig: .2, eyes: null, term: 0, termLines: [], beepT: 0, beepI: 1.2,
+    pops: [], hero, botTarget: () => 604, cam: { x: 0, y: 0 }, music: null, amb: 'office', holdBlack: true, elevOpen: 0, t: 0, desat: .2, vig: .2, eyes: null, term: 0, termLines: [], beepT: 0, beepI: 1.2,
     elevInside(c) { if (sc.inElev) hero.draw(c); },
     enter() { this.script = new Script(this.intro()); },
     *intro() {
@@ -199,18 +200,31 @@ SCENES.c5_office = () => {
       yield 1;
       yield caption('A engrenagem apenas o absorveu, o reajustou e o colocou de volta na roda.', { auto: 4 });
       this.term = 0;
-      // senta
+      // percebe que não há cadeira: a câmera se aproxima devagar
       hero.face = 1; hero.frozen = true;
+      this.zoomT = 1.9;
       yield think(mA, '...Não tem cadeira mesmo.');
       this.standType = true;
-      yield 2;
-      if (AU.ctx) AU.humG.gain.setTargetAtTime(.05, AU.ctx.currentTime, 1);
-      this.beeping = true;
-      yield 2;
-      yield fadeTo(1, 6);
       yield 1.2;
-      this.beeping = false;
-      if (AU.ctx) AU.humG.gain.setTargetAtTime(0, AU.ctx.currentTime, .3);
+      // notificações sem parar: alinhamentos e novas funções
+      if (AU.ctx) AU.humG.gain.setTargetAtTime(.05, AU.ctx.currentTime, 1);
+      this.notifOn = true; this.beeping = true;
+      yield 4.5;
+      // as luzes começam a falhar
+      this.flick = .4; sfx('click');
+      yield 3;
+      this.flick = 1; this.zoomT = 2.6;
+      yield 2.5;
+      // o surto
+      this.surto = true; this.zoomT = 3.2; sfx('glitch'); G.shake(8);
+      if (AU.ctx) AU.humG.gain.setTargetAtTime(.12, AU.ctx.currentTime, .3);
+      yield shout(mA, 'CHEGA!!!', { auto: 1.4 });
+      yield shout(mA, 'EU NÃO AGUENTO MAIS!!!', { auto: 1.6 });
+      yield { t: 0, update(dt) { this.t += dt; G.glitch = Math.min(1, this.t / 1.6); G.shake(3); return this.t >= 2; } };
+      // corte seco: o caos volta ao começo
+      this.beeping = false; this.notifOn = false; G.glitch = 0; G.fadeA = 1; sfx('pum');
+      if (AU.ctx) AU.humG.gain.setTargetAtTime(0, AU.ctx.currentTime, .05);
+      yield 1.4;
       yield overlayTask(4, (c, o) => { R(c, 0, 0, W, H, '#000'); c.globalAlpha = Math.min(1, o.t / 1.2); T(c, 'FIM DO JOGO', W / 2, 82, { size: 14, align: 'center', col: '#f3efe6' }); c.globalAlpha = 1; });
       G.go('credits', { cut: true, black: true });
     },
@@ -218,9 +232,35 @@ SCENES.c5_office = () => {
       this.t += dt;
       if (this.script) { this.script.update(dt); if (this.script.done) this.script = null; }
       hero.update(dt, solids, { minX: 4, maxX: OFFICE_W - 4, upJump: true, stride: 11 });
-      if (this.seated) hero.pose = { sit: true, arms: 'type', tremble: Math.random() < .3 };
+      if (this.surto) hero.pose = { arms: Math.floor(this.t * 8) % 2 ? 'up2' : 'shrug', mouth: 'shout', eyes: 'wide', slump: 0, tremble: true, sweat: true };
+      else if (this.seated) hero.pose = { sit: true, arms: 'type', tremble: Math.random() < .3 };
       else if (this.standType) hero.pose = { arms: 'type', slump: 1, tremble: Math.random() < .3 };
       else if (this.eyes) hero.pose = { eyes: this.eyes };
+      // zoom progressivo no Mirango
+      if (this.zoomT) {
+        this.zoom = this.zoom || { k: 1, x: W / 2, y: H / 2 };
+        this.zoom.k = lerp(this.zoom.k, this.zoomT, Math.min(1, dt * .45));
+        this.zoom.x = hero.cx - this.cam.x; this.zoom.y = hero.y + 8;
+      }
+      // enxurrada de notificações
+      if (this.notifOn) {
+        this.notifT = (this.notifT || 0) - dt;
+        if (this.notifT <= 0) {
+          const n = this.nN = (this.nN || 0) + 1;
+          const txt = NOTIFS[(n - 1) % NOTIFS.length];
+          // nas laterais, deixando o Mirango (centro da tela) sempre visível
+          const toast = n <= 4, left = n % 2 === 0;
+          this.pops.push({ s: txt, t: 0, side: toast ? 1 : left ? -1 : 1, off: toast ? 4 : rnd(2, 14), y: toast ? 4 + (n - 1) * 15 : rnd(2, H - 18), red: /URGENTE|AGORA|∞/.test(txt) });
+          this.notifT = Math.max(.1, 1.1 * Math.pow(.88, n));
+          if (this.pops.length > 28) this.pops.shift();
+        }
+        for (const p of this.pops) p.t += dt;
+      }
+      // luzes falhando de forma intermitente
+      if (this.flick) {
+        this.darkT = (this.darkT || 0) - dt;
+        if (this.darkT <= 0) { this.dark = !this.dark && Math.random() < .35 + this.flick * .4; this.darkT = this.dark ? rnd(.05, .25) : rnd(.15, 1.2 - this.flick * .8); if (this.dark) sfx('click'); }
+      }
       vac.x += vac.d * 22 * dt; if (vac.x > 640 || vac.x < 380) vac.d *= -1;
       if (this.beeping) { this.beepT -= dt; if (this.beepT <= 0) { sfx('notif'); this.beepI = Math.max(.08, this.beepI * .86); this.beepT = this.beepI; } }
       this.cur = null;
@@ -259,12 +299,22 @@ SCENES.c5_office = () => {
       if (chefe.active) chefe.draw(c);
       if (!this.inElev) hero.draw(c);
       parts.draw(c);
-      drawLights(c, this, cx, this.beeping ? .6 : 0);
+      drawLights(c, this, cx, this.flick ? Math.min(1, .5 + this.flick * .5) : this.beeping ? .3 : 0);
       c.restore();
+      if (this.dark) { c.globalAlpha = .55 + (this.flick || 0) * .3; R(c, 0, 0, W, H, '#05060c'); c.globalAlpha = 1; }
+      if (this.surto && Math.random() < .25) { c.globalAlpha = .18; R(c, 0, 0, W, H, '#d8323c'); c.globalAlpha = 1; }
     },
     ui(c) {
       if (this.stage === 1 && !this.cur) objectiveUI(c, this, 'Fale com o Sr. Castro', chefe.x, FLOOR - 40);
       if (this.cur) promptAt(c, this.cur.x - this.cam.x, 92, 'a', this.cur.l);
+      // notificações (por cima de tudo, cada vez mais caóticas)
+      for (const p of this.pops) {
+        c.font = '8px ' + FONT2; const tw = Math.ceil(c.measureText(p.s).width);
+        const bw = tw + 18, x = p.side < 0 ? p.off : W - bw - p.off, y = p.y + (p.t < .15 ? (1 - p.t / .15) * -6 : 0);
+        pxBox(c, x, y, bw, 14, p.red ? '#3a0c12' : '#14202c', p.red ? '#ff5252' : '#7fd4ff');
+        R(c, x + 3, y + 3, 8, 8, p.red ? '#ff5252' : '#7fd4ff'); T(c, '!', x + 7, y + 4.5, { size: 4.5, align: 'center', col: '#000', sh: false });
+        T(c, p.s, x + 14, y + 2.5, { f: FONT2, size: 8, col: '#f3efe6', sh: false });
+      }
       if (this.term) {
         pxBox(c, 60, 34, 200, 104, '#06121a', '#2a4a5a');
         R(c, 64, 38, 192, 96, '#0a1e2a');
