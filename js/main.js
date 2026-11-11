@@ -61,6 +61,7 @@ function frame(ts) {
   ctx.setTransform(S, 0, 0, S, 0, 0);
   if (sc) {
     if (sc.ui) { ctx.save(); sc.ui(ctx); ctx.restore(); }
+    if (sc.hints && !G.paused) { const hs = typeof sc.hints === 'function' ? sc.hints() : sc.hints; if (hs) { ctx.save(); controlsHint(ctx, hs); ctx.restore(); } }
     Balloons.draw(ctx);
     for (const o of G.overlays) { ctx.save(); o.draw(ctx, o); ctx.restore(); }
   }

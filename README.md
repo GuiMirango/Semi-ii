@@ -14,16 +14,18 @@ python3 -m http.server 8000
 # depois abra http://localhost:8000
 ```
 
-| Ação | Teclado | Gamepad | Toque |
+| Ação | Teclado | Controle (Xbox) | Toque |
 |---|---|---|---|
-| Mover | ← → / A D | Analógico / D-pad | ◀ ▶ |
-| Pular | Espaço / ↑ / W | A | PULO |
-| Agachar · segurar | ↓ / S | ↓ | ▼ |
-| Interagir · confirmar | E / Z / Enter | X | E |
-| Gritar · rejeitar · empurrar | X / Q | B | X |
-| Esquivar (cap. 4) | Shift / C | RB | ⇢ |
-| Pausa | Esc / P | Start | II |
+| Andar | ← → / A D | Analógico / D-pad | Setas |
+| Subir · descer · agachar · segurar | ↑ ↓ / W S | ↑ ↓ | Setas |
+| Pular | Espaço | A (verde) | A |
+| Interagir · confirmar | E | X (azul) | X |
+| Gritar · rejeitar · empurrar | X | B (vermelho) | B |
+| Esquivar | Q | Y (amarelo) | Y |
+| Pausa | Esc | Start | II |
 | Som · tela cheia | M · F | — | — |
+
+Em todo minigame, uma faixa na base da tela mostra os comandos disponíveis naquele momento.
 
 Atalho de desenvolvimento: abrir com `#nome_da_cena` (ex.: `index.html#c3_climb`) carrega uma cena diretamente.
 

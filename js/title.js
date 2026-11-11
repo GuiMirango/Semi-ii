@@ -92,9 +92,9 @@ SCENES.title = () => {
       if (this.sub === 'ctrl') {
         pxBox(c, 30, 58, 260, 118, 'rgba(14,12,20,.94)', '#d8323c');
         T(c, 'CONTROLES', W / 2, 63, { size: 6, align: 'center', col: '#f3efe6' });
-        const rows = [['← → / A D', 'Mover'], ['ESPAÇO / ↑ / W', 'Pular'], ['↓ / S', 'Agachar · segurar'], ['E / Z / ENTER', 'Interagir · confirmar'], ['X / Q', 'Gritar · rejeitar · empurrar'], ['SHIFT / C', 'Esquivar (cap. 4)'], ['ESC / P', 'Pausa'], ['M · F', 'Som · Tela cheia']];
-        rows.forEach((r, i) => { T(c, r[0], 44, 75 + i * 10.5, { f: FONT2, size: 10, col: '#ffd54a' }); T(c, r[1], 150, 75 + i * 10.5, { f: FONT2, size: 10, col: '#e8e4f0' }); });
-        T(c, 'Gamepad: A pular · X interagir · B gritar · RB esquivar', W / 2, 162, { f: FONT2, size: 8, align: 'center', col: '#8a84a0' });
+        const rows = [['← → / A D', 'Andar'], ['↑ ↓ / W S', 'Subir · descer · agachar · segurar'], ['ESPAÇO', 'Pular (A)'], ['E', 'Interagir · confirmar (X)'], ['X', 'Gritar · rejeitar · empurrar (B)'], ['Q', 'Esquivar (Y)'], ['ESC', 'Pausa (START)'], ['M · F', 'Som · Tela cheia']];
+        rows.forEach((r, i) => { T(c, r[0], 44, 75 + i * 10.5, { f: FONT2, size: 10, col: '#ffd54a' }); T(c, r[1], 112, 75 + i * 10.5, { f: FONT2, size: 10, col: '#e8e4f0' }); });
+        T(c, 'Controle Xbox: A pular · X interagir · B gritar · Y esquivar', W / 2, 162, { f: FONT2, size: 8, align: 'center', col: '#8a84a0' });
         return;
       }
       this.items.forEach((it, i) => {

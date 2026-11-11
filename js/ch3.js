@@ -102,7 +102,7 @@ SCENES.c3_beach = () => {
   const crabs = [{ x: 150, d: 1 }, { x: 330, d: -1 }];
   const solids = [{ x: -20, y: BEACH_FLOOR, w: BEACH_W + 40, h: 30 }];
   const sc = {
-    cam: { x: 0, y: 0 }, music: 'beach', amb: 'waves', t: 0, stage: 0, items: null, hero, botTarget: () => 608,
+    cam: { x: 0, y: 0 }, music: 'beach', amb: 'waves', t: 0, stage: 0, items: null, hero, botTarget: () => 608, hints() { return this.stage >= 1 ? [['move', 'Andar'], ['a', 'Interagir']] : null; },
     enter() {
       this.script = new Script((function* () {
         yield titleCard('CAPÍTULO 3', 'BARGANHA');
@@ -216,11 +216,12 @@ SCENES.c3_climb = () => {
   const mA = heroActor(hero);
   const parts = new Parts(), peels = [];
   const sc = {
+    hints() { return this.vine ? [['move', 'Balançar'], ['vert', 'Subir/descer no cipó'], ['jump', 'Soltar e pular']] : [['move', 'Andar'], ['jump', 'Pular (encoste no cipó para agarrar)']]; },
     cam: { x: 0, y: CLIMB_H - H }, music: 'beach', amb: 'waves', t: 0, vine: null, grabCD: 0, done: false, maxH: 0,
     enter() {
       this.script = new Script((function* () {
         yield bigText('A COLHEITA DO COCO', 1.4, { size: 13, zoom: true, col: '#ffd54a' });
-        Balloons.add(null, 'Pule de pedra em pedra. Galhos finos quebram se você demorar. Agarre os cipós e balance com ← →; ' + Input.label('jump') + ' para soltar.', { type: 'caption', auto: 6, y: 20 });
+        Balloons.add(null, 'Pule de pedra em pedra até o topo. Galhos finos quebram se você demorar. Encoste nos cipós para se agarrar.', { type: 'caption', auto: 6, y: 20 });
       })());
     },
     update(dt) {
@@ -437,6 +438,7 @@ SCENES.c3_dream = () => {
   const sc = {
     cam: { x: 0, y: 0 }, music: 'dream', amb: 'dream', t: 0, bore: 100, shellsDone: false, sheet: 0, sheetDone: false, waveHits: 0, waveDone: false,
     hero, botTarget() { const s = shells.find(s => !s.got); if (s) return s.x; if (!this.shellsDone) return 120; if (!this.sheetDone) return 330; return 545; },
+    hints() { return this.waveGame ? [['a', 'Marcar no verde'], ['b', 'Sair']] : [['move', 'Andar'], ['jump', 'Pular caranguejos'], ['a', 'Interagir (segure na planilha)']]; },
     waveGame: null, diveT: 5, tint: ['#b8a0ff', .22, 'multiply'], desat: .3, aligned: false, melt: false, climax: false, rocks: [[150, 0], [470, 0]],
     enter() {
       this.script = new Script((function* () {

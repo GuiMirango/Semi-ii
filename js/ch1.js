@@ -184,6 +184,7 @@ function makeOffice() {
     { x: 758, y: 118, w: 54, h: 3, oneway: true }, { x: 384, y: 136, w: 24, h: 3, oneway: true }
   ];
   const sc = {
+    hints() { return this.phase >= 1 && this.phase < 6 && !this.panel ? [['move', 'Andar'], ['jump', 'Pular'], ['a', 'Interagir']] : null; },
     cam: { x: 0, y: 0 }, music: 'office', amb: 'office', capY: 44, parts: new Parts(), hero, phase: 0, showHUD: false,
     energy: 100, sanity: 100, emails: 0, answered: 0, etimer: 13, eint: 13, jobs: [], signs: 0, hasDocs: false, busy: 0, busyFn: null,
     coffeeCD: 0, donut: true, obj: null, objX: null, elevOpen: 0, t: 0, vig: .12, mailPops: [], badge: 0, prod: 100, ringing: false,
@@ -212,7 +213,7 @@ function makeOffice() {
       yield walkTo(plinio, plinio.home, 50); plinio.face = -1; plinio.pose = { sit: true, arms: 'type' };
       this.phase = 1; this.jobs.push({ for: plinio, st: 'queued', t: 0 });
       hero.frozen = false;
-      Balloons.add(null, 'Mover: ← →   Pular: ' + Input.label('jump') + '   Interagir: ' + Input.label('a'), { type: 'caption', auto: 5, bottom: true });
+
     },
     startPhase2() {
       this.phase = 2; this.ringing = true; sfx('phone'); this.ringT = 1.2;
@@ -477,7 +478,7 @@ function makeOffice() {
         R(c, bx0 + 34, 12, 18, 3, '#2c2638'); R(c, bx0 + 34, 12, Math.round(18 * k), 3, k < .3 ? '#ff5252' : '#7ad0ff');
         T(c, 'PRODUTIVIDADE ' + Math.round(this.prod) + '%', W - 6, 36, { f: FONT2, size: 8, align: 'right', col: this.prod < 50 ? '#ff8a8a' : '#8f9bc0' });
       }
-      if (this.obj && !Balloons.l.some(b => b.type === 'caption')) objectiveUI(c, this, this.obj, this.objX, FLOOR - 40, this.showHUD ? H - 14 : 15);
+      if (this.obj && !Balloons.l.some(b => b.type === 'caption')) objectiveUI(c, this, this.obj, this.objX, FLOOR - 40, this.showHUD ? H - HINT_H - 13 : 15);
       if (this.cur) promptAt(c, this.cur.x - cam.x, (this.cur.py || 96) - cam.y, 'a', this.cur.label());
       if (this.panel) {
         const pn = this.panel;
@@ -548,13 +549,14 @@ SCENES.c1_meeting = (o) => {
     'Mais interconectividade! E-mail a cada 13 segundos é POUCO.', 'Quem não se alinha... se desalinha.'
   ];
   const sc = {
+    hints: [['a', 'Concordar quando ele olhar pra você']],
     restartOpts: { n: N }, music: 'office', amb: 'office', capY: 44, t: 0, slide: 0, st: 0, qte: null, nextQ: 2.5, minute: 0, vig: .35, eng: 0,
     pops: [], script: null, moveWarn: 0,
     enter() {
       Music.tempo = 1.15;
       this.script = new Script((function* () {
         if (N === 2) return;
-        Balloons.add(null, 'Quando o gerente olhar pra você, pressione ' + Input.label('a') + ' para concordar com a cabeça.', { type: 'caption', auto: 4.5, bottom: true });
+        Balloons.add(null, 'Quando o gerente olhar pra você (ícone de olho), concorde com a cabeça!', { type: 'caption', auto: 4.5, bottom: true });
       })());
     },
     update(dt) {
@@ -635,7 +637,7 @@ SCENES.c1_meeting = (o) => {
     ui(c) {
       hudBar(c, 6, 10, 70, 'ENERGIA', off.energy / 100, '#ffd54a', '#c49a1a');
       hudBar(c, 6, 27, 70, 'SANIDADE', off.sanity / 100, '#b07aff', '#7a4ad0');
-      T(c, 'Engajamento: ' + this.eng, W - 6, 170, { f: FONT2, size: 9, align: 'right', col: '#8f9bc0' });
+      T(c, 'Engajamento: ' + this.eng, W - 6, 156, { f: FONT2, size: 9, align: 'right', col: '#8f9bc0' });
       if (this.qte) { promptAt(c, mir.x, 76, 'a', 'Concordar'); R(c, mir.x - 15, 90, 30 * (this.qte.t / 1.35), 2, '#ffd54a'); }
       this.pops.forEach(p => T(c, p.s, mir.x, 82 - p.t * 16, { size: 5, align: 'center', col: p.col }));
     }

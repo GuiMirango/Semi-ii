@@ -145,7 +145,7 @@ function drawCaption(c, b, shown) {
   c.font = font; let tw = 0; for (const l of lines) tw = Math.max(tw, c.measureText(l).width);
   const lh = size * .82, bw = Math.ceil(tw + 12), bh = Math.ceil(lines.length * lh + 7);
   const capY = (G.scene && G.scene.capY) || 6;
-  const x = Math.round(b.o.x != null ? b.o.x : (W - bw) / 2), y = Math.round(b.o.y != null ? b.o.y : (b.o.bottom ? H - bh - 6 : capY));
+  const x = Math.round(b.o.x != null ? b.o.x : (W - bw) / 2), y = Math.round(b.o.y != null ? b.o.y : (b.o.bottom ? H - bh - 6 - ((G.scene && G.scene.hints) ? HINT_H + 2 : 0) : capY));
   pxBox(c, x + 1.5, y + 1.5, bw, bh, 'rgba(0,0,0,.45)', 'rgba(0,0,0,0)');
   pxBox(c, x, y, bw, bh, b.o.fill || '#f3e2a6', b.o.border || '#3a2a14');
   let left = shown.length;
@@ -201,13 +201,56 @@ function keyCap(c, k, x, y, col = '#f3efe6') {
   T(c, k, x + w / 2, y + 2.2, { size: 5, align: 'center', col: '#16121c', sh: false });
   return w;
 }
+const PAD_COL = { A: '#3fae49', B: '#e0403a', X: '#3a78e0', Y: '#e8b72a' };
+// setas desenhadas à mão (a fonte pixelada não tem esses símbolos)
+const ARROW_ACTS = { move: ['l', 'r'], vert: ['u', 'd'], down: ['d'], up: ['u'], left: ['l'], right: ['r'] };
+function arrowTri(c, d, cx, cy) {
+  c.fillStyle = '#16121c'; c.beginPath();
+  if (d === 'l') { c.moveTo(cx - 2.5, cy); c.lineTo(cx + 2, cy - 2.5); c.lineTo(cx + 2, cy + 2.5); }
+  if (d === 'r') { c.moveTo(cx + 2.5, cy); c.lineTo(cx - 2, cy - 2.5); c.lineTo(cx - 2, cy + 2.5); }
+  if (d === 'u') { c.moveTo(cx, cy - 2.5); c.lineTo(cx - 2.5, cy + 2); c.lineTo(cx + 2.5, cy + 2); }
+  if (d === 'd') { c.moveTo(cx, cy + 2.5); c.lineTo(cx - 2.5, cy - 2); c.lineTo(cx + 2.5, cy - 2); }
+  c.closePath(); c.fill();
+}
+function btnW(c, act) { if (ARROW_ACTS[act]) return ARROW_ACTS[act].length * 9 - (ARROW_ACTS[act].length - 1); const k = Input.label(act); if (Input.dev !== 'kb' && PAD_COL[k]) return 9; c.font = '5px ' + FONT; return Math.max(8, c.measureText(k).width + 4); }
+function btnIcon(c, act, x, y) {
+  if (ARROW_ACTS[act]) {
+    let xx = x;
+    for (const d of ARROW_ACTS[act]) { pxBox(c, xx, y, 8, 9, '#f3efe6', OUT); R(c, xx + 1, y + 7, 6, 1, '#9a94a8'); arrowTri(c, d, xx + 4, y + 3.8); xx += 8; }
+    return xx - x;
+  }
+  const k = Input.label(act);
+  if (Input.dev !== 'kb' && PAD_COL[k]) {
+    c.fillStyle = OUT; c.beginPath(); c.arc(x + 4.5, y + 4.5, 5, 0, 7); c.fill();
+    c.fillStyle = PAD_COL[k]; c.beginPath(); c.arc(x + 4.5, y + 4.5, 4.2, 0, 7); c.fill();
+    T(c, k, x + 4.6, y + 2.4, { size: 4.5, align: 'center', col: '#fff', sh: false });
+    return 9;
+  }
+  return keyCap(c, k, x, y);
+}
 function promptAt(c, x, y, act, label) {
   c.font = '9px ' + FONT2; const lw = c.measureText(label).width;
-  const kl = Input.label(act); c.font = '5px ' + FONT; const kw = Math.max(8, c.measureText(kl).width + 4);
+  const kw = btnW(c, act);
   const tw = kw + 3 + lw + 6; const bx0 = clamp(x - tw / 2, 2, W - tw - 2), by0 = y + Math.sin(G.t * 5) * 1;
   pxBox(c, bx0, by0, tw, 12, 'rgba(22,18,28,.88)', '#f3efe6');
-  keyCap(c, kl, bx0 + 2, by0 + 1.5);
+  btnIcon(c, act, bx0 + 2, by0 + 1.5);
   T(c, label, bx0 + kw + 5, by0 + 2, { f: FONT2, size: 9, col: '#fff', sh: false });
+}
+// faixa fixa com os comandos disponíveis no minigame (sempre visível na base da tela)
+const HINT_H = 12;
+function controlsHint(c, items) {
+  if (!items || !items.length) return;
+  c.font = '9px ' + FONT2;
+  const parts = items.map(([act, lab]) => ({ act, lab, w: btnW(c, act) + 3 + c.measureText(lab).width }));
+  const gap = 9, tw = parts.reduce((s, p) => s + p.w, 0) + gap * (parts.length - 1) + 10;
+  let x = Math.round((W - tw) / 2) + 5; const y = H - HINT_H;
+  c.globalAlpha = .82; R(c, Math.round((W - tw) / 2), y, tw, HINT_H, '#0c0a12'); c.globalAlpha = 1;
+  R(c, Math.round((W - tw) / 2), y, tw, 1, '#d8323c');
+  for (const p of parts) {
+    const iw = btnIcon(c, p.act, x, y + 1.6);
+    c.font = '9px ' + FONT2; T(c, p.lab, x + iw + 3, y + 1.8, { f: FONT2, size: 9, col: '#f3efe6', sh: false });
+    x += p.w + gap;
+  }
 }
 function objectiveUI(c, sc, text, tx, ty, by = 15) {
   if (!text) return;

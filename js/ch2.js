@@ -160,13 +160,14 @@ SCENES.c2_frogger = () => {
   const parts = new Parts();
   const skids = [];
   const sc = {
+    hints: [['move', 'Andar'], ['vert', 'Subir/descer'], ['b', 'Gritar de volta (após buzina)']],
     music: 'rage', amb: 'city', capY: 44, pat: 100, rev: 0, shoutWin: 0, fury: 0, t: 0, spawnT: LANES.map(() => rnd(.2, 1.5)), shoutCD: 0, won: false, script: null, honks: 0,
     enter() {
       // pré-povoa as faixas
       for (let i = 0; i < 4; i++) for (let k = 0; k < 2; k++) this.spawn(i, rnd(0, W));
       this.script = new Script((function* () {
         yield bigText('A FAIXA DO FODA-SE', 1.6, { size: 13, zoom: true, col: '#ffd54a' });
-        Balloons.add(null, 'O sinal nunca abre. Atravesse mesmo assim: os carros freiam. Parado, sua PACIÊNCIA acaba. Quando buzinarem: ' + Input.label('b') + ' = Gritar de Volta.', { type: 'caption', auto: 6, bottom: true });
+        Balloons.add(null, 'O sinal nunca abre. Atravesse mesmo assim: os carros freiam. Se ficar parado, sua PACIÊNCIA acaba. Quando buzinarem, grite de volta para encher a REVOLTA e correr mais.', { type: 'caption', auto: 6, bottom: true });
       })());
     },
     spawn(lane, x) {
@@ -339,7 +340,7 @@ function drawCart(c, x, y) {
 SCENES.c2_stop = () => {
   const bg = buildStreet();
   const m = npc(LOOKS.mirango, -10, STREET_FLOOR, { face: 1 });
-  const zé = npc(LOOKS.vendedor, 298, STREET_FLOOR, { face: -1 });
+  const zé = npc(LOOKS.vendedor, 226, STREET_FLOOR, { face: -1 });
   const ap = npc(LOOKS.apressado, 340, STREET_FLOOR, { face: -1 });
   const parts = new Parts();
   const sc = {
@@ -350,17 +351,17 @@ SCENES.c2_stop = () => {
       m.pose = { arms: 'up', mouth: 'shout' }; sfx('door');
       sc.busV = 1;
       yield shout(m, 'EI! ESPERA! ESPERAAA!', { auto: 1.2 });
-      yield walkTo(m, 150, 90);
+      yield walkTo(m, 110, 90);
       yield Tk.until(() => sc.busX > W + 20);
       m.pose = { arms: 'fist', mouth: 'sad' }; G.shake(1);
       yield think(m, 'Ótimo. Simplesmente ótimo. Nem o ônibus me espera.');
       m.pose = {};
       yield think(m, '...Pelo menos tem paçoca.');
-      yield walkTo(m, 236, 50);
+      yield walkTo(m, 158, 50);
       yield say(m, 'Uma paçoca, por favor.');
       zé.pose = { arms: 'out' };
       yield say(zé, 'É a última, freguês! Saindo...', { name: 'SEU ZÉ' });
-      yield walkTo(ap, 322, 140);
+      yield walkTo(ap, 262, 140);
       ap.pose = { arms: 'point', mouth: 'open' };
       yield say(ap, 'EI! Essa paçoca é MINHA! Tô atrasado pra uma reunião de alinhamento!', { name: 'APRESSADO' });
       m.face = 1; m.pose = { arms: 'fist' };
@@ -383,9 +384,9 @@ SCENES.c2_stop = () => {
       drawBusSide(c, this.busX, 142);
       streetFront(c);
       // abrigo do ponto
-      R(c, 150, 102, 70, 4, '#2a2a30'); R(c, 152, 106, 2, 50, '#555'); R(c, 216, 106, 2, 50, '#555'); R(c, 160, 136, 50, 3, '#6a4a3a');
-      c.globalAlpha = .3; R(c, 154, 106, 62, 30, '#9ac4e0'); c.globalAlpha = 1;
-      drawCart(c, 248, STREET_FLOOR);
+      R(c, 50, 102, 70, 4, '#2a2a30'); R(c, 52, 106, 2, 50, '#555'); R(c, 116, 106, 2, 50, '#555'); R(c, 60, 136, 50, 3, '#6a4a3a');
+      c.globalAlpha = .3; R(c, 54, 106, 62, 30, '#9ac4e0'); c.globalAlpha = 1;
+      drawCart(c, 172, STREET_FLOOR);
       zé.draw(c); ap.draw(c); m.draw(c);
       if (zé.pose.arms === 'out') { R(c, zé.x - 12, 136, 5, 4, '#c9a05a'); R(c, zé.x - 12, 136, 5, 1, '#e3c88a'); }
       parts.draw(c);
@@ -648,12 +649,13 @@ SCENES.c2_bus = () => {
     return s;
   }
   const sc = {
+    hints() { return this.qte ? [['a', 'Martele para pegar o banco']] : [['down', 'Segurar (curvas/freadas)'], ['jump', 'Pular'], ['a', 'Com licença'], ['b', 'Empurrar']]; },
     cam: { x: 0, y: 0 }, music: 'bus', amb: 'bus', t: 0, sway: 0, ev: null, evT: 5, stumble: 0, hold: false, qte: null, done: false, cityX: 0,
     enter() {
       this.script = new Script((function* () {
         hero.frozen = true;
         yield bigText('TETRIS HUMANO', 1.4, { size: 14, zoom: true, col: '#ffd54a' });
-        Balloons.add(null, 'Chegue ao banco livre no fundo  •  ' + Input.label('down') + ' segurar nas curvas  •  ' + Input.label('a') + ' "Com licença!"  •  ' + Input.label('b') + ' empurrar', { type: 'caption', auto: 6, y: 4 });
+        Balloons.add(null, 'Chegue ao banco livre no fundo. Quando aparecer o aviso de CURVA/FREADA, segure ' + Input.label('down') + ' para não cair!', { type: 'caption', auto: 6, y: 4 });
         hero.frozen = false;
       })());
     },
@@ -784,11 +786,11 @@ SCENES.c2_bus = () => {
     },
     ui(c) {
       // medidor de equilíbrio
-      pxBox(c, W / 2 - 52, H - 16, 104, 11, 'rgba(20,18,28,.85)', '#f3efe6');
-      R(c, W / 2 - 50, H - 13, 100, 5, '#2c2638'); R(c, W / 2 - 50, H - 13, 15, 5, '#7a2020'); R(c, W / 2 + 35, H - 13, 15, 5, '#7a2020');
+      pxBox(c, W / 2 - 52, H - 30, 104, 11, 'rgba(20,18,28,.85)', '#f3efe6');
+      R(c, W / 2 - 50, H - 27, 100, 5, '#2c2638'); R(c, W / 2 - 50, H - 27, 15, 5, '#7a2020'); R(c, W / 2 + 35, H - 27, 15, 5, '#7a2020');
       const mx = W / 2 + clamp(this.sway, -1.4, 1.4) / 1.4 * 48;
-      R(c, mx - 1, H - 15, 3, 9, this.hold ? '#7aff9a' : Math.abs(this.sway) > .9 ? '#ff5252' : '#ffd54a');
-      T(c, this.hold ? 'SEGURANDO' : 'EQUILÍBRIO', W / 2, H - 23, { size: 4.5, align: 'center', col: this.hold ? '#7aff9a' : '#fff' });
+      R(c, mx - 1, H - 29, 3, 9, this.hold ? '#7aff9a' : Math.abs(this.sway) > .9 ? '#ff5252' : '#ffd54a');
+      T(c, this.hold ? 'SEGURANDO' : 'EQUILÍBRIO (segure ' + Input.label('down') + ')', W / 2, H - 37, { size: 4.5, align: 'center', col: this.hold ? '#7aff9a' : '#fff' });
       if (this.ev && this.ev.t < 2.4 && Math.floor(G.t * 6) % 2) {
         pxBox(c, W / 2 - 40, 34, 80, 16, '#d8323c', '#ffd54a'); T(c, '⚠ ' + this.ev.k, W / 2, 38.5, { size: 7, align: 'center', col: '#fff' });
         if (!this.hold) T(c, 'segure ' + Input.label('down') + '!', W / 2, 52, { f: FONT2, size: 10, align: 'center', col: '#ffd54a' });

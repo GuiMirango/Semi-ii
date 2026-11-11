@@ -83,7 +83,7 @@ SCENES.c4_street = () => {
   resetHZ(0);
   const proj = [];
   const sc = {
-    cam: { x: 0, y: 0 }, music: 'night', amb: 'night', capY: 30, hero, botTarget: () => 1960, t: 0, san: 100, heavy: 0, cp: 56, lit: {}, busX: -20, collapsing: false, vig: .55, desat: .35, holdBlack: true, flashD: 0,
+    cam: { x: 0, y: 0 }, music: 'night', amb: 'night', capY: 30, hero, botTarget: () => 1960, hints: [['move', 'Andar'], ['jump', 'Pular'], ['down', 'Agachar'], ['dash', 'Esquivar']], t: 0, san: 100, heavy: 0, cp: 56, lit: {}, busX: -20, collapsing: false, vig: .55, desat: .35, holdBlack: true, flashD: 0,
     enter() { this.script = new Script(this.intro()); },
     *intro() {
       G.fadeA = 1;
@@ -98,7 +98,7 @@ SCENES.c4_street = () => {
       this.busV = 160;
       yield 1.2;
       yield think(mA, 'Só... chegar em casa.');
-      Balloons.add(null, 'Pular: ' + Input.label('jump') + '  •  Agachar: ' + Input.label('down') + '  •  Esquivar: ' + Input.label('dash'), { type: 'caption', auto: 6, bottom: true });
+      Balloons.add(null, 'Chegue em casa. Pule ou agache para desviar dos pensamentos; a esquiva atravessa tudo por um instante. Os postes de luz recuperam sanidade.', { type: 'caption', auto: 6, bottom: true });
       hero.frozen = false;
     },
     hit(src) {
@@ -213,20 +213,18 @@ SCENES.c4_street = () => {
         } else if (h.t === 'shadow') {
           if (h.used) continue;
           const x = h.x;
-          if (h.st === 0) { threat(c, x - 5, NIGHT_FLOOR - 30, 10, 30); drawPerson(c, x, NIGHT_FLOOR, LOOKS.chefe, { face: -1, mono: '#0a0b12', outline: '#ff2a4a' }); R(c, x - 3, NIGHT_FLOOR - 23, 2, 1, '#ff3040'); R(c, x, NIGHT_FLOOR - 23, 2, 1, '#ff3040'); }
-          else {
-            const grow = h.st === 1 ? Math.min(1, h.t0 / .55) : 1, fade = h.st === 3 ? Math.max(0, 1 - h.t0 / .6) : 1;
-            c.globalAlpha = fade;
-            const fw = Math.round(16 + 20 * grow), fh = Math.round(18 + 24 * grow), fx = x - fw / 2, fy = NIGHT_FLOOR - 30 - fh;
-            threat(c, fx, fy, fw, fh);
-            R(c, fx - 1, fy - 1, fw + 2, fh + 2, '#05060a'); R(c, fx, fy, fw, fh, '#5a6070'); R(c, fx + 3, fy + fh * .32 - 1, 2, 2, '#ff3040'); R(c, fx + fw * .62, fy + fh * .32 - 1, 2, 2, '#ff3040');
-            R(c, fx + 3, fy + fh * .32, fw * .3, 3, '#05060a'); R(c, fx + fw * .58, fy + fh * .32, fw * .3, 3, '#05060a');
-            R(c, fx + fw * .1, fy + fh * .25, fw * .35, 1, '#05060a'); R(c, fx + fw * .55, fy + fh * .22, fw * .35, 1, '#05060a');
-            R(c, fx + fw * .3, fy + fh * .7, fw * .4, 2, '#05060a');
-            R(c, x - 4, NIGHT_FLOOR - 30, 8, 30, '#0a0b12');
-            if (h.st === 2 && h.ext) { const L = Math.round(70 * h.ext); R(c, x - 12 - L, 127, L, 6, '#05060a'); R(c, x - 12 - L + 1, 128, L - 1, 4, '#6a7080'); R(c, x - 14 - L, 128, 4, 3, '#6a7080'); }
-            c.globalAlpha = 1;
+          // vulto: silhueta escura (sem destaque vermelho) que cresce e aponta o dedo
+          const grow = h.st === 0 ? 0 : h.st === 1 ? Math.min(1, h.t0 / .55) : 1, fade = h.st === 3 ? Math.max(0, 1 - h.t0 / .6) : 1;
+          const sc2 = 1 + .45 * grow, pointing = h.st >= 2;
+          c.globalAlpha = fade * .92;
+          drawPersonBig(c, x, NIGHT_FLOOR, LOOKS.chefe, { face: -1, mono: '#07080d', outline: '#262a3a', arms: pointing ? 'point' : undefined, slump: h.st === 0 ? .6 : 0 }, sc2);
+          if (h.st === 2 && h.ext) {
+            const L2 = Math.round(70 * h.ext), ay = 128;
+            R(c, x - 10 - L2, ay - 1, L2 + 2, 5, '#262a3a'); R(c, x - 10 - L2, ay, L2 + 2, 3, '#07080d');
+            R(c, x - 15 - L2, ay - 1, 6, 5, '#262a3a'); R(c, x - 14 - L2, ay, 4, 3, '#07080d');
+            R(c, x - 21 - L2, ay, 7, 2, '#262a3a'); R(c, x - 20 - L2, ay, 6, 1, '#07080d');
           }
+          c.globalAlpha = 1;
         }
       }
       for (const p of proj) {
@@ -245,7 +243,7 @@ SCENES.c4_street = () => {
     ui(c) {
       if (this.showHero) hudBar(c, 6, 10, 80, 'SANIDADE', this.san / 100, '#8a9ad8', '#5a6aa8');
       if (this.cur) promptAt(c, 1960 - this.cam.x, 92, 'a', 'Abrir o portão');
-      if (this.showHero && !hero.frozen) { const k = clamp(hero.cx / 1960, 0, 1); R(c, 100, 172, 120, 2, 'rgba(255,255,255,.15)'); R(c, 100 + 120 * k - 1, 170, 3, 6, '#d8323c'); T(c, 'casa', 224, 168, { f: FONT2, size: 8, col: '#8a90b0' }); }
+      if (this.showHero && !hero.frozen) { const k = clamp(hero.cx / 1960, 0, 1); R(c, 190, 14, 100, 2, 'rgba(255,255,255,.15)'); R(c, 190 + 100 * k - 1, 12, 3, 6, '#d8323c'); T(c, 'casa', 294, 10, { f: FONT2, size: 8, col: '#8a90b0' }); }
     }
   };
   return sc;
@@ -318,13 +316,13 @@ SCENES.c4_house = () => {
   const wall = { x: 404, y: HOUSE_CEIL, w: 8, h: 58 };
   const solids = [{ x: -20, y: HOUSE_FLOOR, w: HOUSE_W + 40, h: 30 }, { x: -10, y: 0, w: 14, h: H }, wall];
   const sc = {
-    cam: { x: 0, y: 0 }, music: 'house', amb: 'house', capY: 32, hero, botTarget() { if (this.open) return 506; let b = null; for (const o of this.orbs) if (!b || Math.abs(o.x - hero.cx) < Math.abs(b.x - hero.cx)) b = o; return b ? b.x : hero.cx; }, t: 0, orbs: [], spawnT: 2.5, count: 0, press: 0, pressV: 0, open: false, doorA: 0, done: false, vig: .4,
+    cam: { x: 0, y: 0 }, music: 'house', amb: 'house', capY: 32, hints: [['move', 'Andar'], ['a', 'Afastar a lembrança de perto']], hero, botTarget() { if (this.open) return 506; let b = null; for (const o of this.orbs) if (!b || Math.abs(o.x - hero.cx) < Math.abs(b.x - hero.cx)) b = o; return b ? b.x : hero.cx; }, t: 0, orbs: [], spawnT: 2.5, count: 0, press: 0, pressV: 0, open: false, doorA: 0, done: false, vig: .4,
     enter() {
       this.script = new Script((function* () {
         sfx('door'); yield .4; sfx('click');
         yield 1.0;
         yield 1.2;
-        Balloons.add(null, 'Aproxime-se das lembranças pulsantes e pressione ' + Input.label('a') + ' para afastá-las antes que estourem.', { type: 'caption', auto: 5.5, bottom: true });
+        Balloons.add(null, 'Chegue perto das lembranças pulsantes e afaste-as antes que estourem. Afaste 8 para abrir o quarto.', { type: 'caption', auto: 5.5, bottom: true });
         hero.frozen = false;
       })());
     },

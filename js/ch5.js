@@ -7,6 +7,7 @@ SCENES.c5_wake = () => {
   const mA = { get x() { return hero.cx * 2; }, get y() { return hero.fy * 2; }, h: 56 };
   const solids = [{ x: -20, y: BR_FLOOR, w: 200, h: 30 }];
   const sc = {
+    hints() { return this.stage === 1 ? [['a', 'Desligar o despertador']] : this.stage === 3 ? [['move', 'Andar'], ['a', 'Interagir']] : null; },
     hero, botTarget() { return this.dressed ? 146 : 21; }, music: null, amb: 'city', t: 0, mode: 'alarm', lying: true, alarmT: 0, holdBlack: true, vig: .35, desat: .25, stage: 0,
     enter() { this.script = new Script(this.run()); },
     *run() {
@@ -92,6 +93,7 @@ SCENES.c5_street = () => {
   const peds = Array.from({ length: 14 }, (_, i) => ({ x: rnd(DAY_W), d: Math.random() < .5 ? -1 : 1, v: rnd(30, 60), look: pick(looks), back: i % 2 === 0, walk: rnd(4), phone: Math.random() < .6 }));
   const cars = [];
   const sc = {
+    hints: [['move', 'Andar'], ['a', 'Interagir']],
     hero, botTarget: () => 875, cam: { x: 0, y: 0 }, music: 'street', amb: 'city', t: 0, desat: .55, vig: .25, carT: 0,
     enter() {
       this.script = new Script((function* () {
@@ -141,6 +143,7 @@ SCENES.c5_office = () => {
   const vac = { x: 400, d: 1 };
   const parts = new Parts();
   const sc = {
+    hints() { return this.stage === 1 ? [['move', 'Andar'], ['jump', 'Pular'], ['a', 'Interagir']] : null; },
     hero, botTarget: () => 604, cam: { x: 0, y: 0 }, music: null, amb: 'office', holdBlack: true, elevOpen: 0, t: 0, desat: .2, vig: .2, eyes: null, term: 0, termLines: [], beepT: 0, beepI: 1.2,
     elevInside(c) { if (sc.inElev) hero.draw(c); },
     enter() { this.script = new Script(this.intro()); },

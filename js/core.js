@@ -59,8 +59,7 @@ resize();
 /* ---------- entrada: teclado, toque e gamepad ---------- */
 const KEYMAP = {
   ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down',
-  Space: 'jump', KeyK: 'jump', KeyE: 'a', KeyZ: 'a', Enter: 'a', KeyJ: 'a', KeyX: 'b', KeyQ: 'b', KeyL: 'b',
-  ShiftLeft: 'dash', ShiftRight: 'dash', KeyC: 'dash', Escape: 'start', KeyP: 'start',
+  Space: 'jump', KeyE: 'a', Enter: 'a', KeyX: 'b', KeyQ: 'dash', Escape: 'start', KeyP: 'start',
   Digit1: 'n1', Digit2: 'n2', Digit3: 'n3', Numpad1: 'n1', Numpad2: 'n2', Numpad3: 'n3', KeyM: 'mute', KeyF: 'full'
 };
 const Input = {
@@ -81,17 +80,16 @@ const Input = {
       if (!p) continue;
       const b = i => p.buttons[i] && p.buttons[i].pressed;
       const ax = p.axes[0] || 0, ay = p.axes[1] || 0;
-      const m = { left: ax < -.4 || b(14), right: ax > .4 || b(15), up: ay < -.5 || b(12), down: ay > .5 || b(13), jump: b(0), b: b(1) || b(3), a: b(2), dash: b(4) || b(5) || b(6) || b(7), start: b(9) };
+      const m = { left: ax < -.4 || b(14), right: ax > .4 || b(15), up: ay < -.5 || b(12), down: ay > .5 || b(13), jump: b(0), b: b(1), a: b(2), dash: b(3) || b(4) || b(5), start: b(9) };
       for (const k in m) if (m[k]) { c[k] = 1; this.dev = 'pad'; }
     }
     this.any = Object.keys(c).some(k => !this.prev[k]);
     this.cur = c;
   },
   label(a) {
-    const kb = { a: 'E', b: 'X', jump: 'ESPAÇO', dash: 'SHIFT', down: '↓', up: '↑', left: '←', right: '→', start: 'ESC' };
-    const pad = { a: 'X', b: 'B', jump: 'A', dash: 'RB', down: '↓', up: '↑', left: '←', right: '→', start: 'START' };
-    const tch = { a: 'E', b: 'X', jump: 'PULO', dash: '⇢', down: '▼', up: '▲', left: '◀', right: '▶', start: 'II' };
-    return (this.dev === 'pad' ? pad : this.dev === 'touch' ? tch : kb)[a] || a;
+    const kb = { a: 'E', b: 'X', jump: 'ESPAÇO', dash: 'Q', down: '↓', up: '↑', left: '←', right: '→', start: 'ESC', move: '← →', vert: '↑ ↓' };
+    const pad = { a: 'X', b: 'B', jump: 'A', dash: 'Y', down: '↓', up: '↑', left: '←', right: '→', start: 'START', move: '← →', vert: '↑ ↓' };
+    return (this.dev === 'kb' ? kb : pad)[a] || a;
   }
 };
 window.addEventListener('keydown', e => {
