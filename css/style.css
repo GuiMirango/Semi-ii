@@ -3,7 +3,7 @@ html,body{margin:0;padding:0;height:100%;background:#0b0a10;overflow:hidden;touc
 #game{display:block;image-rendering:pixelated;image-rendering:crisp-edges;background:#000;box-shadow:0 0 40px rgba(0,0,0,.6)}
 #touch{display:none;position:fixed;inset:0;pointer-events:none;font-family:"Press Start 2P",monospace}
 body.touch #touch{display:block}
-#touch .tb{opacity:.78}#touch .tb.on{opacity:1}
+#touch .tb{opacity:.5}#touch .tb.on{opacity:1}
 .tb{pointer-events:auto;position:absolute;border:2px solid rgba(255,255,255,.55);background:rgba(20,18,30,.38);color:rgba(255,255,255,.9);font-family:inherit;font-size:12px;border-radius:10px;padding:0;touch-action:none;-webkit-user-select:none;user-select:none;box-shadow:0 3px 0 rgba(0,0,0,.35)}
 .pad{position:absolute;left:calc(12px + env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom));width:174px;height:174px}
 .pad .tb{width:58px;height:58px;display:flex;align-items:center;justify-content:center;color:#fff;background:#1e1c2c;border-color:#fff}

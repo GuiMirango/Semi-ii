@@ -83,7 +83,7 @@ SCENES.c4_street = () => {
   resetHZ(0);
   const proj = [];
   const sc = {
-    cam: { x: 0, y: 0 }, music: 'night', amb: 'night', capY: 30, hero, botTarget: () => 1960, hints: [['move', 'Andar'], ['jump', 'Pular'], ['down', 'Agachar'], ['dash', 'Esquivar']], t: 0, san: 100, heavy: 0, cp: 56, lit: {}, busX: -20, collapsing: false, vig: .55, desat: .35, holdBlack: true, flashD: 0,
+    cam: { x: 0, y: 0 }, music: 'night', amb: 'night', capSafe: [96, W - 4], hero, botTarget: () => 1960, hints: [['move', 'Andar'], ['jump', 'Pular'], ['down', 'Agachar'], ['dash', 'Esquivar']], t: 0, san: 100, heavy: 0, cp: 56, lit: {}, busX: -20, collapsing: false, vig: .55, desat: .35, holdBlack: true, flashD: 0,
     enter() { this.script = new Script(this.intro()); },
     *intro() {
       G.fadeA = 1;
@@ -243,7 +243,7 @@ SCENES.c4_street = () => {
     ui(c) {
       if (this.showHero) hudBar(c, 6, 10, 80, 'SANIDADE', this.san / 100, '#8a9ad8', '#5a6aa8');
       if (this.cur) promptAt(c, 1960 - this.cam.x, 92, 'a', 'Abrir o portão');
-      if (this.showHero && !hero.frozen) { const k = clamp(hero.cx / 1960, 0, 1); R(c, 190, 14, 100, 2, 'rgba(255,255,255,.15)'); R(c, 190 + 100 * k - 1, 12, 3, 6, '#d8323c'); T(c, 'casa', 294, 10, { f: FONT2, size: 8, col: '#8a90b0' }); }
+      if (this.showHero && !hero.frozen) { const k = clamp(hero.cx / 1960, 0, 1); R(c, 8, 26, 70, 2, 'rgba(255,255,255,.15)'); R(c, 8 + 70 * k - 1, 24, 3, 6, '#d8323c'); T(c, 'casa', 81, 22, { f: FONT2, size: 8, col: '#8a90b0' }); }
     }
   };
   return sc;
@@ -316,7 +316,7 @@ SCENES.c4_house = () => {
   const wall = { x: 404, y: HOUSE_CEIL, w: 8, h: 58 };
   const solids = [{ x: -20, y: HOUSE_FLOOR, w: HOUSE_W + 40, h: 30 }, { x: -10, y: 0, w: 14, h: H }, wall];
   const sc = {
-    cam: { x: 0, y: 0 }, music: 'house', amb: 'house', capY: 32, hints: [['move', 'Andar'], ['a', 'Afastar a lembrança de perto']], hero, botTarget() { if (this.open) return 506; let b = null; for (const o of this.orbs) if (!b || Math.abs(o.x - hero.cx) < Math.abs(b.x - hero.cx)) b = o; return b ? b.x : hero.cx; }, t: 0, orbs: [], spawnT: 2.5, count: 0, press: 0, pressV: 0, open: false, doorA: 0, done: false, vig: .4,
+    cam: { x: 0, y: 0 }, music: 'house', amb: 'house', capSafe: [102, W - 4], hints: [['move', 'Andar'], ['a', 'Afastar a lembrança de perto']], hero, botTarget() { if (this.open) return 506; let b = null; for (const o of this.orbs) if (!b || Math.abs(o.x - hero.cx) < Math.abs(b.x - hero.cx)) b = o; return b ? b.x : hero.cx; }, t: 0, orbs: [], spawnT: 2.5, count: 0, press: 0, pressV: 0, open: false, doorA: 0, done: false, vig: .4,
     enter() {
       this.script = new Script((function* () {
         sfx('door'); yield .4; sfx('click');

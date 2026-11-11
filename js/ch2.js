@@ -161,7 +161,7 @@ SCENES.c2_frogger = () => {
   const skids = [];
   const sc = {
     hints: [['move', 'Andar'], ['vert', 'Subir/descer'], ['b', 'Gritar de volta (após buzina)']],
-    music: 'rage', amb: 'city', capY: 44, pat: 100, rev: 0, shoutWin: 0, fury: 0, t: 0, spawnT: LANES.map(() => rnd(.2, 1.5)), shoutCD: 0, won: false, script: null, honks: 0,
+    music: 'rage', amb: 'city', capSafe: [78, 262], pat: 100, rev: 0, shoutWin: 0, fury: 0, t: 0, spawnT: LANES.map(() => rnd(.2, 1.5)), shoutCD: 0, won: false, script: null, honks: 0,
     enter() {
       // pré-povoa as faixas
       for (let i = 0; i < 4; i++) for (let k = 0; k < 2; k++) this.spawn(i, rnd(0, W));
@@ -419,7 +419,7 @@ SCENES.c2_fight = () => {
   const B = { x: 228, y: 162, face: -1, look: LOOKS.apressado, hp: 1, pose: {}, rot: 0, k: 'ap' };
   const parts = new Parts();
   const sc = {
-    music: 'fight', amb: 'city', round: 0, score: [0, 0], choosing: false, sel: 0, choice: null, ch: ['pedra', 'papel', 'tesoura'], reveal: null, count: '', t: 0, vig: .2, bullet: 0,
+    capTop: 38, music: 'fight', amb: 'city', round: 0, score: [0, 0], choosing: false, sel: 0, choice: null, ch: ['pedra', 'papel', 'tesoura'], reveal: null, count: '', t: 0, vig: .2, bullet: 0,
     enter() { this.script = new Script(this.run()); },
     *jo(slow) {
       const step = slow ? 1 : .42;
@@ -650,7 +650,7 @@ SCENES.c2_bus = () => {
   }
   const sc = {
     hints() { return this.qte ? [['a', 'Martele para pegar o banco']] : [['down', 'Segurar (curvas/freadas)'], ['jump', 'Pular'], ['a', 'Com licença'], ['b', 'Empurrar']]; },
-    cam: { x: 0, y: 0 }, music: 'bus', amb: 'bus', t: 0, sway: 0, ev: null, evT: 5, stumble: 0, hold: false, qte: null, done: false, cityX: 0,
+    cam: { x: 0, y: 0 }, capSafe: [4, 262], music: 'bus', amb: 'bus', t: 0, sway: 0, ev: null, evT: 5, stumble: 0, hold: false, qte: null, done: false, cityX: 0,
     enter() {
       this.script = new Script((function* () {
         hero.frozen = true;
@@ -802,7 +802,7 @@ SCENES.c2_bus = () => {
         pxBox(c, 60, 92, 200, 10, '#1a1622', '#f3efe6'); R(c, 62, 94, 196 * clamp(this.qte.r, 0, 1), 6, '#ff5252');
         T(c, 'MIRANGO', 58, 79, { size: 4.5, align: 'right', col: '#7aff9a' }); T(c, 'RIVAL', 58, 93, { size: 4.5, align: 'right', col: '#ff5252' });
       }
-      T(c, 'Banco livre ▶', W - 6, 4, { f: FONT2, size: 9, align: 'right', col: '#fff' });
+      T(c, 'Banco livre ▶', W - 6, 26, { f: FONT2, size: 9, align: 'right', col: '#fff' });
     }
   };
   sc.parts = parts; sc.hero = hero; sc.botTarget = () => BUS_W;

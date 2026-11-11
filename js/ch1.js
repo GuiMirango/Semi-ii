@@ -185,7 +185,7 @@ function makeOffice() {
   ];
   const sc = {
     hints() { return this.phase >= 1 && this.phase < 6 && !this.panel ? [['move', 'Andar'], ['jump', 'Pular'], ['a', 'Interagir']] : null; },
-    cam: { x: 0, y: 0 }, music: 'office', amb: 'office', capY: 44, parts: new Parts(), hero, phase: 0, showHUD: false,
+    cam: { x: 0, y: 0 }, music: 'office', amb: 'office', capSafe: [86, 252], parts: new Parts(), hero, phase: 0, showHUD: false,
     energy: 100, sanity: 100, emails: 0, answered: 0, etimer: 13, eint: 13, jobs: [], signs: 0, hasDocs: false, busy: 0, busyFn: null,
     coffeeCD: 0, donut: true, obj: null, objX: null, elevOpen: 0, t: 0, vig: .12, mailPops: [], badge: 0, prod: 100, ringing: false,
     script: null, holdBlack: true, flick: 0, p5t: 0, heartT: 0, chefeCalled: false, floatTx: [],
@@ -569,7 +569,7 @@ SCENES.c1_meeting = (o) => {
     'Mais interconectividade! E-mail a cada 13 segundos é POUCO.', 'Quem não se alinha... se desalinha.'
   ];
   const sc = {
-    restartOpts: { n: N }, music: 'office', amb: 'office', capY: 44, t: 0, slide: 0, st: 0, qte: null, nextQ: 2.5, minute: 0, vig: .35, eng: 0,
+    restartOpts: { n: N }, capSafe: [86, 180], music: 'office', amb: 'office', t: 0, slide: 0, st: 0, qte: null, nextQ: 2.5, minute: 0, vig: .35, eng: 0,
     pops: [], script: null, moveWarn: 0,
     enter() {
       Music.tempo = 1.15;

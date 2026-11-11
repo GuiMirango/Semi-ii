@@ -217,7 +217,7 @@ SCENES.c3_climb = () => {
   const parts = new Parts(), peels = [];
   const sc = {
     hints() { return this.vine ? [['move', 'Balançar'], ['vert', 'Subir/descer no cipó'], ['jump', 'Soltar e pular']] : [['move', 'Andar'], ['jump', 'Pular (encoste no cipó para agarrar)']]; },
-    cam: { x: 0, y: CLIMB_H - H }, music: 'beach', amb: 'waves', t: 0, vine: null, grabCD: 0, done: false, maxH: 0,
+    cam: { x: 0, y: CLIMB_H - H }, capSafe: [4, 252], music: 'beach', amb: 'waves', t: 0, vine: null, grabCD: 0, done: false, maxH: 0,
     enter() {
       this.script = new Script((function* () {
         yield bigText('A COLHEITA DO COCO', 1.4, { size: 13, zoom: true, col: '#ffd54a' });
@@ -438,7 +438,7 @@ SCENES.c3_dream = () => {
     cam: { x: 0, y: 0 }, music: 'dream', amb: 'dream', t: 0, bore: 100, shellsDone: false, sheet: 0, sheetDone: false, waveHits: 0, waveDone: false,
     hero, botTarget() { const s = shells.find(s => !s.got); if (s) return s.x; if (!this.shellsDone) return 120; if (!this.sheetDone) return 330; return 545; },
     hints() { return this.waveGame ? [['a', 'Marcar no verde'], ['b', 'Sair']] : [['move', 'Andar'], ['jump', 'Pular caranguejos'], ['a', 'Interagir (segure na planilha)']]; },
-    waveGame: null, diveT: 5, tint: ['#b8a0ff', .22, 'multiply'], desat: .3, aligned: false, melt: false, climax: false, rocks: [[150, 0], [470, 0]],
+    capSafe: [124, W - 4], waveGame: null, diveT: 5, tint: ['#b8a0ff', .22, 'multiply'], desat: .3, aligned: false, melt: false, climax: false, rocks: [[150, 0], [470, 0]],
     enter() {
       this.script = new Script((function* () {
         hero.frozen = true;

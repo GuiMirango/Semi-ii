@@ -74,7 +74,11 @@ const Balloons = {
   },
   draw(c) {
     const cam = camOf(G.scene);
-    for (const b of this.l) drawBalloon(c, b, cam);
+    let capY = null;
+    for (const b of this.l) {
+      if (b.type === 'caption') { const yy = capY == null ? captionArea().top : capY; const h = drawCaption(c, b, b.text.slice(0, Math.floor(b.shown)), yy); capY = yy + h + 3; }
+      else drawBalloon(c, b, cam);
+    }
   }
 };
 function drawBalloon(c, b, cam) {
@@ -139,18 +143,31 @@ function drawBalloon(c, b, cam) {
   c.restore();
 }
 function roundRect(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
-function drawCaption(c, b, shown) {
-  const size = b.o.size || 11, font = size + 'px ' + FONT2;
-  const lines = wrapText(c, b.text, b.o.maxW || 250, font);
-  c.font = font; let tw = 0; for (const l of lines) tw = Math.max(tw, c.measureText(l).width);
+// Legendas de contexto (caixa amarela): SEMPRE no topo, dentro da faixa livre da cena
+// (entre o HUD da esquerda e o da direita, e longe do botão MENU no toque). Empilham se houver mais de uma.
+function captionArea() {
+  const sc = G.scene || {};
+  let [x0, x1] = sc.capSafe || [4, W - 4];
+  if (Input.dev === 'touch') x1 = Math.min(x1, W - 74);
+  return { x0, x1, top: sc.capTop != null ? sc.capTop : 3 };
+}
+function drawCaption(c, b, shown, yTop) {
+  const A = captionArea(), avail = A.x1 - A.x0;
+  let size = b.o.size || 10, font, lines, tw;
+  // encolhe a fonte se o texto ficar com linhas demais para o espaço livre
+  for (;;) {
+    font = size + 'px ' + FONT2; lines = wrapText(c, b.text, Math.min(b.o.maxW || 250, avail - 12), font);
+    if (lines.length <= 3 || size <= 8) break; size -= 1;
+  }
+  c.font = font; tw = 0; for (const l of lines) tw = Math.max(tw, c.measureText(l).width);
   const lh = size * .82, bw = Math.ceil(tw + 12), bh = Math.ceil(lines.length * lh + 7);
-  const capY = (G.scene && G.scene.capY) || 6;
-  const x = Math.round(b.o.x != null ? b.o.x : (W - bw) / 2), y = Math.round(b.o.y != null ? b.o.y : (b.o.bottom ? H - bh - 6 - ((G.scene && G.scene.hints) ? HINT_H + 2 : 0) : capY));
+  const x = Math.round(A.x0 + (avail - bw) / 2), y = Math.round(yTop != null ? yTop : A.top);
   pxBox(c, x + 1.5, y + 1.5, bw, bh, 'rgba(0,0,0,.45)', 'rgba(0,0,0,0)');
   pxBox(c, x, y, bw, bh, b.o.fill || '#f3e2a6', b.o.border || '#3a2a14');
   let left = shown.length;
   lines.forEach((l, i) => { const part = l.slice(0, Math.max(0, left)); left -= l.length + 1; T(c, part, x + 6, y + 3.5 + i * lh, { f: FONT2, size, col: b.o.col || '#3a2a14', sh: false }); });
   if (!b.o.auto && b.shown >= b.text.length && Math.floor(G.t * 3) % 2 === 0) T(c, '▼', x + bw - 7, y + bh - 6.5, { size: 4, col: '#8a2a1a', sh: false });
+  return bh;
 }
 // tarefas de diálogo
 function balloonTask(actor, text, o) { return { b: null, update() { if (!this.b) this.b = Balloons.add(actor, text, o); return this.b.done; } }; }
