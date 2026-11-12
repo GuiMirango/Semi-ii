@@ -25,6 +25,7 @@ const LOOKS = {
   passB: { skin: '#e8c4a0', skinD: '#c9a27e', hair: '#5a3a22', style: 'long', shirt: '#c45a8a', shirtD: '#9e436c', pants: '#2b2b33', pantsD: '#1f1f26', shoes: '#222', eye: '#111' },
   passC: { skin: '#b07a52', skinD: '#8e5d3a', hair: '#999', style: 'bald', shirt: '#4a7a5a', shirtD: '#365c43', pants: '#5a5040', pantsD: '#463e30', shoes: '#222', mustache: true, glasses: true, eye: '#111' },
   passD: { skin: '#6e432b', skinD: '#55321e', hair: '#111', style: 'afro', shirt: '#3b5fa0', shirtD: '#2c4780', pants: '#222', pantsD: '#181818', shoes: '#ddd', eye: '#111' },
+  terno: { skin: '#d9b08c', skinD: '#b88c66', hair: '#3a2a1a', style: 'short', shirt: '#f2f2f2', shirtD: '#cfcfcf', jacket: '#3a3f4a', jacketD: '#2a2e36', pants: '#3a3f4a', pantsD: '#2a2e36', shoes: '#0d0d0d', tie: '#d8323c', eye: '#111' },
   rival: { skin: '#d9a77c', skinD: '#b8865c', hair: '#3a2a1a', style: 'bun', shirt: '#7aa04a', shirtD: '#5e7f36', pants: '#3a3a44', pantsD: '#2a2a32', shoes: '#222', eye: '#111' }
 };
 

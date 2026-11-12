@@ -122,6 +122,7 @@ const SFX = {
   gull: () => tone(1500, 1100, .2, 'sawtooth', .025),
   creak: () => tone(180, 120, .7, 'sawtooth', .04),
   click: () => noise(.03, .15, 'highpass', 2000),
+  bump: () => { tone(72, 30, .45, 'sine', .7); noise(.14, .4, 'lowpass', 320); },
   thud: () => { tone(90, 50, .2, 'sine', .3); noise(.1, .15, 'lowpass', 500); },
   notif: () => tone(1567, 1567, .12, 'sine', .07),
   sparkle: () => { tone(1800, 2400, .15, 'sine', .05); tone(2400, 3000, .15, 'sine', .04, .08); },
