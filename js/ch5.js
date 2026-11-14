@@ -207,27 +207,19 @@ SCENES.c5_office = () => {
       this.standType = true;
       yield 1.2;
       // notificações sem parar: alinhamentos e novas funções
-      if (AU.ctx) AU.humG.gain.setTargetAtTime(.05, AU.ctx.currentTime, 1);
-      this.notifOn = true; this.beeping = true;
-      yield 4.5;
-      // as luzes começam a falhar
-      this.flick = .4; sfx('click');
-      yield 3;
-      this.flick = 1; this.zoomT = 2.6;
-      yield 2.5;
-      // o surto: em silêncio, só tremendo, enquanto as notificações não param de chegar
-      this.surto = true; this.zoomT = 3.4;
-      if (AU.ctx) AU.humG.gain.setTargetAtTime(.1, AU.ctx.currentTime, 2);
-      yield 6;
-      yield fadeTo(1, 5);
-      yield 1.5;
-      // as notificações continuam no escuro... até um corte seco
-      this.beeping = false; this.notifOn = false;
-      if (AU.ctx) AU.humG.gain.setTargetAtTime(0, AU.ctx.currentTime, .05);
-      this.pops = []; sfx('click');
-      yield 1.6;
-      G.fadeA = 0; this.blackout = true;
-      yield overlayTask(4, (c, o) => { R(c, 0, 0, W, H, '#000'); c.globalAlpha = Math.min(1, o.t / 1.2); T(c, 'FIM DO JOGO', W / 2, 82, { size: 14, align: 'center', col: '#f3efe6' }); c.globalAlpha = 1; });
+      if (AU.ctx) AU.humG.gain.setTargetAtTime(.06, AU.ctx.currentTime, .5);
+      this.notifOn = true; this.beeping = true; this.beepI = .7;
+      yield 2.4;
+      // as luzes falham, a câmera fecha nele: em silêncio, só tremendo
+      this.flick = .6; this.zoomT = 2.8; sfx('click');
+      yield 1.8;
+      this.flick = 1; this.surto = true; this.zoomT = 3.4;
+      yield 2.6;
+      // corte seco direto para os créditos
+      this.beeping = false; this.notifOn = false; this.pops = [];
+      G.fadeA = 1; Music.play(null); AU.amb(null);
+      if (AU.ctx) AU.humG.gain.setTargetAtTime(0, AU.ctx.currentTime, .02);
+      yield 1.2;
       G.go('credits', { cut: true, black: true });
     },
     update(dt) {
@@ -241,8 +233,8 @@ SCENES.c5_office = () => {
       // zoom progressivo no Mirango
       if (this.zoomT) {
         this.zoom = this.zoom || { k: 1, x: W / 2, y: H / 2 };
-        this.zoom.k = lerp(this.zoom.k, this.zoomT, Math.min(1, dt * .45));
-        this.zoom.x = hero.cx - this.cam.x; this.zoom.y = hero.y + 8;
+        this.zoom.k = lerp(this.zoom.k, this.zoomT, Math.min(1, dt * .9));
+        this.zoom.x = hero.cx - this.cam.x; this.zoom.y = hero.y + 3;
       }
       // enxurrada de notificações
       if (this.notifOn) {
@@ -253,7 +245,7 @@ SCENES.c5_office = () => {
           // nas laterais, deixando o Mirango (centro da tela) sempre visível
           const toast = n <= 4, left = n % 2 === 0;
           this.pops.push({ s: txt, t: 0, side: toast ? 1 : left ? -1 : 1, off: toast ? 4 : rnd(2, 14), y: toast ? 4 + (n - 1) * 15 : rnd(2, H - 18), red: /URGENTE|AGORA|∞/.test(txt) });
-          this.notifT = Math.max(.1, 1.1 * Math.pow(.88, n));
+          this.notifT = Math.max(.07, .55 * Math.pow(.84, n));
           if (this.pops.length > 28) this.pops.shift();
         }
         for (const p of this.pops) p.t += dt;
@@ -335,7 +327,7 @@ SCENES.c5_office = () => {
 SCENES.credits = () => {
   const lines = [
     ['O CICLO DE MIRANGO', 7, '#f3efe6'], ['', 6], ['Um jogo em cinco estágios e um ciclo.', 11, '#a9a3b8'], ['', 14],
-    ['IDEALIZAÇÃO', 7, '#ffd54a'], ['', 4], ['@guimirango', 14, '#f3efe6'], ['', 18],
+    ['IDEALIZAÇÃO', 7, '#ffd54a'], ['', 4], ['Guilherme Oliveira dos Santos', 12, '#f3efe6'], ['@guimirango', 11, '#a9a3b8'], ['', 18],
     ['NEGAÇÃO · RAIVA · BARGANHA', 11, '#d8323c'], ['DEPRESSÃO · ACEITAÇÃO', 11, '#d8323c'], ['', 18],
     ['ELENCO', 7, '#ffd54a'], ['', 4],
     ['Mirango ......... ele mesmo', 10, '#f3efe6'], ['Plínio ........... sorriso plastificado', 10, '#f3efe6'], ['Sueli ............ supervisão', 10, '#f3efe6'],
@@ -344,7 +336,6 @@ SCENES.credits = () => {
     ['FATEC SEBRAE', 12, '#f3efe6'], ['Curso de Marketing — 3º Semestre', 10, '#a9a3b8'], ['Sociedade e Cultura — 2026', 10, '#a9a3b8'], ['', 18],
     ['AGRADECIMENTOS ESPECIAIS', 7, '#ffd54a'], ['', 4], ['Ao professor Alexander Homenko Neto', 11, '#f3efe6'], ['', 18],
     ['DEDICATÓRIA', 7, '#ffd54a'], ['', 4], ['À mulher da minha vida,', 11, '#f3efe6'], ['a biomédica Isabele Ribeiro,', 11, '#f3efe6'], ['celebrando 8 anos desde que nos conhecemos.', 10, '#d8323c'], ['', 22],
-    ['Pixel art, trilha e efeitos 100% procedurais', 9, '#a9a3b8'], ['', 22],
     ['Gaude AI agradece a sua dedicação.', 11, '#7fd4ff'], ['', 30]
   ];
   let total = 0; for (const l of lines) total += l[1] + 4;

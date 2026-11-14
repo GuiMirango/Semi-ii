@@ -361,7 +361,7 @@ SCENES.c3_sunset = () => {
     enter() { this.script = new Script(this.run()); },
     // um tremor: uma batida seca que sacode tudo de uma vez
     tremor(k = 1) {
-      sfx('bump'); G.shake(5 + k * 4); this.jolt = 1;
+      sfx('quake'); if (Music.name !== 'tense') Music.play('tense'); G.shake(5 + k * 4); this.jolt = 1;
       for (let i = 0; i < 18 * k; i++) parts.add({ x: cx + rnd(0, W), y: BEACH_FLOOR + rnd(-2, 18), vx: rnd(-8, 8), vy: rnd(-50, -20), g: 160, life: .8, col: pick(['#e8d8a8', '#d8c490', '#fff4d0']) });
       for (let i = 0; i < 5; i++) parts.add({ x: cx + rnd(0, W), y: rnd(60, 100), vx: rnd(-5, 5), vy: rnd(5, 25), g: 30, life: 1.6, col: pick(['#2f8a3f', '#3eaa4f']), s: 2, drag: .4 });
     },

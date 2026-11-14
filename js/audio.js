@@ -122,6 +122,7 @@ const SFX = {
   gull: () => tone(1500, 1100, .2, 'sawtooth', .025),
   creak: () => tone(180, 120, .7, 'sawtooth', .04),
   click: () => noise(.03, .15, 'highpass', 2000),
+  quake: () => { tone(58, 26, 1.5, 'sawtooth', .22); tone(70, 30, .6, 'sine', .8); noise(1.8, .6, 'lowpass', 240, 50); noise(.18, .45, 'lowpass', 1100); noise(1.2, .12, 'bandpass', 300, 120, .1, 3); },
   bump: () => { tone(72, 30, .45, 'sine', .7); noise(.14, .4, 'lowpass', 320); },
   thud: () => { tone(90, 50, .2, 'sine', .3); noise(.1, .15, 'lowpass', 500); },
   notif: () => tone(1567, 1567, .12, 'sine', .07),
@@ -179,6 +180,11 @@ const TRACKS = {
   end: { bpm: 66, ch: [
     { i: 'box', v: .09, n: 'A5 . E5 . C5 . E5 . A5 . B5 . C6 . B5 . G5 . E5 . C5 . E5 . G5 . A5 . B5 . G5 . F5 . C5 . A4 . C5 . F5 . G5 . A5 . G5 . E5 . B4 . G#4 . B4 . E5 - - - . . . .' },
     { i: 'sine', v: .2, n: 'A2 - - - - - - - - - - - - - - - C3 - - - - - - - - - - - - - - - F2 - - - - - - - - - - - - - - - E2 - - - - - - - - - - - - - - -' }] },
+  tense: { bpm: 96, ch: [
+    { i: 'saw', v: .08, n: 'C2 . . C2 . . C#2 . C2 . . C2 . . B1 . C2 . . C2 . . C#2 . D2 . . C#2 . . C2 .' },
+    { i: 'pad', v: .1, n: 'C3 - - - - - - - F#3 - - - - - - - C3 - - - - - - - G3 - - - - - - -' },
+    { i: 'drum', v: .5, n: 'k . . . . . . . k . k . . . . . k . . . . . . . k . k . . . s .' },
+    { i: 'sq', v: .035, n: '. . . . C5 . C#5 . . . . . . . . . . . . . F#5 . G5 . . . . . . . . .' }] },
   street: { bpm: 88, ch: [
     { i: 'pluck', v: .1, n: 'C3 . . C3 . . G2 . Bb2 . . Bb2 . . F2 . Ab2 . . Ab2 . . Eb2 . G2 . . G2 . . D2 .' },
     { i: 'drum', v: .4, n: 'k . h . . . h . k . h . . . h . k . h . . . h . k . h . . . h h' }] }
