@@ -65,7 +65,7 @@ function threat(c, x, y, w, h) {
   R(c, x - 2, y - 2, w + 4, 1, '#ff2a4a'); R(c, x - 2, y + h + 1, w + 4, 1, '#ff2a4a'); R(c, x - 2, y - 2, 1, h + 4, '#ff2a4a'); R(c, x + w + 1, y - 2, 1, h + 4, '#ff2a4a');
 }
 function angryEyes(c, x, y) { R(c, x, y, 3, 2, '#ff3040'); R(c, x + 5, y, 3, 2, '#ff3040'); R(c, x, y - 1, 2, 1, '#0a0a10'); R(c, x + 6, y - 1, 2, 1, '#0a0a10'); }
-const WORDS = ['VOCE E UM FRACASSO', 'DESISTIU, E?', 'E AS CONTAS?', 'MEDIOCRE', 'QUEM VAI TE CONTRATAR?', 'FRACO', 'NINGUEM LIGA'];
+const WORDS = ['VOCE E UM FRACASSO', 'DESISTIU, E?', 'E AS CONTAS?', 'MEDIOCRE', 'QUEM VAI TE CONTRATAR?', 'NINGUEM LIGA'];
 SCENES.c4_street = () => {
   const B = buildNight();
   const hero = new Hero(56, NIGHT_FLOOR - 24, LOOKS.mirangoNight); hero.speed = 56; hero.slump = 1; hero.frozen = true;
@@ -145,17 +145,21 @@ SCENES.c4_street = () => {
           h.cx = fx; h.cy = fy;
           if (overlap(hero, { x: fx, y: fy, w: 19, h: 11 })) { this.hit(fx); h.used = true; parts.burst(fx + 5, fy + 5, 8, { col: ['#e8e8e0', '#d8d040'], min: 10, max: 40, g: 40 }); }
         } else if (h.t === 'shadow') {
-          // vulto parado: as falas negativas saem dele como projéteis em direção ao Mirango
-          if (h.st === 0 && hero.cx > h.x - 150) { h.st = 1; h.t0 = .5; h.n = 0; sfx('glitch'); }
+          // vulto parado: dispara UMA fala negativa (projétil lento) e se desfaz; se Mirango chegar perto, some também
+          if (h.st === 0 && hero.cx > h.x - 170) { h.st = 1; h.t0 = 0; sfx('glitch'); }
           if (h.st === 1) {
             h.t0 += dt;
-            if (h.t0 >= 1.15) {
-              h.t0 = 0; h.n++; sfx('swoosh');
-              const s = WORDS[(h.x + h.n * 3) % WORDS.length], high = (h.n + Math.round(h.x / 10)) % 2 === 0;
-              proj.push({ k: 'word', s, w: s.length * 4 + 6, x: h.x - 16, y: high ? 120 : 140, vx: -105 });
-              if (h.n >= 2) h.st = 2;
+            if (h.t0 >= .6) {
+              sfx('swoosh');
+              const s = WORDS[Math.round(h.x / 10) % WORDS.length], high = Math.round(h.x / 10) % 2 === 0;
+              proj.push({ k: 'word', s, w: s.length * 4 + 8, x: h.x - 18, y: high ? 118 : 139, vx: -58 });
+              h.st = 2; h.t0 = 0;
             }
           }
+          if (h.st >= 1 && h.st < 3 && Math.abs(hero.cx - h.x) < 26) { h.st = 3; h.t0 = 0; }
+          if (h.st === 2 && h.t0 > .2) { h.st = 3; h.t0 = 0; }
+          if (h.st === 2) h.t0 += dt;
+          if (h.st === 3) { h.t0 += dt; if (h.t0 > .7) h.used = true; }
         } else {
           if (!h.st && hero.cx > h.trig) { h.st = 1; h.t0 = 0; sfx(h.t === 'alarm' ? 'alarm' : 'email'); }
           if (h.st === 1) { h.t0 += dt; if (h.t0 > .8) { h.st = 2; proj.push({ k: h.t, x: this.cam.x + W + 10, y: h.high ? 122 : 142, vx: -150 }); h.used = true; } }
@@ -201,7 +205,7 @@ SCENES.c4_street = () => {
       for (const lx of LAMPS) R(c, lx + 12, 74, 8, 2, this.lit[lx] ? '#e8f0ff' : '#a8b8d8');
       // perigos
       for (const h of HZ) {
-        if (h.used && h.t !== 'shadow') continue;
+        if (h.used) continue;
         if (h.t === 'trash') {
           threat(c, h.x, NIGHT_FLOOR - 12, 14, 12);
           R(c, h.x, NIGHT_FLOOR - 12, 14, 12, OUT); R(c, h.x + 1, NIGHT_FLOOR - 11, 12, 11, '#2a2a34'); R(c, h.x - 2, NIGHT_FLOOR - 14 + (Math.floor(G.t * 3) % 2), 18, 2, '#1a1a22');
@@ -212,17 +216,18 @@ SCENES.c4_street = () => {
           threat(c, x, y, 19, 11);
           R(c, x - 1, y - 1, 21, 13, OUT); R(c, x, y, 19, 11, '#3a1a24'); R(c, x, y, 19, 3, '#ff2a4a'); pixText(c, 'VAGA', x + 10, y + 5, '#ffb0b8', 1, 'center');
         } else if (h.t === 'shadow') {
-          // vulto: silhueta escura e parada na calçada
-          const x = h.x;
-          c.globalAlpha = .92;
-          drawPersonBig(c, x, NIGHT_FLOOR, LOOKS.chefe, { face: -1, mono: '#07080d', outline: '#262a3a', slump: .6 }, 1.15);
+          // vulto: silhueta escura parada; depois de disparar, se desfaz
+          const fade = h.st === 3 ? Math.max(0, 1 - h.t0 / .7) : 1;
+          if (fade <= 0) continue;
+          c.globalAlpha = .92 * fade;
+          drawPersonBig(c, h.x + (h.st === 3 ? Math.round(rnd(-1, 1)) : 0), NIGHT_FLOOR, LOOKS.chefe, { face: -1, mono: '#07080d', outline: '#262a3a', slump: .6 }, 1.15);
           c.globalAlpha = 1;
         }
       }
       for (const p of proj) {
         const x = Math.round(p.x), y = Math.round(p.y);
         threat(c, x, y, p.w || 18, p.k === 'word' ? 9 : 12);
-        if (p.k === 'word') { R(c, x - 1, y - 1, p.w + 2, 11, '#ff5a6a'); R(c, x, y, p.w, 9, '#14060c'); pixText(c, p.s, x + 3, y + 2, '#ffd0d6'); continue; }
+        if (p.k === 'word') { R(c, x - 1, y - 1, p.w + 2, 11, OUT); R(c, x, y, p.w, 9, '#d8323c'); R(c, x, y, p.w, 1, '#ff6a6a'); pixText(c, p.s, x + 4, y + 2, '#ffffff'); continue; }
         if (p.k === 'email') iconMail(c, x, y, '#ffb0b8', 2);
         else { R(c, x - 1, y - 1, 18, 14, OUT); R(c, x + 2, y, 12, 12, '#d8a040'); R(c, x + 4, y + 2, 8, 8, '#f3efe6'); R(c, x + 7, y + 3, 1, 4, '#222'); R(c, x + 7, y + 6, 3, 1, '#222'); R(c, x, y - 1, 4, 3, '#d8a040'); R(c, x + 12, y - 1, 4, 3, '#d8a040'); }
       }
@@ -309,7 +314,7 @@ SCENES.c4_house = () => {
   const wall = { x: 404, y: HOUSE_CEIL, w: 8, h: 58 };
   const solids = [{ x: -20, y: HOUSE_FLOOR, w: HOUSE_W + 40, h: 30 }, { x: -10, y: 0, w: 14, h: H }, wall];
   const sc = {
-    cam: { x: 0, y: 0 }, music: 'house', amb: 'house', capSafe: [102, W - 4], hints: [['move', 'Andar'], ['a', 'Afastar a lembrança de perto']], hero, botTarget() { if (this.open) return 506; let b = null; for (const o of this.orbs) if (!b || Math.abs(o.x - hero.cx) < Math.abs(b.x - hero.cx)) b = o; return b ? b.x : hero.cx; }, t: 0, orbs: [], spawnT: 2.5, count: 0, press: 0, pressV: 0, open: false, doorA: 0, done: false, vig: .4,
+    cam: { x: 0, y: 0 }, music: 'house', amb: 'house', capSafe: [102, W - 4], hints() { return this.open ? [['move', 'Andar até a cama'], ['a', 'Desabar na cama']] : [['move', 'Andar'], ['a', 'Afastar a lembrança de perto']]; }, hero, botTarget() { if (this.open) return 506; let b = null; for (const o of this.orbs) if (!b || Math.abs(o.x - hero.cx) < Math.abs(b.x - hero.cx)) b = o; return b ? b.x : hero.cx; }, t: 0, orbs: [], spawnT: 2.5, count: 0, press: 0, pressV: 0, open: false, doorA: 0, done: false, vig: .4,
     enter() {
       this.script = new Script((function* () {
         sfx('door'); yield .4; sfx('click');
@@ -342,7 +347,7 @@ SCENES.c4_house = () => {
       if (this.script) { this.script.update(dt); if (this.script.done) this.script = null; }
       hero.update(dt, solids, { minX: 4, maxX: HOUSE_W - 6, parts, upJump: false, canJump: false, stride: 10 });
       // esferas de lembranças
-      if (!hero.frozen && !this.done) {
+      if (!hero.frozen && !this.done && !this.open) {
         this.spawnT -= dt;
         const maxOrbs = this.count < 4 ? 2 : 3;
         if (this.spawnT <= 0 && this.orbs.length < maxOrbs) {
@@ -376,8 +381,17 @@ SCENES.c4_house = () => {
       }
       this.orbs = this.orbs.filter(o => !o.dead);
       if (!this.open && this.count >= 8) {
+        // limpa a tela: todos os pensamentos e a pressão somem na hora
         this.open = true; wall.off = true; sfx('creak');
-        Balloons.add(null, 'A porta do quarto range e se abre.', { type: 'caption', auto: 2.6 });
+        for (const o of this.orbs) parts.burst(o.x, o.y, 6, { col: ['#a8c0ff', '#e8f0ff'], min: 10, max: 40, lmax: .5 });
+        this.orbs = []; this.press = 0; this.pressV = 0;
+        this.script = new Script((function* () {
+          hero.frozen = true; hero.vx = 0; hero.pose = { slump: 1, arms: 'face' };
+          yield .5;
+          yield say(mA, 'Tá, agora eu preciso deitar, eu não aguento mais pensar...');
+          hero.pose = {}; hero.frozen = false;
+          Balloons.add(null, 'O quarto está aberto. Vá para a cama.', { type: 'caption', auto: 3 });
+        })());
       }
       if (this.open) this.doorA = Math.min(1, this.doorA + dt);
       this.pressV = lerp(this.pressV, this.press, dt * 3);
@@ -467,7 +481,7 @@ SCENES.c4_house = () => {
       T(c, 'Pressão: ' + '■'.repeat(this.press) + '□'.repeat(Math.max(0, 4 - this.press)), 10, 17, { f: FONT2, size: 9, col: this.press >= 3 ? '#ff8a8a' : '#c8d0f0' });
       if (this.cur) promptAt(c, this.cur.x - this.cam.x, this.cur.y + 18, 'a', 'Afastar');
       if (this.bed) promptAt(c, 506 - this.cam.x, 96, 'a', 'Desabar na cama');
-      if (this.open && !this.done && !this.bed) objectiveUI(c, this, 'Vá para o quarto', 506, 120);
+      if (this.open && !this.done && !this.bed && !hero.frozen) objectiveUI(c, this, 'Vá para a cama', 506, 112);
     }
   };
   return sc;

@@ -176,7 +176,7 @@ SCENES.c3_target = () => {
   const M = { x: 70, y: BEACH_FLOOR, h: 28 };          // Mirango (parado, arremessando)
   const hand = () => ({ x: M.x + 5, y: BEACH_FLOOR - 21 });
   const cocos = [[-6, 3], [-1, 5], [4, 3], [-3, 9], [3, 9]].map(([dx, dy]) => ({ x: crown.x + dx, y: crown.y + dy, ox: dx, oy: dy, st: 'on', vx: 0, vy: 0, r: 0 }));
-  const birds = Array.from({ length: 5 }, (_, i) => ({ x: i * 70 - 20, y: 22 + (i % 3) * 18 + (i > 2 ? 9 : 0), v: rnd(16, 26), d: i % 2 ? -1 : 1, ph: rnd(6), dead: 0, vy: 0, rot: 0 }));
+  const birds = Array.from({ length: 4 }, (_, i) => ({ x: i * 90 - 20, y: 18 + i * 14, v: rnd(16, 26), d: i % 2 ? -1 : 1, ph: rnd(6), dead: 0, vy: 0, rot: 0 }));
   const parts = new Parts();
   const LEAD = ['Putz, perdi mais um lead.', 'Putz, lead descartado.', 'Putz, esse não ia converter mesmo.', 'Putz, taxa de rejeição: uma gaivota.'];
   const sc = {
@@ -275,8 +275,8 @@ SCENES.c3_target = () => {
             if (Math.hypot(b.x - s.x, b.y - s.y) < 8) {
               b.dead = 1; b.vy = -20; this.leads++; sfx('gull'); sfx('pop'); G.shake(2);
               for (let j = 0; j < 10; j++) parts.add({ x: b.x, y: b.y, vx: rnd(-30, 30), vy: rnd(-30, 10), g: 30, life: 1.6, col: '#f3efe6', s: 1, drag: .5 });
-              // a pedra perde força e cai: nada de coco nesse arremesso
-              s.hit = true; s.vx *= .25; s.vy = 20;
+              // só no primeiro acerto a pedra perde força e cai; depois a pedra segue e não bloqueia o arremesso
+              if (this.leads === 1) { s.hit = true; s.vx *= .25; s.vy = 20; }
               this.pose = { arms: 'face', eyes: 'wide' }; this.poseT = 1.6;
               sayAuto(M, this.leads === 1 ? 'Putz, perdi um lead.' : pick(LEAD), 2.6, { type: 'shout', size: 14 });
             }
