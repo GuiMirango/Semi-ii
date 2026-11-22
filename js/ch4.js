@@ -65,7 +65,8 @@ function threat(c, x, y, w, h) {
   R(c, x - 2, y - 2, w + 4, 1, '#ff2a4a'); R(c, x - 2, y + h + 1, w + 4, 1, '#ff2a4a'); R(c, x - 2, y - 2, 1, h + 4, '#ff2a4a'); R(c, x + w + 1, y - 2, 1, h + 4, '#ff2a4a');
 }
 function angryEyes(c, x, y) { R(c, x, y, 3, 2, '#ff3040'); R(c, x + 5, y, 3, 2, '#ff3040'); R(c, x, y - 1, 2, 1, '#0a0a10'); R(c, x + 6, y - 1, 2, 1, '#0a0a10'); }
-const WORDS = ['VOCE E UM FRACASSO', 'DESISTIU, E?', 'E AS CONTAS?', 'MEDIOCRE', 'QUEM VAI TE CONTRATAR?', 'NINGUEM LIGA'];
+// uma fala diferente para cada sombra, na ordem em que aparecem (nenhuma se repete)
+const WORDS = ['QUEM VAI TE CONTRATAR?', 'VOCE E UM FRACASSADO', 'DESISTIU FACIL, NE?', 'E AS CONTAS, HEIN?', 'NINGUEM PRECISA DE VOCE'];
 SCENES.c4_street = () => {
   const B = buildNight();
   const hero = new Hero(56, NIGHT_FLOOR - 24, LOOKS.mirangoNight); hero.speed = 56; hero.slump = 1; hero.frozen = true;
@@ -79,6 +80,7 @@ SCENES.c4_street = () => {
     { t: 'shadow', x: 1460 }, { t: 'trash', x: 1550 }, { t: 'email', trig: 1600, high: false }, { t: 'email', trig: 1640, high: true }, { t: 'shadow', x: 1720 },
     { t: 'alarm', trig: 1790, high: true }, { t: 'flyer', x: 1860 }
   ];
+  HZ0.filter(h => h.t === 'shadow').forEach((h, i) => { h.wi = i; });
   let HZ = [];
   const resetHZ = (fromX) => { HZ = HZ0.map(h => Object.assign({}, h, { st: 0, t0: 0, fx: 0, used: (h.trig || h.x) < fromX - 10 })); };
   resetHZ(0);
@@ -151,7 +153,7 @@ SCENES.c4_street = () => {
             h.t0 += dt;
             if (h.t0 >= .6) {
               sfx('swoosh');
-              const s = WORDS[Math.round(h.x / 10) % WORDS.length], high = Math.round(h.x / 10) % 2 === 0;
+              const s = WORDS[h.wi % WORDS.length], high = h.wi % 2 === 0;
               proj.push({ k: 'word', s, w: s.length * 4 + 8, x: h.x - 18, y: high ? 118 : 139, vx: -58 });
               h.st = 2; h.t0 = 0;
             }
@@ -244,6 +246,7 @@ SCENES.c4_street = () => {
       if (this.showHero && !hero.frozen) { const k = clamp(hero.cx / 1960, 0, 1); R(c, 8, 26, 70, 2, 'rgba(255,255,255,.15)'); R(c, 8 + 70 * k - 1, 24, 3, 6, '#d8323c'); T(c, 'casa', 81, 22, { f: FONT2, size: 8, col: '#8a90b0' }); }
     }
   };
+  sc.proj = proj;
   return sc;
 };
 
