@@ -65,6 +65,7 @@ function threat(c, x, y, w, h) {
   R(c, x - 2, y - 2, w + 4, 1, '#ff2a4a'); R(c, x - 2, y + h + 1, w + 4, 1, '#ff2a4a'); R(c, x - 2, y - 2, 1, h + 4, '#ff2a4a'); R(c, x + w + 1, y - 2, 1, h + 4, '#ff2a4a');
 }
 function angryEyes(c, x, y) { R(c, x, y, 3, 2, '#ff3040'); R(c, x + 5, y, 3, 2, '#ff3040'); R(c, x, y - 1, 2, 1, '#0a0a10'); R(c, x + 6, y - 1, 2, 1, '#0a0a10'); }
+const WORDS = ['VOCE E UM FRACASSO', 'DESISTIU, E?', 'E AS CONTAS?', 'MEDIOCRE', 'QUEM VAI TE CONTRATAR?', 'FRACO', 'NINGUEM LIGA'];
 SCENES.c4_street = () => {
   const B = buildNight();
   const hero = new Hero(56, NIGHT_FLOOR - 24, LOOKS.mirangoNight); hero.speed = 56; hero.slump = 1; hero.frozen = true;
@@ -144,17 +145,17 @@ SCENES.c4_street = () => {
           h.cx = fx; h.cy = fy;
           if (overlap(hero, { x: fx, y: fy, w: 19, h: 11 })) { this.hit(fx); h.used = true; parts.burst(fx + 5, fy + 5, 8, { col: ['#e8e8e0', '#d8d040'], min: 10, max: 40, g: 40 }); }
         } else if (h.t === 'shadow') {
-          if (h.st === 0 && hero.cx > h.x - 92) { h.st = 1; h.t0 = 0; sfx('glitch'); }
-          if (h.st > 0) h.t0 += dt;
-          if (h.st === 1 && h.t0 > .55) { h.st = 2; h.t0 = 0; sfx('swoosh'); sayAuto({ x: h.x, y: NIGHT_FLOOR - 30, h: 30 }, pick(['VOCÊ É UM FRACASSO.', 'DESISTIU, É?', 'E AS CONTAS?', 'MEDÍOCRE.', 'QUEM VAI TE CONTRATAR?']), 1.4, { type: 'shout', fill: '#b0b8d0' }); }
-          if (h.st === 2) {
-            const ext = Math.min(1, h.t0 / .3) * (h.t0 > .9 ? Math.max(0, 1 - (h.t0 - .9) / .3) : 1);
-            h.ext = ext;
-            const fx = h.x - 12 - 70 * ext;
-            if (ext > .2 && overlap(hero, { x: fx, y: 126, w: 70 * ext, h: 8 })) this.hit(h.x);
-            if (h.t0 > 1.3) { h.st = 3; h.t0 = 0; }
+          // vulto parado: as falas negativas saem dele como projéteis em direção ao Mirango
+          if (h.st === 0 && hero.cx > h.x - 150) { h.st = 1; h.t0 = .5; h.n = 0; sfx('glitch'); }
+          if (h.st === 1) {
+            h.t0 += dt;
+            if (h.t0 >= 1.15) {
+              h.t0 = 0; h.n++; sfx('swoosh');
+              const s = WORDS[(h.x + h.n * 3) % WORDS.length], high = (h.n + Math.round(h.x / 10)) % 2 === 0;
+              proj.push({ k: 'word', s, w: s.length * 4 + 6, x: h.x - 16, y: high ? 120 : 140, vx: -105 });
+              if (h.n >= 2) h.st = 2;
+            }
           }
-          if (h.st === 3 && h.t0 > .6) h.used = true;
         } else {
           if (!h.st && hero.cx > h.trig) { h.st = 1; h.t0 = 0; sfx(h.t === 'alarm' ? 'alarm' : 'email'); }
           if (h.st === 1) { h.t0 += dt; if (h.t0 > .8) { h.st = 2; proj.push({ k: h.t, x: this.cam.x + W + 10, y: h.high ? 122 : 142, vx: -150 }); h.used = true; } }
@@ -162,9 +163,9 @@ SCENES.c4_street = () => {
       }
       for (const p of proj) {
         p.x += p.vx * dt;
-        if (overlap(hero, { x: p.x, y: p.y, w: 18, h: 12 })) { p.dead = true; this.hit(p.x); }
-        if (p.x < this.cam.x - 40) p.dead = true;
-        if (Math.random() < .4) parts.add({ x: p.x + 18, y: p.y + rnd(2, 10), vx: 20, vy: 0, life: .3, col: p.k === 'alarm' ? '#d8a040' : '#8a9ac8' });
+        if (overlap(hero, { x: p.x, y: p.y, w: p.w || 18, h: p.k === 'word' ? 10 : 12 })) { p.dead = true; this.hit(p.x); }
+        if (p.x + (p.w || 18) < this.cam.x - 40) p.dead = true;
+        if (Math.random() < .4) parts.add({ x: p.x + (p.w || 18), y: p.y + rnd(2, 8), vx: 20, vy: 0, life: .3, col: p.k === 'alarm' ? '#d8a040' : p.k === 'word' ? '#c84a5a' : '#8a9ac8' });
       }
       for (let i = proj.length - 1; i >= 0; i--) if (proj[i].dead) proj.splice(i, 1);
       this.flashD = Math.max(0, this.flashD - dt);
@@ -211,25 +212,17 @@ SCENES.c4_street = () => {
           threat(c, x, y, 19, 11);
           R(c, x - 1, y - 1, 21, 13, OUT); R(c, x, y, 19, 11, '#3a1a24'); R(c, x, y, 19, 3, '#ff2a4a'); pixText(c, 'VAGA', x + 10, y + 5, '#ffb0b8', 1, 'center');
         } else if (h.t === 'shadow') {
-          if (h.used) continue;
+          // vulto: silhueta escura e parada na calçada
           const x = h.x;
-          // vulto: silhueta escura (sem destaque vermelho) que cresce e aponta o dedo
-          const grow = h.st === 0 ? 0 : h.st === 1 ? Math.min(1, h.t0 / .55) : 1, fade = h.st === 3 ? Math.max(0, 1 - h.t0 / .6) : 1;
-          const sc2 = 1 + .45 * grow, pointing = h.st >= 2;
-          c.globalAlpha = fade * .92;
-          drawPersonBig(c, x, NIGHT_FLOOR, LOOKS.chefe, { face: -1, mono: '#07080d', outline: '#262a3a', arms: pointing ? 'point' : undefined, slump: h.st === 0 ? .6 : 0 }, sc2);
-          if (h.st === 2 && h.ext) {
-            const L2 = Math.round(70 * h.ext), ay = 128;
-            R(c, x - 10 - L2, ay - 1, L2 + 2, 5, '#262a3a'); R(c, x - 10 - L2, ay, L2 + 2, 3, '#07080d');
-            R(c, x - 15 - L2, ay - 1, 6, 5, '#262a3a'); R(c, x - 14 - L2, ay, 4, 3, '#07080d');
-            R(c, x - 21 - L2, ay, 7, 2, '#262a3a'); R(c, x - 20 - L2, ay, 6, 1, '#07080d');
-          }
+          c.globalAlpha = .92;
+          drawPersonBig(c, x, NIGHT_FLOOR, LOOKS.chefe, { face: -1, mono: '#07080d', outline: '#262a3a', slump: .6 }, 1.15);
           c.globalAlpha = 1;
         }
       }
       for (const p of proj) {
         const x = Math.round(p.x), y = Math.round(p.y);
-        threat(c, x, y, 18, 12);
+        threat(c, x, y, p.w || 18, p.k === 'word' ? 9 : 12);
+        if (p.k === 'word') { R(c, x - 1, y - 1, p.w + 2, 11, '#ff5a6a'); R(c, x, y, p.w, 9, '#14060c'); pixText(c, p.s, x + 3, y + 2, '#ffd0d6'); continue; }
         if (p.k === 'email') iconMail(c, x, y, '#ffb0b8', 2);
         else { R(c, x - 1, y - 1, 18, 14, OUT); R(c, x + 2, y, 12, 12, '#d8a040'); R(c, x + 4, y + 2, 8, 8, '#f3efe6'); R(c, x + 7, y + 3, 1, 4, '#222'); R(c, x + 7, y + 6, 3, 1, '#222'); R(c, x, y - 1, 4, 3, '#d8a040'); R(c, x + 12, y - 1, 4, 3, '#d8a040'); }
       }

@@ -229,10 +229,20 @@ function makeOffice() {
     },
     startPhase3() {
       // depois da 1ª reunião: o volume de tarefas explode
-      this.phase = 3; this.eint = 7; this.etimer = 2; this.emails += 5; this.p3t = 0; this.p3jobs = 0;
-      hero.x = 578; hero.y = FLOOR - 24; hero.frozen = false;
+      hero.x = 578; hero.y = FLOOR - 24; hero.frozen = true; hero.face = 1;
       Music.play('office'); Music.tempo = 1.15;
-      sueli.pose = {}; sayAuto(sueli, 'MIRANGO! Aqui, AGORA!', 2.2, { name: 'SUELI' }); sfx('alarm');
+      this.script = new Script((function* () {
+        // o peso de carregar tudo sozinho... e o recuo imediato
+        hero.pose = { slump: 1, arms: 'face' };
+        yield 0.6;
+        yield say(mA, 'Vou largar tudo aqui, essa empresa acaba, essa empresa depende de mim. Tá tudo nas minhas costas, eu não aguento mais.');
+        hero.pose = { arms: 'fist' };
+        yield say(mA, 'Não, eu aguento, eu aguento sim.');
+        hero.pose = {};
+        sc.phase = 3; sc.eint = 7; sc.etimer = 2; sc.emails += 5; sc.p3t = 0; sc.p3jobs = 0;
+        hero.frozen = false;
+        sueli.pose = {}; sayAuto(sueli, 'MIRANGO! Aqui, AGORA!', 2.2, { name: 'SUELI' }); sfx('alarm');
+      })());
     },
     *sueliTalk() {
       hero.frozen = true;

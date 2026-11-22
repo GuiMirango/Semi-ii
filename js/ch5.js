@@ -27,6 +27,7 @@ SCENES.c5_wake = () => {
       hero.pose = { arms: 'fist' };
       yield think(mA, 'Eu vou voltar. Vou pedir meu emprego de volta.');
       hero.pose = {};
+      yield think(mA, 'Primeiro, trocar de roupa. O guarda-roupa.');
       hero.frozen = false; this.stage = 3;
     },
     update(dt) {
@@ -38,9 +39,10 @@ SCENES.c5_wake = () => {
       this.cur = null;
       if (this.stage === 3 && !hero.frozen) {
         if (Math.abs(hero.cx - 21) < 18 && !this.dressed) this.cur = { x: 42, l: 'Vestir a roupa cinzenta', k: 'dress' };
-        else if (Math.abs(hero.cx - 146) < 10 && this.dressed) this.cur = { x: 292, l: 'Sair para o trabalho', k: 'out' };
+        else if (Math.abs(hero.cx - 146) < 10) this.cur = this.dressed ? { x: 292, l: 'Sair para o trabalho', k: 'out' } : { x: 292, l: 'Sair', k: 'nodress' };
         if (this.cur && Input.pressed('a')) {
-          if (this.cur.k === 'dress') { this.dressed = true; hero.look = LOOKS.mirangoGray; sfx('swoosh'); G.flash('#888', .5); sayAuto(mA, 'Cinza. Combina com tudo.', 1.6, { type: 'thought' }); }
+          if (this.cur.k === 'nodress') sayAuto(mA, 'De pijama não dá. Primeiro, o guarda-roupa.', 2, { type: 'thought' });
+          else if (this.cur.k === 'dress') { this.dressed = true; hero.look = LOOKS.mirangoGray; sfx('swoosh'); G.flash('#888', .5); sayAuto(mA, 'Cinza. Combina com tudo.', 1.6, { type: 'thought' }); }
           else { sfx('door'); hero.frozen = true; G.go('c5_street', { dur: .8 }); }
         }
       }
@@ -53,6 +55,14 @@ SCENES.c5_wake = () => {
           R(x, 92, 55, 10, 6, '#e8ecf0'); R(x, 92, 55, 10, 1, '#fff');
         } else hero.draw(x);
         blindsLight(x, .04, '#ffffff');
+        // sinalização do objetivo: guarda-roupa antes de sair; depois, a porta
+        if (this.stage === 3 && !hero.frozen) {
+          const tgt = this.dressed ? [136, 39, 20, 37] : [11, 36, 21, 40], k = Math.floor(this.t * 4) % 2;
+          x.strokeStyle = k ? '#ffd54a' : '#ff9a2a'; x.lineWidth = 1; x.strokeRect(tgt[0] + .5, tgt[1] + .5, tgt[2], tgt[3]);
+          const ax = tgt[0] + tgt[2] / 2, ay = tgt[1] - 4 + Math.round(Math.sin(this.t * 6) * 1.5);
+          x.fillStyle = OUT; x.beginPath(); x.moveTo(ax, ay + 1); x.lineTo(ax - 5, ay - 6); x.lineTo(ax + 5, ay - 6); x.fill();
+          x.fillStyle = '#ffd54a'; x.beginPath(); x.moveTo(ax, ay); x.lineTo(ax - 3.5, ay - 5); x.lineTo(ax + 3.5, ay - 5); x.fill();
+        }
         if (this.ringing && Math.floor(this.t * 8) % 2) { pixText(x, '!', 110, 52, '#ff3030'); pixText(x, '!', 120, 51, '#ff3030'); }
       });
     },
@@ -145,7 +155,7 @@ SCENES.c5_office = () => {
   const parts = new Parts();
   const sc = {
     hints() { return this.stage === 1 ? [['move', 'Andar'], ['jump', 'Pular'], ['a', 'Interagir']] : null; },
-    pops: [], hero, botTarget: () => 604, cam: { x: 0, y: 0 }, music: null, amb: 'office', holdBlack: true, elevOpen: 0, t: 0, desat: .2, vig: .2, eyes: null, term: 0, termLines: [], beepT: 0, beepI: 1.2,
+    pops: [], seen: {}, hero, botTarget: () => 604, cam: { x: 0, y: 0 }, music: null, amb: 'office', holdBlack: true, elevOpen: 0, t: 0, desat: .2, vig: .2, eyes: null, term: 0, termLines: [], beepT: 0, beepI: 1.2,
     elevInside(c) { if (sc.inElev) hero.draw(c); },
     enter() { this.script = new Script(this.intro()); },
     *intro() {
@@ -171,10 +181,9 @@ SCENES.c5_office = () => {
       chefe.pose = { arms: 'out' };
       yield say(chefe, 'Hm. Olha só quem voltou.', { name: 'SR. CASTRO' });
       yield say(chefe, 'Muita coisa mudou desde ontem. Impressora, contratos, e-mails... a Gaude AI faz tudo agora.', { name: 'SR. CASTRO' });
-      yield think(mA, 'Então eu sou... obsoleto?');
+      yield say(mA, 'Putz, agora eu fui substituído? Eu perdi meu cargo? O que que aconteceu?');
       chefe.pose = { arms: 'out', mouth: 'smile' }; sfx('thud');
-      yield say(chefe, 'Mas a gente pensou muito no seu caso... *tapinha nas costas*', { name: 'SR. CASTRO' });
-      yield say(chefe, '...e decidimos te dar uma PROMOÇÃO.', { name: 'SR. CASTRO' });
+      yield say(chefe, 'É, você foi substituído, mas a gente pensou no seu caso e pelo seu esforço a gente acredita que você merece uma PROMOÇÃO.', { name: 'SR. CASTRO' });
       this.eyes = 'shine'; hero.slump = .2; sfx('sparkle');
       yield 1.6;
       chefe.pose = { arms: 'point' };
@@ -259,11 +268,18 @@ SCENES.c5_office = () => {
       if (this.beeping) { this.beepT -= dt; if (this.beepT <= 0) { sfx('notif'); this.beepI = Math.max(.08, this.beepI * .86); this.beepT = this.beepI; } }
       this.cur = null;
       if (this.stage === 1 && !hero.frozen) {
-        if (Math.abs(hero.cx - 150) < 18) this.cur = { x: 150, l: 'Olhar a mesa do Plínio', k: 'plinio' };
-        if (Math.abs(hero.cx - 984) < 26) this.cur = { x: 984, l: 'Olhar', k: 'printer' };
+        // cada curiosidade mostra o balão uma vez só; depois some e a cena segue
+        if (Math.abs(hero.cx - 150) < 18 && !this.seen.plinio) this.cur = { x: 150, l: 'Olhar a mesa do Plínio', k: 'plinio' };
+        if (Math.abs(hero.cx - 984) < 26 && !this.seen.printer) this.cur = { x: 984, l: 'Olhar', k: 'printer' };
         if (this.cur && Input.pressed('a')) {
-          if (this.cur.k === 'plinio') sayAuto({ x: 150, y: 128, h: 10 }, 'PLÍNIO.AI v2 — "Sorriso 100% otimizado :)"', 2.4, { name: 'SERVIDOR' });
-          else sayAuto(mA, 'A impressora... foi pra onde?', 2, { type: 'thought' });
+          this.seen[this.cur.k] = true;
+          const k = this.cur.k;
+          this.script = new Script((function* () {
+            hero.frozen = true; hero.vx = 0;
+            if (k === 'plinio') yield say({ x: 150, y: 128, h: 10 }, 'PLÍNIO.AI v2 — "Sorriso 100% otimizado :)"', { name: 'SERVIDOR' });
+            else yield think(mA, 'A impressora... foi pra onde?');
+            hero.frozen = false;
+          })());
         }
         if (Math.abs(hero.cx - chefe.x) < 26) { this.stage = 2; this.script = new Script(this.promo()); }
       }

@@ -115,19 +115,16 @@ SCENES.c3_beach = () => {
       hero.frozen = true; hero.face = 1;
       yield say(nat, 'Ôpa. Bem-vindo, viajante.', { name: 'NATIVO' });
       hero.pose = { arms: 'out' }; sc.items = 1; sfx('coin');
-      yield say(mA, 'Eu preciso de suprimentos. Pode passar no crédito ou em espécie, quanto custa?');
+      yield say(mA, 'Pô, eu gostaria de uma água de coco. Você consegue passar no vale refeição? Se não passar, pode ser no crédito.');
       sfx('crowd');
-      yield say(nat, 'Hahaha... Comprar? O que é dinheiro? Aqui não trocamos valor por papel colorido.', { name: 'NATIVO' });
-      yield say(nat, 'Se quer comer ou beber, o mundo está aberto. Vá lá e pega.', { name: 'NATIVO' });
+      yield say(nat, 'Putz, o que que é vale refeição? Comprar? Como assim? Se você quer água de coco, vai lá no coqueiro e pega, cara. Fica à vontade aí. Tem as pedras aí, pode pegar e tacar.', { name: 'NATIVO' });
       // o vento leva o dinheiro
       sc.items = 0; sfx('swoosh');
       for (let i = 0; i < 16; i++) parts.add({ x: hero.cx + 8, y: hero.fy - 16, vx: rnd(10, 70), vy: rnd(-60, -10), g: 20, life: 3, col: pick(['#4a9a5a', '#7aca8a', '#3a7a4a']), s: 3, drag: .3 });
       hero.pose = { arms: 'shrug', eyes: 'wide' };
-      yield 1.2;
+      yield 1;
       hero.pose = {};
-      yield think(mA, 'Esforço orgânico direto... tá bom. Tá bom.');
-      yield say(nat, 'O coco mais fresco fica lá no alto daquela palmeira gigante. Pedra e concha tem de sobra na areia.', { name: 'NATIVO' });
-      yield think(mA, 'Com as próprias mãos, então.');
+      yield say(mA, 'Putz, eu não consigo comprar? Eu mesmo tenho que pegar? Ah, tá bom, né? Vou economizar pelo menos.');
       hero.frozen = false; sc.stage = 2;
     },
     update(dt) {
@@ -179,9 +176,9 @@ SCENES.c3_target = () => {
   const M = { x: 70, y: BEACH_FLOOR, h: 28 };          // Mirango (parado, arremessando)
   const hand = () => ({ x: M.x + 5, y: BEACH_FLOOR - 21 });
   const cocos = [[-6, 3], [-1, 5], [4, 3], [-3, 9], [3, 9]].map(([dx, dy]) => ({ x: crown.x + dx, y: crown.y + dy, ox: dx, oy: dy, st: 'on', vx: 0, vy: 0, r: 0 }));
-  const birds = Array.from({ length: 3 }, (_, i) => ({ x: i * 120 - 40, y: 20 + i * 18, v: rnd(16, 26), d: 1, ph: rnd(6), dead: 0, vy: 0, rot: 0 }));
+  const birds = Array.from({ length: 5 }, (_, i) => ({ x: i * 70 - 20, y: 22 + (i % 3) * 18 + (i > 2 ? 9 : 0), v: rnd(16, 26), d: i % 2 ? -1 : 1, ph: rnd(6), dead: 0, vy: 0, rot: 0 }));
   const parts = new Parts();
-  const LEAD = ['Menos um lead.', 'Lead descartado.', 'Esse não ia converter mesmo.', 'Taxa de rejeição: uma gaivota.', 'Menos um lead no funil.'];
+  const LEAD = ['Putz, perdi mais um lead.', 'Putz, lead descartado.', 'Putz, esse não ia converter mesmo.', 'Putz, taxa de rejeição: uma gaivota.'];
   const sc = {
     music: 'beach', amb: 'waves', t: 0, phase: 'intro', kind: 'pedra', hits: 0, misses: 0, leads: 0, pose: {}, poseT: 0,
     cross: { x: 0, y: 0 }, lock: null, p: 0, pDir: 1, pStar: .6, band: .085, stone: null, trail: [], lastTrail: [], capSafe: [80, W - 4],
@@ -208,6 +205,12 @@ SCENES.c3_target = () => {
       const v = v0 * (1 + err * .32);
       this.stone = { x: o.x, y: o.y, vx: v * Math.cos(ANG), vy: -v * Math.sin(ANG), kind: this.kind, rot: 0 };
       this.trail = []; this.phase = 'fly'; this.pose = { arms: 'out' }; this.poseT = .35; sfx('swoosh');
+      // intenção de design: o primeiro arremesso acerta um pássaro sem querer (antes de qualquer coco)
+      if (this.leads === 0 && this.hits === 0) {
+        const st = this.stone, tt = .42, px = st.x + st.vx * tt, py = st.y + st.vy * tt + .5 * GRAV * tt * tt;
+        const b = birds.find(k => !k.dead) || birds[0];
+        b.dead = 0; b.d = 1; b.v = 30; b.x = px - b.v * tt; b.y = py;
+      }
     },
     land(miss) {
       const s = this.stone; this.stone = null; this.lastTrail = this.trail;
@@ -258,6 +261,7 @@ SCENES.c3_target = () => {
           const h = dt / 4; s.vy += GRAV * h; s.x += s.vx * h; s.y += s.vy * h; s.rot += h * 12;
           if (i === 0) this.trail.push({ x: s.x, y: s.y });
           for (const c of cocos) {
+            if (s.hit) break;
             if (c.st !== 'on') continue; const cp = this.cocoPos(c);
             if (Math.hypot(cp.x + 1.5 - s.x, cp.y + 1.5 - s.y) < 7) {
               c.st = 'fall'; c.x = cp.x; c.y = cp.y; c.vx = rnd(-25, 5); c.vy = -20; this.hits++;
@@ -268,10 +272,13 @@ SCENES.c3_target = () => {
           }
           for (const b of birds) {
             if (b.dead || s.hit) continue;
-            if (Math.hypot(b.x - s.x, b.y - s.y) < 6) {
-              b.dead = 1; b.vy = -20; this.leads++; sfx('gull'); sfx('pop');
-              for (let j = 0; j < 8; j++) parts.add({ x: b.x, y: b.y, vx: rnd(-30, 30), vy: rnd(-30, 10), g: 30, life: 1.6, col: '#f3efe6', s: 1, drag: .5 });
-              this.say(this.leads === 1 ? 'Menos um lead.' : pick(LEAD), 1.8);
+            if (Math.hypot(b.x - s.x, b.y - s.y) < 8) {
+              b.dead = 1; b.vy = -20; this.leads++; sfx('gull'); sfx('pop'); G.shake(2);
+              for (let j = 0; j < 10; j++) parts.add({ x: b.x, y: b.y, vx: rnd(-30, 30), vy: rnd(-30, 10), g: 30, life: 1.6, col: '#f3efe6', s: 1, drag: .5 });
+              // a pedra perde força e cai: nada de coco nesse arremesso
+              s.hit = true; s.vx *= .25; s.vy = 20;
+              this.pose = { arms: 'face', eyes: 'wide' }; this.poseT = 1.6;
+              sayAuto(M, this.leads === 1 ? 'Putz, perdi um lead.' : pick(LEAD), 2.6, { type: 'shout', size: 14 });
             }
           }
           if (s.y >= BEACH_FLOOR - 1) { sfx('thud'); parts.burst(s.x, BEACH_FLOOR - 1, 5, { col: ['#e8d8a8', '#d8c490'], min: 10, max: 40, lmax: .4 }); this.land(!s.hit); break; }
@@ -493,8 +500,8 @@ SCENES.c3_wake = () => {
       });
       R(c, 250, 26, 66, 16, '#111'); pixText(c, '310 LAPA', 283, 29, '#ffb030', 1, 'center'); pixText(c, 'PROX: PERIFERIA', 283, 35, '#ff7a30', 1, 'center');
       const sx0 = 168;
-      c.save(); c.translate(sx0 - 6, 178); c.scale(2, 2); drawBusSeat(c, 0, 0, '#1e4680'); c.restore();
-      c.save(); c.translate(sx0 + 46, 178); c.scale(2, 2); drawBusSeat(c, 0, 0, '#1e4680'); c.restore();
+      c.save(); c.translate(sx0 - 6, 178); c.scale(2, 2); drawBusSeat(c, 0, 0, '#b8861e', 0, true); c.restore();
+      c.save(); c.translate(sx0 + 46, 178); c.scale(2, 2); drawBusSeat(c, 0, 0, '#b8861e', 0, true); c.restore();
       const vib = Math.floor(this.t * 12) % 2 - Math.round(this.jolt * 3);
       drawPersonBig(c, sx0 + 46, 174 + vib, LOOKS.mirango, { face: -1, sit: true, slump: this.startle ? 0 : .7, eyes: this.eyes, mouth: this.startle ? 'open' : null, rot2: this.startle ? 0 : -.14, tremble: this.startle && Math.random() < .5 }, 2);
       // passageiro de terno em pé no corredor, segurando a alça
