@@ -317,34 +317,49 @@ function streetFront(c) {
   R(c, 300, 140, 10, 18, '#2e7d32'); R(c, 299, 139, 12, 2, '#1f5a22');
 }
 function drawBusSide(c, x, y, col, lit) {
-  // ônibus intermunicipal em vista estritamente lateral (padrão da referência):
-  // carroceria azul, seção cinza, três faixas diagonais (vermelha + duas cinzas) e frente azul à direita. y = chão.
+  // ônibus intermunicipal fiel à referência (vista estritamente lateral, frente à direita), y = chão.
+  // Traseira azul com 3 janelas, porta do meio azul com faixa vermelha + 2 cinzas, seção cinza com 3 janelas,
+  // faixas vermelha/azul logo após a porta, porta dianteira, frente azul e retrovisor.
   x = Math.round(x);
-  const L = 132, top = y - 46, BL = '#1f43a8', BLD = '#16307a', GR = '#b9bec7', GRD = '#8e949e';
-  R(c, x - 1, top - 1, L + 2, 40, OUT);
-  R(c, x, top, L, 38, BL); R(c, x, top, L, 2, '#3a62c8');                       // corpo azul
-  R(c, x + 64, top, L - 78, 38, GR); R(c, x + 64, top, L - 78, 2, '#d8dce2');    // seção cinza
-  R(c, x, top + 33, L, 5, BLD); R(c, x + 64, top + 33, L - 78, 5, GRD);          // saia
-  R(c, x + L - 3, top + 2, 2, 34, '#2c58c0');                                    // canto da frente
-  // espelho retrovisor projetado
-  R(c, x + L + 1, top + 6, 1, 6, OUT); R(c, x + L + 2, top + 6, 3, 9, OUT); R(c, x + L + 2, top + 7, 2, 7, '#2a2e36');
-  // janelas (vidro claro com moldura escura)
-  const win = (wx, ww) => { R(c, wx - 1, top + 5, ww + 2, 14, OUT); R(c, wx, top + 6, ww, 12, lit ? '#e8d48a' : '#bfe4f0'); R(c, wx + 1, top + 7, 2, 10, lit ? '#f8e8b0' : '#e6f6fb'); };
-  win(x + 4, 13); win(x + 19, 13);
-  for (let wx = x + 68; wx < x + L - 34; wx += 15) win(wx, 13);
-  // porta do meio (no trecho azul) e porta dianteira (no trecho cinza)
-  const door = (dx) => { R(c, x + dx - 1, top + 4, 14, 32, OUT); R(c, x + dx, top + 5, 12, 30, '#1a2433'); R(c, x + dx + 1, top + 6, 4, 20, lit ? '#e8d48a' : '#a8d4e8'); R(c, x + dx + 7, top + 6, 4, 20, lit ? '#e8d48a' : '#a8d4e8'); R(c, x + dx + 2, top + 36, 9, 1, '#e3c34a'); };
-  door(36); door(L - 28);
-  // três faixas diagonais sobre o azul: vermelha + duas cinzas
-  [['#d8323c', 0], [GR, 4], [GR, 8]].forEach(([cc, o]) => { for (let k = 0; k < 18; k++) R(c, x + 49 + o + Math.round(k * .45), top + 34 - k, 3, 1, cc); });
-  // detalhes: refletores, lanternas, letreiro lateral e número
-  for (const rx of [8, 26, 74, 92]) R(c, x + rx, top + 30, 3, 1, '#ff7a30');
-  R(c, x + 1, top + 24, 2, 5, '#ff3030'); R(c, x + L - 3, top + 28, 2, 3, '#fff3b0');
-  R(c, x + 67, top + 21, 34, 6, '#0c0c0c'); pixText(c, '310 LAPA', x + 84, top + 22, '#ffb030', 1, 'center');
-  pixText(c, '20954', x + 6, top + 22, '#f3efe6');
-  // rodas
-  for (const wx of [x + 14, x + L - 40]) { R(c, wx - 2, y - 11, 20, 3, '#0e1018'); R(c, wx, y - 10, 16, 10, OUT); R(c, wx + 1, y - 9, 14, 8, '#222'); R(c, wx + 4, y - 7, 8, 5, '#c8ccd2'); R(c, wx + 7, y - 6, 2, 2, '#555'); }
-  if (lit) { c.globalAlpha = .35; R(c, x, top, L, 38, '#0a1030'); c.globalAlpha = 1; }
+  const L = 132, t = y - 40;
+  const BL = '#2244b0', BLD = '#18338a', GR = '#bcc0c7', GRD = '#9aa0a8', NV = '#1c2a5a', GL = lit ? '#e8d48a' : '#bfe6f2', GLL = lit ? '#f8e8b0' : '#e2f6fb';
+  const P = (dx, dy, w, h, k) => R(c, x + dx, t + dy, w, h, k);
+  // contorno e corpo
+  P(-1, -1, L + 2, 36, OUT); P(0, 0, 66, 34, BL); P(66, 0, 60, 34, GR); P(126, 0, 6, 34, BL);
+  P(0, 0, L, 1, '#11141c');                                   // teto escuro
+  P(0, 30, 66, 4, BLD); P(66, 30, 60, 4, GRD); P(126, 30, 6, 4, BLD);
+  P(0, 28, 3, 6, '#c8ccd2'); P(130, 28, 3, 6, '#e8ebee');      // para-choques
+  P(1, 22, 1, 5, '#e03030');                                   // lanterna traseira
+  P(129, 25, 2, 1, '#ff9a2a');                                 // pisca dianteiro
+  // janelas: bloco de 3 vidros na traseira e 3 na seção cinza
+  const win = (x0, x1) => { P(x0 - 1, 3, x1 - x0 + 2, 15, '#14161c'); for (let k = 0; k < 3; k++) { const a = x0 + Math.round(k * (x1 - x0) / 3), b2 = x0 + Math.round((k + 1) * (x1 - x0) / 3); P(a + 1, 4, b2 - a - 1, 13, GL); P(a + 1, 4, 1, 13, GLL); } };
+  win(4, 45); win(70, 109);
+  // porta do meio: cabeçalho escuro, duas folhas com vidro em cima e faixas diagonais embaixo
+  P(49, 0, 17, 4, '#2a3550'); P(49, 4, 17, 30, NV);
+  for (const dx of [50, 58]) { P(dx, 5, 7, 28, BL); P(dx + 1, 6, 5, 12, GL); }
+  P(57, 5, 1, 28, NV);
+  const diag = (x0, w, col, y0 = 18, y1 = 33, slope = .5) => { for (let k = y0; k <= y1; k++) P(x0 + Math.round((k - y0) * slope), k, w, 1, col); };
+  diag(50, 3, '#e82020', 19, 32, .3);                        // vermelha na folha esquerda
+  diag(58, 2, GR, 19, 32, .3); diag(61, 2, GR, 19, 32, .3);   // duas cinzas na folha direita
+  // faixas vermelha e azul logo após a porta, sobre a seção cinza
+  diag(67, 2, '#e82020', 20, 33, .55); diag(70, 2, '#2a4ac0', 20, 33, .55);
+  P(51, 35, 14, 1, '#e3c34a');                                 // degrau amarelo
+  // porta dianteira (vidro alto, moldura azul-marinho)
+  P(113, 4, 13, 30, NV); P(114, 5, 5, 27, GL); P(120, 5, 5, 27, GL); P(114, 5, 1, 27, GLL); P(120, 5, 1, 27, GLL);
+  P(115, 18, 3, 1, NV); P(121, 18, 3, 1, NV);
+  // retrovisor
+  P(132, 7, 3, 1, '#11141c'); P(134, 4, 3, 13, '#11141c'); P(135, 5, 1, 11, '#3a3f48');
+  // refletores (vermelho + branco) e luzes laterais
+  for (const rx of [4, 24, 43, 71, 89, 109]) { P(rx, 27, 2, 1, '#e03030'); P(rx + 2, 27, 2, 1, '#f3efe6'); }
+  for (const rx of [6, 72, 110]) P(rx, 30, 2, 1, '#ff9a2a');
+  // rodas com caixa escura
+  const disc = (cx, cy, r, col) => { c.fillStyle = col; for (let dy = -r; dy <= r; dy++) { const w = Math.round(Math.sqrt(r * r - dy * dy)); c.fillRect(cx - w, cy + dy, w * 2, 1); } };
+  for (const wc of [37, 101]) {
+    disc(x + wc, t + 32, 9, '#0e1018');                 // caixa de roda
+    disc(x + wc, y - 7, 7, OUT); disc(x + wc, y - 7, 6, '#26282e');
+    disc(x + wc, y - 7, 3, '#c8ccd2'); disc(x + wc, y - 7, 1, '#6a7078');
+  }
+  if (lit) { c.globalAlpha = .35; P(0, 0, L, 34, '#0a1030'); c.globalAlpha = 1; }
 }
 function drawCart(c, x, y) {
   R(c, x - 2, y - 26, 44, 20, OUT); R(c, x - 1, y - 25, 42, 18, '#e8c46a'); R(c, x - 1, y - 25, 42, 3, '#f8dc8a');
