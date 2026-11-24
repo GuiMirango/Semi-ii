@@ -366,7 +366,12 @@ function makeOffice() {
         if (this.p3jobs === 1 && this.p3t > 22) { this.p3jobs = 2; this.jobs.push({ for: sueli, st: 'queued', t: 0, ph: 3 }); sayAuto(sueli, 'E a ata da reunião! Impressa!', 2.6, { name: 'SUELI' }); }
       }
       // diretor andarilho
-      if (diretor.active) {
+      // com as 3 assinaturas, o diretor vai embora: sem etiqueta, anda até sair de cena
+      if (diretor.active && diretor.leaving) {
+        diretor.busy = false; diretor.pose = { arms: 'phone' }; diretor.face = 1; diretor.moving = true;
+        const st = 70 * dt; diretor.x += st; diretor.walk += st / 14;
+        if (diretor.x > OFFICE_W + 20) { diretor.active = false; diretor.leaving = false; }
+      } else if (diretor.active) {
         diretor.bt -= dt; if (diretor.bt <= 0) { diretor.busy = !diretor.busy; diretor.bt = diretor.busy ? rnd(1.6, 2.4) : rnd(3, 4); }
         diretor.pose = diretor.busy ? { arms: 'phone' } : {};
         if (diretor.wait > 0) { diretor.wait -= dt; diretor.moving = false; }
@@ -453,8 +458,17 @@ function makeOffice() {
       if (ready) { R(c, 969, 136, 26, 4, '#f4f4ee'); R(c, 969, 136, 26, 1, '#fff'); }
       // NPCs
       plinio.draw(c); sueli.draw(c);
-      if (diretor.active) {
-        diretor.draw(c);
+      if (diretor.active && diretor.leaving) diretor.draw(c);
+      else if (diretor.active) {
+        // enquanto faltar assinatura, o diretor fica em destaque (contorno pulsante + contador)
+        const pending = this.phase === 3 && this.hasDocs && this.signs < 3;
+        if (pending) {
+          const pc = Math.floor(G.t * 4) % 2 ? '#ffd54a' : '#ff9a2a';
+          drawPerson(c, diretor.x, diretor.y, diretor.look, Object.assign({ face: diretor.face, walk: diretor.moving ? diretor.walk : null, outline: pc }, diretor.pose));
+          const bt = 'ASSINATURAS ' + this.signs + '/3', bw = bt.length * 4 + 5, bby = FLOOR - 56 + Math.round(Math.sin(G.t * 5));
+          R(c, Math.round(diretor.x - bw / 2) - 1, bby - 1, bw + 2, 9, OUT); R(c, Math.round(diretor.x - bw / 2), bby, bw, 7, pc);
+          pixText(c, bt, diretor.x, bby + 1, '#1a1622', 1, 'center');
+        } else diretor.draw(c);
         const lab = diretor.busy ? 'EM LIGACAO' : 'LIVRE!', w2 = lab.length * 4 + 5, by2 = FLOOR - 44 + (diretor.busy ? 0 : Math.round(Math.sin(G.t * 6)));
         R(c, Math.round(diretor.x - w2 / 2) - 1, by2 - 1, w2 + 2, 9, OUT); R(c, Math.round(diretor.x - w2 / 2), by2, w2, 7, diretor.busy ? '#b02a2a' : '#2f9a4a');
         pixText(c, lab, diretor.x, by2 + 1, '#fff', 1, 'center');
@@ -502,7 +516,8 @@ function makeOffice() {
           ? [['Responder os e-mails', '', this.answered >= 4], ['Entregar as impressões', '', done >= 3 && this.p2jobs === 2]]
           : [['Pegar os documentos', '', this.hasDocs || this.signs > 0], ['Assinaturas do Diretor', '', this.signs >= 3], ['Impressões extras', '', done >= tot && tot > 0]];
         pxBox(c, 4, 40, 102, 6 + rows.length * 10, 'rgba(14,12,20,.82)', '#5a5470');
-        rows.forEach(([k, v, ok], i) => { T(c, (ok ? '☑ ' : '☐ ') + k, 8, 42 + i * 10, { f: FONT2, size: 9, col: ok ? '#9aff9a' : '#e8e4f0', sh: false }); T(c, v, 124, 42 + i * 10, { f: FONT2, size: 9, align: 'right', col: ok ? '#9aff9a' : '#ffd54a', sh: false }); });
+        const pulse = Math.floor(G.t * 4) % 2 ? '#ffd54a' : '#ff9a2a';
+        rows.forEach(([k, v, ok], i) => { const hot = !ok && this.phase === 3 && this.hasDocs && k === 'Assinaturas do Diretor'; T(c, (ok ? '☑ ' : hot ? '▶ ' : '☐ ') + k, 8, 42 + i * 10, { f: FONT2, size: 9, col: ok ? '#9aff9a' : hot ? pulse : '#e8e4f0', sh: false }); T(c, v, 124, 42 + i * 10, { f: FONT2, size: 9, align: 'right', col: ok ? '#9aff9a' : '#ffd54a', sh: false }); });
       }
       if (this.panel) {
         const pn = this.panel;
@@ -539,7 +554,8 @@ function makeOffice() {
       act: () => {
         const sign = (line) => {
           sc.signs++; sfx('paper'); sc.floatTx.push({ x: diretor.x, y: 110, t: 0, s: 'ASSINATURA ' + sc.signs + '/3', col: '#ffd54a' });
-          sayAuto(diretor, line, 1.8, { name: 'DR. MOURA' });
+          sayAuto(diretor, sc.signs >= 3 ? 'Pronto, as três. Agora me deixa trabalhar.' : line, 1.8, { name: 'DR. MOURA' });
+          if (sc.signs >= 3) { diretor.leaving = true; sfx('ok'); }
           diretor.refused = 0; diretor.busy = true; diretor.bt = 2.2; diretor.wait = 0;
         };
         if (diretor.busy && (diretor.refused || 0) < 1) {
