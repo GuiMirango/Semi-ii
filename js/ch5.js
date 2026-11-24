@@ -343,7 +343,8 @@ SCENES.c5_office = () => {
 SCENES.credits = () => {
   const lines = [
     ['O CICLO DE MIRANGO', 7, '#f3efe6'], ['', 6], ['Um jogo em cinco estágios e um ciclo.', 11, '#a9a3b8'], ['', 14],
-    ['IDEALIZAÇÃO', 7, '#ffd54a'], ['', 4], ['Guilherme Oliveira dos Santos', 12, '#f3efe6'], ['@guimirango', 11, '#a9a3b8'], ['', 18],
+    ['IDEALIZAÇÃO', 7, '#ffd54a'], ['', 4], ['Guilherme Oliveira Dos Santos', 12, '#f3efe6'], ['@guimirango', 10, '#a9a3b8'], ['', 4],
+    ['Gustavo E Silva Garcia', 12, '#f3efe6'], ['Larissa Vidal Campos', 12, '#f3efe6'], ['Micaely de Almeida Siqueira Tavares', 12, '#f3efe6'], ['', 18],
     ['NEGAÇÃO · RAIVA · BARGANHA', 11, '#d8323c'], ['DEPRESSÃO · ACEITAÇÃO', 11, '#d8323c'], ['', 18],
     ['ELENCO', 7, '#ffd54a'], ['', 4],
     ['Mirango ......... ele mesmo', 10, '#f3efe6'], ['Plínio ........... sorriso plastificado', 10, '#f3efe6'], ['Sueli ............ supervisão', 10, '#f3efe6'],
@@ -351,7 +352,6 @@ SCENES.credits = () => {
     ['O Apressado ...... atrasado', 10, '#f3efe6'], ['O Nativo ......... livre', 10, '#f3efe6'], ['', 18],
     ['FATEC SEBRAE', 12, '#f3efe6'], ['Curso de Marketing — 3º Semestre', 10, '#a9a3b8'], ['Sociedade e Cultura — 2026', 10, '#a9a3b8'], ['', 18],
     ['AGRADECIMENTOS ESPECIAIS', 7, '#ffd54a'], ['', 4], ['Ao professor Alexander Homenko Neto', 11, '#f3efe6'], ['', 18],
-    ['DEDICATÓRIA', 7, '#ffd54a'], ['', 4], ['À mulher da minha vida,', 11, '#f3efe6'], ['a biomédica Isabele Ribeiro,', 11, '#f3efe6'], ['celebrando 8 anos desde que nos conhecemos.', 10, '#d8323c'], ['', 22],
     ['Gaude AI agradece a sua dedicação.', 11, '#7fd4ff'], ['', 30]
   ];
   let total = 0; for (const l of lines) total += l[1] + 4;
