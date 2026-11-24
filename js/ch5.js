@@ -343,7 +343,7 @@ SCENES.c5_office = () => {
 SCENES.credits = () => {
   const lines = [
     ['O CICLO DE MIRANGO', 7, '#f3efe6'], ['', 6], ['Um jogo em cinco estágios e um ciclo.', 11, '#a9a3b8'], ['', 14],
-    ['IDEALIZAÇÃO', 7, '#ffd54a'], ['', 4], ['Guilherme Oliveira Dos Santos', 12, '#f3efe6'], ['@guimirango', 10, '#a9a3b8'], ['', 4],
+    ['IDEALIZAÇÃO', 7, '#ffd54a'], ['', 4], ['Guilherme Oliveira Dos Santos', 12, '#f3efe6'],
     ['Gustavo E Silva Garcia', 12, '#f3efe6'], ['Larissa Vidal Campos', 12, '#f3efe6'], ['Micaely de Almeida Siqueira Tavares', 12, '#f3efe6'], ['', 18],
     ['NEGAÇÃO · RAIVA · BARGANHA', 11, '#d8323c'], ['DEPRESSÃO · ACEITAÇÃO', 11, '#d8323c'], ['', 18],
     ['ELENCO', 7, '#ffd54a'], ['', 4],

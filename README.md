@@ -50,6 +50,6 @@ Nenhum arquivo de imagem ou som externo é usado; as únicas dependências exter
 
 ## Créditos
 
-- Idealização: Guilherme Oliveira Dos Santos (**@guimirango**), Gustavo E Silva Garcia, Larissa Vidal Campos e Micaely de Almeida Siqueira Tavares
+- Idealização: Guilherme Oliveira Dos Santos, Gustavo E Silva Garcia, Larissa Vidal Campos e Micaely de Almeida Siqueira Tavares
 - FATEC SEBRAE — Curso de Marketing (3º semestre) — Sociedade e Cultura, 2026
 - Agradecimento especial ao professor Alexander Homenko Neto
